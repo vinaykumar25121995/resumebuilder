@@ -1,3 +1,13 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:7ee2438757e668c41f819a2ffce1d490cc176c2eec0e42922ee4fda8846e52a1
-size 391
+import { PrismaClient } from "@prisma/client"
+
+const globalForPrisma = globalThis as unknown as {
+  prisma: PrismaClient | undefined
+}
+
+export const prisma =
+  globalForPrisma.prisma ??
+  new PrismaClient({
+    log: process.env.NODE_ENV === "development" ? ["query", "error", "warn"] : ["error"],
+  })
+
+if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma

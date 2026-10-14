@@ -1,3 +1,27 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:bd3e72b3edd342a8544193afbc9846826e9747ceb4514faf644c4131353613e0
-size 717
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
+import "./globals.css";
+import { Providers } from "@/components/Providers";
+
+const inter = Inter({ subsets: ["latin"] });
+
+export const metadata: Metadata = {
+  title: "ATS Resume Builder | Build once, Tailor for every job",
+  description: "AI-powered platform to build, manage, and tailor ATS-friendly resumes for every job application.",
+};
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <html lang="en">
+      <body className={inter.className}>
+        <Providers>
+          {children}
+        </Providers>
+      </body>
+    </html>
+  );
+}

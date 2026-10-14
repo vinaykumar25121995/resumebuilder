@@ -1,3 +1,231 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:f96c4579ce868210761f69a9199452bbf7325ae5e946b4de0099004073bc35a2
-size 6741
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?
+  accounts      Account[]
+  sessions      Session[]
+  profile       Profile?
+  resumes       Resume[]
+  jobAnalyses   JobAnalysis[]
+  applicationTrackers ApplicationTracker[]
+  resumeImports ResumeImport[]
+}
+
+model ResumeImport {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  originalFileName String
+  fileType        String   // pdf | docx
+  fileSize        Int?
+  extractedText   String?  // raw extracted text
+  extractedData   String?  // JSON - structured profile data
+  qualityScore    Int?     // 0-100
+  status          String   @default("pending") // pending | completed | failed
+  errorMessage    String?
+  createdAt       DateTime @default(now())
+}
+
+model Account {
+  id                 String  @id @default(cuid())
+  userId             String
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String?
+  access_token       String?
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String?
+  session_state      String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Profile {
+  id                 String   @id @default(cuid())
+  userId             String   @unique
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  professionalTitle  String?
+  summary            String?
+  city               String?
+  state              String?
+  country            String?
+  phone              String?
+  linkedinUrl        String?
+  githubUrl          String?
+  portfolioUrl       String?
+  photoUrl           String?
+  
+  educations         Education[]
+  experiences        Experience[]
+  projects           Project[]
+  skills             Skill[]
+  certifications     Certification[]
+  achievements       Achievement[]
+  languages          Language[]
+  
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
+
+model Education {
+  id           String   @id @default(cuid())
+  profileId    String
+  profile      Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  degree       String
+  institution  String
+  fieldOfStudy String?
+  startDate    String?
+  endDate      String?
+  score        String?
+  location     String?
+}
+
+model Experience {
+  id               String   @id @default(cuid())
+  profileId        String
+  profile          Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  company          String
+  jobTitle         String
+  location         String?
+  startDate        String?
+  endDate          String?
+  responsibilities String?
+  achievements     String?
+  technologies     String?
+}
+
+model Project {
+  id           String   @id @default(cuid())
+  profileId    String
+  profile      Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  name         String
+  description  String?
+  technologies String?
+  results      String?
+  url          String?
+}
+
+model Skill {
+  id           String   @id @default(cuid())
+  profileId    String
+  profile      Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  name         String
+  category     String?
+}
+
+model Certification {
+  id           String   @id @default(cuid())
+  profileId    String
+  profile      Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  name         String
+  issuer       String
+  date         String?
+  url          String?
+}
+
+model Achievement {
+  id           String   @id @default(cuid())
+  profileId    String
+  profile      Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  title        String
+  description  String?
+}
+
+model Language {
+  id           String   @id @default(cuid())
+  profileId    String
+  profile      Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  name         String
+  proficiency  String?
+}
+
+model Resume {
+  id             String   @id @default(cuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title          String
+  targetJobTitle String?
+  company        String?
+  jobUrl         String?
+  jobDescription String?
+  atsScore       Int?
+  matchScore     Int?
+  template       String   @default("classic")
+  content        String   // Stored as JSON representing the optimized resume data
+  
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  
+  versions       ResumeVersion[]
+}
+
+model ResumeVersion {
+  id             String   @id @default(cuid())
+  resumeId       String
+  resume         Resume   @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+  content        String   // JSON
+  atsScore       Int?
+  matchScore     Int?
+  createdAt      DateTime @default(now())
+}
+
+model JobAnalysis {
+  id             String   @id @default(cuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  jobTitle       String?
+  company        String?
+  description    String
+  extractedData  String   // JSON containing keywords, skills, etc.
+  matchScore     Int?
+  createdAt      DateTime @default(now())
+}
+
+model ApplicationTracker {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  company     String
+  jobTitle    String
+  jobUrl      String?
+  dateApplied String?
+  resumeId    String?
+  atsScore    Int?
+  status      String   @default("Saved")
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

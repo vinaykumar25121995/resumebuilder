@@ -1,3 +1,15 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:e2b9b24848ceb4f25d418f958f69909b1b2055167d9178e181e45d5b0a80bb79
-size 644
+import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/lib/auth";
+import { optimizeBulletPoints } from "@/lib/ai";
+
+export async function POST(req: Request) {
+  const session = await getServerSession(authOptions);
+  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const { bullet, jobKeywords } = await req.json();
+  if (!bullet) return NextResponse.json({ error: "Bullet point required" }, { status: 400 });
+
+  const result = await optimizeBulletPoints(bullet, jobKeywords || []);
+  return NextResponse.json(result);
+}
