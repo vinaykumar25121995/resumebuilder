@@ -383,3 +383,33 @@ export async function updateUserPlan(
 
   return { success: true };
 }
+
+/**
+ * Delete a user from the Supabase `users` table and Prisma.
+ */
+export async function deleteSupabaseUser(
+  userId: string
+): Promise<{ success: boolean; error?: string }> {
+  if (isSupabaseConfigured()) {
+    try {
+      const { error } = await executeSupabaseOperation(async (client) => {
+        return client.from("users").delete().eq("id", userId);
+      });
+
+      if (error) {
+        return { success: false, error: formatSupabaseError(error) };
+      }
+    } catch (err: any) {
+      return { success: false, error: err?.message || "Failed to delete user from Supabase" };
+    }
+  }
+
+  // Also clean up in Prisma if present
+  try {
+    await prisma.user.deleteMany({ where: { id: userId } });
+  } catch (err) {
+    console.warn("Prisma user delete fallback warning:", err);
+  }
+
+  return { success: true };
+}
