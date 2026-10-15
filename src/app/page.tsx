@@ -83,7 +83,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-slate-50/30">
       {/* Navbar */}
       <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-100 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -113,7 +113,7 @@ export default function Home() {
       {/* Dynamic Scientific Hero Section */}
       <div
         ref={heroRef}
-        className="relative overflow-hidden bg-gradient-to-b from-blue-50/50 via-white to-slate-50/30 px-6 py-24 lg:py-32"
+        className="relative overflow-hidden bg-gradient-to-b from-blue-50/40 via-white/60 to-slate-50/30 px-6 py-24 lg:py-32"
       >
         {/* Subtle Engineering Grid Backdrop */}
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#e2e8f0_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f0_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-30 pointer-events-none" />

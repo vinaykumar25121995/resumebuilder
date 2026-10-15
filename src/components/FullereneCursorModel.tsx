@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import * as THREE from "three";
 
-// --- MATHEMATICAL GEOMETRY BUILDERS FOR BUCKMINSTERFULLERENE & CONCENTRIC FULLERNES ---
+// --- MATHEMATICAL GEODESIC & BUCKMINSTERFULLERENE GENERATOR ---
 
 function createIcosahedron() {
   const t = (1 + Math.sqrt(5)) / 2;
@@ -26,7 +26,7 @@ function createIcosahedron() {
   return { v, faces };
 }
 
-// Dual Geodesic Fullerene Generator: produces true pentagonal and hexagonal trivalent cages
+// Dual Geodesic Fullerene: produces true pentagonal and hexagonal trivalent cages
 function buildGeodesicFullerene(freq: number, radius: number) {
   const ico = createIcosahedron();
   const vMap = new Map<string, number>();
@@ -71,7 +71,7 @@ function buildGeodesicFullerene(freq: number, radius: number) {
     verts[id] = key.split(",").map(Number).map((x) => x / 10000);
   }
 
-  // Dual vertices: Centroids of the spherical triangles
+  // Dual vertices: Centroids of spherical triangles projected to sphere
   const dualVerts: THREE.Vector3[] = triIndices.map((tri) => {
     const v0 = verts[tri[0]], v1 = verts[tri[1]], v2 = verts[tri[2]];
     const cx = (v0[0] + v1[0] + v2[0]) / 3;
@@ -159,60 +159,133 @@ function buildC60Fullerene(radius: number) {
   return { vertices, edges };
 }
 
-// Helper to construct InstancedMesh for Atoms and Bonds in a single shell
-function createShellMesh(
-  data: { vertices: THREE.Vector3[]; edges: [number, number][] },
-  atomRadius: number,
-  bondRadius: number,
-  material: THREE.Material
-): { group: THREE.Group; atomMesh: THREE.InstancedMesh; bondMesh: THREE.InstancedMesh } {
-  const group = new THREE.Group();
+// GLSL Shaders for Depth-Aware Cursor Reveal
+const lineVertexShader = `
+uniform vec2 uCursor;
+uniform vec2 uResolution;
+uniform float uRevealRadius;
+uniform float uLayerIndex;
+uniform float uBaseOpacity;
+uniform float uActiveOpacity;
 
-  // 1. Carbon Node Atoms (Instanced Spheres)
-  const sphereGeo = new THREE.SphereGeometry(atomRadius, 14, 14);
-  const atomMesh = new THREE.InstancedMesh(sphereGeo, material, data.vertices.length);
-  const dummy = new THREE.Object3D();
+varying float vOpacity;
+varying vec3 vColor;
 
-  data.vertices.forEach((v, idx) => {
-    dummy.position.copy(v);
-    dummy.rotation.set(0, 0, 0);
-    dummy.scale.set(1, 1, 1);
-    dummy.updateMatrix();
-    atomMesh.setMatrixAt(idx, dummy.matrix);
-  });
-  atomMesh.instanceMatrix.needsUpdate = true;
-  group.add(atomMesh);
-
-  // 2. Carbon-Carbon Bonds (Instanced Cylinders)
-  const cylGeo = new THREE.CylinderGeometry(bondRadius, bondRadius, 1, 8);
-  const bondMesh = new THREE.InstancedMesh(cylGeo, material, data.edges.length);
-  const upVec = new THREE.Vector3(0, 1, 0);
-
-  data.edges.forEach(([i, j], idx) => {
-    const vA = data.vertices[i];
-    const vB = data.vertices[j];
-    const mid = new THREE.Vector3().addVectors(vA, vB).multiplyScalar(0.5);
-    const dir = new THREE.Vector3().subVectors(vB, vA);
-    const len = dir.length();
-
-    dummy.position.copy(mid);
-    dummy.quaternion.setFromUnitVectors(upVec, dir.clone().normalize());
-    dummy.scale.set(1, len, 1);
-    dummy.updateMatrix();
-    bondMesh.setMatrixAt(idx, dummy.matrix);
-  });
-  bondMesh.instanceMatrix.needsUpdate = true;
-  group.add(bondMesh);
-
-  return { group, atomMesh, bondMesh };
+void main() {
+  vec3 normalModel = normalize(position);
+  vec3 normalView = normalize(normalMatrix * normalModel);
+  
+  vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+  gl_Position = projectionMatrix * mvPosition;
+  
+  // Calculate projected screen-space position in pixels
+  vec2 ndc = gl_Position.xy / gl_Position.w;
+  vec2 screenPos = vec2((ndc.x * 0.5 + 0.5) * uResolution.x, (1.0 - (ndc.y * 0.5 + 0.5)) * uResolution.y);
+  
+  // Distance from screen vertex to cursor
+  float dist = length(screenPos - uCursor);
+  
+  // Smooth cubic-hermite feathered reveal factor
+  float reveal = smoothstep(uRevealRadius, uRevealRadius * 0.20, dist);
+  
+  // Front-facing factor: normalView.z > 0 faces camera, normalView.z < 0 faces away
+  float frontFacing = smoothstep(-0.15, 0.40, normalView.z);
+  
+  // Resting opacity: delicate 3-7% watermark line
+  float restingOpacity = mix(uBaseOpacity * 0.65, uBaseOpacity, frontFacing);
+  
+  // Illuminated opacity: front-facing lines brighten up to 28-38%
+  float illuminatedOpacity = uActiveOpacity * frontFacing;
+  
+  // Rear-facing suppression: inside the reveal field, rear-facing lines fade even more
+  float rearSuppression = (1.0 - frontFacing) * reveal * 0.85;
+  
+  vOpacity = mix(restingOpacity, illuminatedOpacity, reveal) * (1.0 - rearSuppression);
+  
+  // Color: faint white / silver with subtle cyan-white core depth
+  vec3 baseCol = vec3(0.92, 0.95, 1.0);
+  if (uLayerIndex == 1.0) {
+    baseCol = vec3(0.78, 0.90, 1.0); // Innermost core: soft blue-white
+  } else if (uLayerIndex == 2.0) {
+    baseCol = vec3(0.85, 0.94, 1.0);
+  } else if (uLayerIndex == 3.0) {
+    baseCol = vec3(0.92, 0.96, 1.0);
+  }
+  
+  // When illuminated, highlight into clean diamond white
+  vColor = mix(baseCol, vec3(1.0, 1.0, 1.0), reveal * 0.6);
 }
+`;
+
+const lineFragmentShader = `
+varying float vOpacity;
+varying vec3 vColor;
+
+void main() {
+  if (vOpacity <= 0.003) discard;
+  gl_FragColor = vec4(vColor, vOpacity);
+}
+`;
+
+const pointVertexShader = `
+uniform vec2 uCursor;
+uniform vec2 uResolution;
+uniform float uRevealRadius;
+uniform float uLayerIndex;
+uniform float uBaseOpacity;
+uniform float uActiveOpacity;
+
+varying float vOpacity;
+varying vec3 vColor;
+
+void main() {
+  vec3 normalModel = normalize(position);
+  vec3 normalView = normalize(normalMatrix * normalModel);
+  
+  vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+  gl_Position = projectionMatrix * mvPosition;
+  
+  // Delicate understated carbon node size (2.5px to 4.5px)
+  gl_PointSize = clamp(3.5 * (10.0 / -mvPosition.z), 2.2, 4.5);
+  
+  vec2 ndc = gl_Position.xy / gl_Position.w;
+  vec2 screenPos = vec2((ndc.x * 0.5 + 0.5) * uResolution.x, (1.0 - (ndc.y * 0.5 + 0.5)) * uResolution.y);
+  
+  float dist = length(screenPos - uCursor);
+  float reveal = smoothstep(uRevealRadius, uRevealRadius * 0.20, dist);
+  float frontFacing = smoothstep(-0.15, 0.40, normalView.z);
+  
+  float restingOpacity = mix(uBaseOpacity * 0.55, uBaseOpacity * 0.85, frontFacing);
+  float illuminatedOpacity = uActiveOpacity * 0.90 * frontFacing;
+  float rearSuppression = (1.0 - frontFacing) * reveal * 0.85;
+  
+  vOpacity = mix(restingOpacity, illuminatedOpacity, reveal) * (1.0 - rearSuppression);
+  
+  vec3 baseCol = vec3(0.94, 0.96, 1.0);
+  if (uLayerIndex == 1.0) baseCol = vec3(0.80, 0.92, 1.0);
+  vColor = mix(baseCol, vec3(1.0, 1.0, 1.0), reveal * 0.6);
+}
+`;
+
+const pointFragmentShader = `
+varying float vOpacity;
+varying vec3 vColor;
+
+void main() {
+  float r = length(gl_PointCoord - vec2(0.5));
+  if (r > 0.5) discard;
+  float alpha = smoothstep(0.5, 0.15, r) * vOpacity;
+  if (alpha <= 0.003) discard;
+  gl_FragColor = vec4(vColor, alpha);
+}
+`;
 
 export default function FullereneCursorModel() {
   const containerRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
   const { status } = useSession();
 
-  // Authentication & Route Protection: only active on public pre-login pages
+  // Route & Auth Filtering: only active on public pre-login pages
   const isProtectedRoute = pathname.startsWith("/dashboard") || pathname.startsWith("/admin");
   const isVisible = !isProtectedRoute && status !== "loading";
 
@@ -248,7 +321,8 @@ export default function FullereneCursorModel() {
       0.1,
       100
     );
-    camera.position.set(0, 0, 11);
+    // Camera positioned at Z = 7.5 to give full-viewport immersive scale
+    camera.position.set(0, 0, 7.5);
 
     const renderer = new THREE.WebGLRenderer({
       alpha: true,
@@ -260,205 +334,168 @@ export default function FullereneCursorModel() {
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     container.appendChild(renderer.domElement);
 
-    // --- PROFESSIONAL 3D SCIENTIFIC LIGHTING ---
-    const ambientLight = new THREE.AmbientLight(0xffffff, 1.4);
-    scene.add(ambientLight);
+    // --- SHARED UNIFORMS FOR DEPTH-AWARE CURSOR REVEAL ---
+    const cursorCurrent = new THREE.Vector2(window.innerWidth / 2, window.innerHeight / 2);
+    const cursorTarget = new THREE.Vector2(window.innerWidth / 2, window.innerHeight / 2);
 
-    // Key Light (Crisp specular sheen on bonds and nodes)
-    const keyLight = new THREE.DirectionalLight(0xffffff, 2.8);
-    keyLight.position.set(6, 8, 10);
-    scene.add(keyLight);
-
-    // Cyan/Blue Rim Light (Distinguishes fullerene silhouette against backgrounds)
-    const rimLight = new THREE.DirectionalLight(0x38bdf8, 2.2);
-    rimLight.position.set(-8, -4, -6);
-    scene.add(rimLight);
-
-    // Deep Indigo Fill Light (Provides dimensional depth between nested shells)
-    const fillLight = new THREE.DirectionalLight(0x818cf8, 1.6);
-    fillLight.position.set(6, -6, 4);
-    scene.add(fillLight);
-
-    // --- BUILD THE FOUR DISTINCT CONCENTRIC SHELLS ---
-    const rootModelGroup = new THREE.Group();
-    scene.add(rootModelGroup);
-
-    // Layer 1: Innermost Core Cage (C20 Dodecahedron, radius 0.70)
-    // Core has a luminous silver-cyan titanium appearance
-    const matLayer1 = new THREE.MeshStandardMaterial({
-      color: 0x60a5fa,
-      metalness: 0.9,
-      roughness: 0.15,
-      emissive: 0x1d4ed8,
-      emissiveIntensity: 0.35,
-    });
-    const shell1Data = buildGeodesicFullerene(1, 0.7);
-    const shell1 = createShellMesh(shell1Data, 0.045, 0.016, matLayer1);
-    rootModelGroup.add(shell1.group);
-
-    // Layer 2: Inner-Middle Cage (C60 Buckyball, radius 1.35)
-    // Titanium-silver metallic carbon
-    const matLayer2 = new THREE.MeshStandardMaterial({
-      color: 0x94a3b8,
-      metalness: 0.85,
-      roughness: 0.2,
-      emissive: 0x0f172a,
-      emissiveIntensity: 0.1,
-    });
-    const shell2Data = buildC60Fullerene(1.35);
-    const shell2 = createShellMesh(shell2Data, 0.048, 0.018, matLayer2);
-    rootModelGroup.add(shell2.group);
-
-    // Layer 3: Outer-Middle Cage (C80 Fullerene, radius 2.05)
-    // Gunmetal graphite carbon
-    const matLayer3 = new THREE.MeshStandardMaterial({
-      color: 0x475569,
-      metalness: 0.8,
-      roughness: 0.25,
-    });
-    const shell3Data = buildGeodesicFullerene(2, 2.05);
-    const shell3 = createShellMesh(shell3Data, 0.052, 0.02, matLayer3);
-    rootModelGroup.add(shell3.group);
-
-    // Layer 4: Outermost Cage (C180 Multi-shell Fullerene Silhouette, radius 2.80)
-    // Deep metallic graphite with subtle silver highlights
-    const matLayer4 = new THREE.MeshStandardMaterial({
-      color: 0x334155,
-      metalness: 0.78,
-      roughness: 0.3,
-    });
-    const shell4Data = buildGeodesicFullerene(3, 2.8);
-    const shell4 = createShellMesh(shell4Data, 0.058, 0.022, matLayer4);
-    rootModelGroup.add(shell4.group);
-
-    // --- RESPONSIVE SCALE & ANCHOR RECALCULATION ---
-    const updateResponsiveScaleAndAnchor = () => {
-      const w = window.innerWidth;
-      const isHome = pathname === "/";
-
-      let scale = 1.0;
-      let anchorX = 0;
-      let anchorY = 0;
-
-      if (w >= 1280) {
-        // Desktop: Large impressive ~400-450px visual diameter
-        scale = 1.0;
-        anchorX = isHome ? 2.5 : 3.0;
-        anchorY = isHome ? 0.3 : 0.0;
-      } else if (w >= 1024) {
-        scale = 0.85;
-        anchorX = isHome ? 2.2 : 2.5;
-        anchorY = 0.2;
-      } else if (w >= 768) {
-        scale = 0.7;
-        anchorX = isHome ? 1.4 : 0;
-        anchorY = isHome ? 0.8 : 0;
-      } else {
-        // Mobile / Small Tablet: Centered, reduced scale to not obscure text
-        scale = 0.48;
-        anchorX = 0;
-        anchorY = isHome ? 0.6 : 0;
-      }
-
-      rootModelGroup.scale.setScalar(scale);
-      return { anchorX, anchorY };
+    const commonUniforms = {
+      uCursor: { value: cursorCurrent },
+      uResolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
+      uRevealRadius: { value: isTouchDevice ? 280.0 : 250.0 },
+      uBaseOpacity: { value: 0.055 }, // Faint 5.5% resting opacity
+      uActiveOpacity: { value: 0.35 }, // 35% illuminated opacity
     };
 
-    let { anchorX, anchorY } = updateResponsiveScaleAndAnchor();
+    // --- CONSTRUCT THE GIANT FOUR-LAYER FULLERENE STRUCTURE ---
+    // The structure stays centered at (0, 0, 0) and fills the viewport!
+    const masterGroup = new THREE.Group();
+    scene.add(masterGroup);
 
-    // --- CURSOR TRACKING & INTERPOLATION STATE ---
-    let mouseNormX = 0;
-    let mouseNormY = 0;
-    let currentX = anchorX;
-    let currentY = anchorY;
-    let targetTiltX = 0;
-    let targetTiltY = 0;
-    let currentTiltX = 0;
-    let currentTiltY = 0;
-    let baseRotationY = 0;
-    let baseRotationX = 0;
+    // Layer Radii: Concentric spacing with outer shell reaching beyond screen edges
+    const layerConfigs = [
+      { layerIndex: 1.0, radius: 1.25, type: "c60" as const }, // Innermost core
+      { layerIndex: 2.0, radius: 2.25, type: "geo" as const, freq: 2 }, // Inner-middle cage
+      { layerIndex: 3.0, radius: 3.35, type: "geo" as const, freq: 3 }, // Outer-middle cage
+      { layerIndex: 4.0, radius: 4.65, type: "geo" as const, freq: 3 }, // Outermost giant cage
+    ];
 
+    const shellGroups: THREE.Group[] = [];
+
+    layerConfigs.forEach((cfg) => {
+      const shellGroup = new THREE.Group();
+      masterGroup.add(shellGroup);
+      shellGroups.push(shellGroup);
+
+      const data =
+        cfg.type === "c60"
+          ? buildC60Fullerene(cfg.radius)
+          : buildGeodesicFullerene(cfg.freq, cfg.radius);
+
+      // 1. Bonds Geometry (Thin LineSegments)
+      const linePositions: number[] = [];
+      data.edges.forEach(([i, j]) => {
+        const vA = data.vertices[i];
+        const vB = data.vertices[j];
+        // Midpoint subdivision for accurate cursor distance calculation along bonds
+        const vMid = new THREE.Vector3().addVectors(vA, vB).multiplyScalar(0.5);
+
+        linePositions.push(vA.x, vA.y, vA.z, vMid.x, vMid.y, vMid.z);
+        linePositions.push(vMid.x, vMid.y, vMid.z, vB.x, vB.y, vB.z);
+      });
+
+      const lineGeo = new THREE.BufferGeometry();
+      lineGeo.setAttribute("position", new THREE.Float32BufferAttribute(linePositions, 3));
+
+      const lineMat = new THREE.ShaderMaterial({
+        vertexShader: lineVertexShader,
+        fragmentShader: lineFragmentShader,
+        uniforms: {
+          ...commonUniforms,
+          uLayerIndex: { value: cfg.layerIndex },
+        },
+        transparent: true,
+        depthWrite: false,
+        blending: THREE.NormalBlending,
+      });
+
+      const lineMesh = new THREE.LineSegments(lineGeo, lineMat);
+      shellGroup.add(lineMesh);
+
+      // 2. Carbon Atom Nodes (Points)
+      const pointPositions: number[] = [];
+      data.vertices.forEach((v) => {
+        pointPositions.push(v.x, v.y, v.z);
+      });
+
+      const pointGeo = new THREE.BufferGeometry();
+      pointGeo.setAttribute("position", new THREE.Float32BufferAttribute(pointPositions, 3));
+
+      const pointMat = new THREE.ShaderMaterial({
+        vertexShader: pointVertexShader,
+        fragmentShader: pointFragmentShader,
+        uniforms: {
+          ...commonUniforms,
+          uLayerIndex: { value: cfg.layerIndex },
+        },
+        transparent: true,
+        depthWrite: false,
+        blending: THREE.NormalBlending,
+      });
+
+      const pointMesh = new THREE.Points(pointGeo, pointMat);
+      shellGroup.add(pointMesh);
+    });
+
+    // --- CURSOR TRACKING (CONTROLS ILLUMINATION REVEAL ONLY) ---
     const onMouseMove = (e: MouseEvent) => {
-      if (isTouchDevice || prefersReducedMotion) return;
-      mouseNormX = (e.clientX / window.innerWidth) * 2 - 1;
-      mouseNormY = -(e.clientY / window.innerHeight) * 2 + 1;
+      if (isTouchDevice) return;
+      cursorTarget.set(e.clientX, e.clientY);
+    };
+
+    const onMouseEnter = (e: MouseEvent) => {
+      cursorTarget.set(e.clientX, e.clientY);
+      cursorCurrent.set(e.clientX, e.clientY);
     };
 
     window.addEventListener("mousemove", onMouseMove, { passive: true });
+    window.addEventListener("mouseenter", onMouseEnter, { passive: true });
 
+    // Responsive Resize Handling
     const onResize = () => {
       const w = window.innerWidth;
       const h = window.innerHeight;
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
       renderer.setSize(w, h);
-      const anchors = updateResponsiveScaleAndAnchor();
-      anchorX = anchors.anchorX;
-      anchorY = anchors.anchorY;
+      commonUniforms.uResolution.value.set(w, h);
+      commonUniforms.uRevealRadius.value = w < 768 ? 190.0 : 250.0;
     };
 
     window.addEventListener("resize", onResize);
 
-    // --- ANIMATION LOOP ---
-    let rafId: number;
+    // Visibility Listener to pause RAF loop in background tab
     let isTabVisible = true;
-
     const onVisibilityChange = () => {
       isTabVisible = !document.hidden;
     };
     document.addEventListener("visibilitychange", onVisibilityChange);
+
+    // --- ANIMATION LOOP ---
+    // The molecular structure STAYS IN PLACE at (0, 0, 0)
+    // Subtle ambient animation: extremely slow, barely perceptible rotation
+    let rafId: number;
 
     const animate = () => {
       rafId = requestAnimationFrame(animate);
 
       if (!isTabVisible) return;
 
-      if (prefersReducedMotion) {
-        // Reduced motion: static rendering with fixed subtle orientation
-        renderer.render(scene, camera);
-        return;
+      if (!prefersReducedMotion) {
+        // Barely perceptible, continuous slow counter-rotations between shells
+        shellGroups[0].rotation.y += 0.00035;
+        shellGroups[0].rotation.x += 0.00020;
+
+        shellGroups[1].rotation.y -= 0.00026;
+        shellGroups[1].rotation.z += 0.00018;
+
+        shellGroups[2].rotation.y += 0.00018;
+        shellGroups[2].rotation.x -= 0.00014;
+
+        shellGroups[3].rotation.y -= 0.00012;
+        shellGroups[3].rotation.z -= 0.00010;
       }
 
-      // Smooth Idle Base Rotation
-      baseRotationY += 0.0028;
-      baseRotationX += 0.0012;
-
-      // Independent Counter-Rotations for the 4 concentric shells
-      shell1.group.rotation.y += 0.0035;
-      shell1.group.rotation.x += 0.0022;
-
-      shell2.group.rotation.y -= 0.0028;
-      shell2.group.rotation.z += 0.0018;
-
-      shell3.group.rotation.y += 0.002;
-      shell3.group.rotation.x -= 0.0015;
-
-      shell4.group.rotation.y -= 0.0015;
-      shell4.group.rotation.z -= 0.0012;
-
-      // Cursor Response: Fluid Spring-like Lerp Interpolation
+      // Smooth cursor lerp interpolation: reveal field follows pointer smoothly
       if (!isTouchDevice) {
-        const targetX = anchorX + mouseNormX * 1.25;
-        const targetY = anchorY + mouseNormY * 0.85;
-        targetTiltX = -mouseNormY * 0.65;
-        targetTiltY = mouseNormX * 0.85;
-
-        currentX += (targetX - currentX) * 0.055;
-        currentY += (targetY - currentY) * 0.055;
-        currentTiltX += (targetTiltX - currentTiltX) * 0.06;
-        currentTiltY += (targetTiltY - currentTiltY) * 0.06;
-
-        rootModelGroup.position.set(currentX, currentY, 0);
-        rootModelGroup.rotation.x = currentTiltX + Math.sin(baseRotationX) * 0.15;
-        rootModelGroup.rotation.y = baseRotationY + currentTiltY;
+        cursorCurrent.x += (cursorTarget.x - cursorCurrent.x) * 0.16;
+        cursorCurrent.y += (cursorTarget.y - cursorCurrent.y) * 0.16;
       } else {
-        // Touchscreen: Smooth ambient lissajous floating drift
-        const time = Date.now() * 0.0012;
-        currentX = anchorX + Math.sin(time * 0.5) * 0.35;
-        currentY = anchorY + Math.cos(time * 0.7) * 0.25;
-        rootModelGroup.position.set(currentX, currentY, 0);
-        rootModelGroup.rotation.y = baseRotationY;
-        rootModelGroup.rotation.x = Math.sin(time * 0.4) * 0.2;
+        // Touch device: slow ambient breathing motion around center
+        const time = Date.now() * 0.0008;
+        const centerX = window.innerWidth / 2;
+        const centerY = window.innerHeight / 2;
+        cursorCurrent.x = centerX + Math.sin(time) * (window.innerWidth * 0.25);
+        cursorCurrent.y = centerY + Math.cos(time * 0.8) * (window.innerHeight * 0.2);
       }
 
       renderer.render(scene, camera);
@@ -466,10 +503,11 @@ export default function FullereneCursorModel() {
 
     animate();
 
-    // --- RESOURCE CLEANUP ON UNMOUNT ---
+    // --- RESOURCE CLEANUP ---
     return () => {
       cancelAnimationFrame(rafId);
       window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("mouseenter", onMouseEnter);
       window.removeEventListener("resize", onResize);
       document.removeEventListener("visibilitychange", onVisibilityChange);
 
@@ -477,9 +515,8 @@ export default function FullereneCursorModel() {
         container.removeChild(renderer.domElement);
       }
 
-      // Dispose Geometries and Materials
       scene.traverse((obj) => {
-        if (obj instanceof THREE.Mesh || obj instanceof THREE.InstancedMesh) {
+        if (obj instanceof THREE.LineSegments || obj instanceof THREE.Points) {
           obj.geometry?.dispose();
           if (Array.isArray(obj.material)) {
             obj.material.forEach((m) => m.dispose());
@@ -490,14 +527,14 @@ export default function FullereneCursorModel() {
       });
       renderer.dispose();
     };
-  }, [isVisible, isTouchDevice, prefersReducedMotion, pathname]);
+  }, [isVisible, isTouchDevice, prefersReducedMotion]);
 
   if (!isVisible) return null;
 
   return (
     <div
       ref={containerRef}
-      className="fixed inset-0 pointer-events-none select-none z-[1] overflow-hidden transition-opacity duration-500 ease-out"
+      className="fixed inset-0 pointer-events-none select-none z-[1] overflow-hidden transition-opacity duration-700 ease-out"
       style={{ opacity: isVisible ? 1 : 0 }}
       aria-hidden="true"
     />
