@@ -1046,11 +1046,29 @@ export default function PublicTemplatesPage() {
                 <div className="absolute top-2.5 right-2.5 bg-emerald-500 text-slate-950 text-[10px] font-black px-2 py-0.5 rounded-full shadow">
                   ATS {tmpl.atsScore}%
                 </div>
+
+                <div className="absolute bottom-2 left-2 bg-slate-950/85 backdrop-blur-sm text-cyan-300 text-[10px] font-mono font-black px-2 py-0.5 rounded-md border border-cyan-500/30 shadow">
+                  Template #{String(tmpl.number || 0).padStart(2, "0")}
+                </div>
               </div>
 
               {/* Information */}
               <div className="p-4 flex-1 flex flex-col justify-between">
                 <div>
+                  <div className="flex items-center justify-between gap-2 mb-1.5">
+                    <span className={`text-[10px] font-black tracking-wider uppercase px-2 py-0.5 rounded-md border ${
+                      tmpl.isPro
+                        ? "bg-amber-500/15 text-amber-300 border-amber-500/30"
+                        : "bg-blue-500/15 text-blue-300 border-blue-500/30"
+                    }`}>
+                      Template #{String(tmpl.number || 0).padStart(2, "0")}
+                    </span>
+                    {tmpl.isPro && (
+                      <span className="text-[10px] text-amber-400 font-bold flex items-center gap-0.5">
+                        <Crown className="w-2.5 h-2.5 fill-current" /> Pro
+                      </span>
+                    )}
+                  </div>
                   <h3 className="font-extrabold text-white text-sm group-hover:text-amber-300 transition-colors">
                     {tmpl.name}
                   </h3>
@@ -1125,6 +1143,9 @@ export default function PublicTemplatesPage() {
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
+                    <span className="text-xs font-mono font-black px-2 py-0.5 rounded-lg bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">
+                      Template #{String(previewTemplate.number || 0).padStart(2, "0")}
+                    </span>
                     <h3 className="font-bold text-white text-base">
                       {previewTemplate.name}
                     </h3>

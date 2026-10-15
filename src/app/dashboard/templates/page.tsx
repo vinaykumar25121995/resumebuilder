@@ -542,11 +542,28 @@ function TemplateCard({
             ✓ Selected
           </div>
         )}
+
+        <div className="absolute bottom-2 left-2 bg-slate-900/85 backdrop-blur-sm text-cyan-300 text-[10px] font-mono font-black px-2 py-0.5 rounded-md border border-cyan-500/30 shadow">
+          Template #{String(template.number || 0).padStart(2, "0")}
+        </div>
       </div>
 
       {/* Info & Metadata */}
       <div className="p-4 flex-1 flex flex-col justify-between">
         <div>
+          <div className="flex items-center justify-between gap-2 mb-1.5">
+            <span className={`text-[10px] font-black tracking-wider uppercase px-2 py-0.5 rounded-md border ${
+              template.isPro
+                ? "bg-amber-50 text-amber-800 border-amber-300"
+                : "bg-blue-50 text-blue-700 border-blue-200"
+            }`}>
+              Template #{String(template.number || 0).padStart(2, "0")}
+            </span>
+            <span className="flex-shrink-0 bg-green-50 text-green-700 text-xs font-bold px-2 py-0.5 rounded-full border border-green-100">
+              ATS {template.atsScore}%
+            </span>
+          </div>
+
           <div className="flex items-start justify-between gap-2 mb-1">
             <h3
               onClick={onSelect}
@@ -554,9 +571,6 @@ function TemplateCard({
             >
               {template.name}
             </h3>
-            <span className="flex-shrink-0 bg-green-50 text-green-700 text-xs font-bold px-2 py-0.5 rounded-full border border-green-100">
-              ATS {template.atsScore}%
-            </span>
           </div>
 
           <div className="flex flex-wrap gap-1 mb-2">

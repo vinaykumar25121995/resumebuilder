@@ -45,7 +45,8 @@ export const ALL_TEMPLATES: TemplateConfig[] = [
   // ─── PREMIUM PRO TEMPLATES (PRO SUBSCRIPTION EXCLUSIVE) ────────────────────
   {
     id: "pro-catherine",
-    name: "Catherine Barnett — 3D Animator",
+    number: 1,
+    name: "Template 01 — Catherine Barnett — 3D Animator",
     category: ["Premium", "Pro", "Creative", "Modern"],
     description: "High-contrast creative dual-column layout with a deep slate sidebar, pill-style contact indicators, and custom circular section badges.",
     bestFor: ["3D Animator", "VFX Artist", "Game Developer", "Creative Roles", "Designers"],
@@ -77,7 +78,8 @@ export const ALL_TEMPLATES: TemplateConfig[] = [
   },
   {
     id: "pro-chris-flims",
-    name: "Chris Flims — Project Manager",
+    number: 2,
+    name: "Template 02 — Chris Flims — Project Manager",
     category: ["Premium", "Pro", "Management", "Modern"],
     description: "High-impact executive single-column layout featuring coral branding, diamond-rule section headers, and an Areas of Expertise matrix.",
     bestFor: ["Project Manager", "Scrum Master", "Operations Director", "Remote Leaders", "Management"],
@@ -105,7 +107,8 @@ export const ALL_TEMPLATES: TemplateConfig[] = [
   },
   {
     id: "pro-will-tribian",
-    name: "Will Tribian — Theater & Creative",
+    number: 3,
+    name: "Template 03 — Will Tribian — Theater & Creative",
     category: ["Premium", "Pro", "Creative", "Popular"],
     description: "Creative profile layout featuring a portrait headshot, dark bio capsule, vibrant cyan-teal contact banner, and split-column credentials.",
     bestFor: ["Actor", "Performer", "Creative Director", "Media Professional", "Entertainer"],
@@ -134,7 +137,8 @@ export const ALL_TEMPLATES: TemplateConfig[] = [
   },
   {
     id: "pro-amanda-smith",
-    name: "Amanda Smith — CIO Executive",
+    number: 4,
+    name: "Template 04 — Amanda Smith — CIO Executive",
     category: ["Premium", "Pro", "Tech", "Executive"],
     description: "High-level CIO executive format featuring a rounded-square portrait, solid charcoal contact bar, dual-column layout, and specialized credentials matrix.",
     bestFor: ["CIO", "CTO", "VP of Engineering", "IT Director", "Executive Leadership"],
@@ -165,7 +169,8 @@ export const ALL_TEMPLATES: TemplateConfig[] = [
   // ─── CLASSIC / STANDARD ──────────────────────────────────────────────────
   {
     id: "ats-classic",
-    name: "ATS Classic",
+    number: 5,
+    name: "Template 05 — ATS Classic",
     category: ["Popular", "Classic"],
     description: "The gold standard ATS resume. Clean, traditional, universally accepted.",
     bestFor: ["All industries", "Corporate", "Enterprise"],
@@ -191,7 +196,8 @@ export const ALL_TEMPLATES: TemplateConfig[] = [
   },
   {
     id: "ats-professional",
-    name: "ATS Professional",
+    number: 6,
+    name: "Template 06 — ATS Professional",
     category: ["Popular", "Classic"],
     description: "Professional layout with strong typographic hierarchy for management roles.",
     bestFor: ["Business", "Management", "Finance"],
@@ -217,7 +223,8 @@ export const ALL_TEMPLATES: TemplateConfig[] = [
   },
   {
     id: "ats-modern",
-    name: "ATS Modern",
+    number: 7,
+    name: "Template 07 — ATS Modern",
     category: ["Popular", "Modern"],
     description: "Contemporary font pairing with clean section breaks for tech companies.",
     bestFor: ["Tech Companies", "Startups", "Product"],
@@ -243,7 +250,8 @@ export const ALL_TEMPLATES: TemplateConfig[] = [
   },
   {
     id: "ats-minimal",
-    name: "ATS Minimal",
+    number: 8,
+    name: "Template 08 — ATS Minimal",
     category: ["Popular", "Minimal"],
     description: "Whitespace-first design. Maximum readability, minimum distraction.",
     bestFor: ["Design adjacent roles", "Startups", "Any"],
@@ -269,7 +277,8 @@ export const ALL_TEMPLATES: TemplateConfig[] = [
   },
   {
     id: "ats-corporate",
-    name: "ATS Corporate",
+    number: 9,
+    name: "Template 09 — ATS Corporate",
     category: ["Classic"],
     description: "Formal structure preferred by Fortune 500 and consulting firms.",
     bestFor: ["Enterprise", "Consulting", "Banking"],
@@ -295,7 +304,8 @@ export const ALL_TEMPLATES: TemplateConfig[] = [
   },
   {
     id: "ats-executive",
-    name: "ATS Executive",
+    number: 10,
+    name: "Template 10 — ATS Executive",
     category: ["Classic"],
     description: "Comprehensive two-page format for senior leaders with extensive experience.",
     bestFor: ["Senior Leadership", "C-Suite", "Directors"],
@@ -321,7 +331,8 @@ export const ALL_TEMPLATES: TemplateConfig[] = [
   },
   {
     id: "ats-clean",
-    name: "ATS Clean",
+    number: 11,
+    name: "Template 11 — ATS Clean",
     category: ["Minimal"],
     description: "Ultra-clean design with generous spacing and razor-sharp typography.",
     bestFor: ["Any industry", "General use"],
@@ -347,7 +358,8 @@ export const ALL_TEMPLATES: TemplateConfig[] = [
   },
   {
     id: "ats-simple",
-    name: "ATS Simple",
+    number: 12,
+    name: "Template 12 — ATS Simple",
     category: ["Minimal"],
     description: "No-frills, maximally parseable format for any role.",
     bestFor: ["Any industry", "Safety-first"],
@@ -373,7 +385,8 @@ export const ALL_TEMPLATES: TemplateConfig[] = [
   },
   {
     id: "ats-traditional",
-    name: "ATS Traditional",
+    number: 13,
+    name: "Template 13 — ATS Traditional",
     category: ["Classic"],
     description: "Time-tested chronological format with centered header and formal tone.",
     bestFor: ["Government", "Legal", "Education", "Healthcare"],
@@ -399,7 +412,8 @@ export const ALL_TEMPLATES: TemplateConfig[] = [
   },
   {
     id: "ats-standard",
-    name: "ATS Standard",
+    number: 14,
+    name: "Template 14 — ATS Standard",
     category: ["Classic"],
     description: "Standard ATS-optimized layout that works with virtually every ATS system.",
     bestFor: ["All industries", "Safe choice"],
@@ -427,7 +441,8 @@ export const ALL_TEMPLATES: TemplateConfig[] = [
   // ─── FRESHER / STUDENT ────────────────────────────────────────────────────
   {
     id: "ats-graduate",
-    name: "ATS Graduate",
+    number: 15,
+    name: "Template 15 — ATS Graduate",
     category: ["Fresher", "Student"],
     description: "Education-forward layout for recent graduates and MBA holders.",
     bestFor: ["Fresh Graduates", "MBA", "Masters"],
@@ -453,7 +468,8 @@ export const ALL_TEMPLATES: TemplateConfig[] = [
   },
   {
     id: "ats-fresher",
-    name: "ATS Fresher",
+    number: 16,
+    name: "Template 16 — ATS Fresher",
     category: ["Fresher", "Student", "Popular"],
     description: "Projects and skills-centered layout for candidates with limited work experience.",
     bestFor: ["Entry Level", "First Job", "Internships"],
@@ -479,7 +495,8 @@ export const ALL_TEMPLATES: TemplateConfig[] = [
   },
   {
     id: "ats-student",
-    name: "ATS Student",
+    number: 17,
+    name: "Template 17 — ATS Student",
     category: ["Student", "Fresher"],
     description: "Academic project and coursework-focused for current students.",
     bestFor: ["Current Students", "Part-time Job", "Internship"],
@@ -505,7 +522,8 @@ export const ALL_TEMPLATES: TemplateConfig[] = [
   },
   {
     id: "ats-entry-level",
-    name: "ATS Entry Level",
+    number: 18,
+    name: "Template 18 — ATS Entry Level",
     category: ["Fresher"],
     description: "Balanced layout highlighting potential and academic achievements.",
     bestFor: ["0-2 Years Experience", "Career Starters"],
@@ -531,7 +549,8 @@ export const ALL_TEMPLATES: TemplateConfig[] = [
   },
   {
     id: "ats-academic",
-    name: "ATS Academic",
+    number: 19,
+    name: "Template 19 — ATS Academic",
     category: ["Student"],
     description: "Research and publication-focused layout for academic and research roles.",
     bestFor: ["Research", "PhD", "Academia"],
@@ -557,7 +576,8 @@ export const ALL_TEMPLATES: TemplateConfig[] = [
   },
   {
     id: "ats-internship",
-    name: "ATS Internship",
+    number: 20,
+    name: "Template 20 — ATS Internship",
     category: ["Student", "Fresher"],
     description: "Compact single-page format optimized for internship applications.",
     bestFor: ["Internship Applications", "Summer Internships"],
@@ -583,7 +603,8 @@ export const ALL_TEMPLATES: TemplateConfig[] = [
   },
   {
     id: "ats-career-starter",
-    name: "ATS Career Starter",
+    number: 21,
+    name: "Template 21 — ATS Career Starter",
     category: ["Fresher"],
     description: "Motivational, achievement-centric layout for career beginners.",
     bestFor: ["Career Change", "First Full-Time Role"],
@@ -609,7 +630,8 @@ export const ALL_TEMPLATES: TemplateConfig[] = [
   },
   {
     id: "ats-graduate-professional",
-    name: "ATS Graduate Professional",
+    number: 22,
+    name: "Template 22 — ATS Graduate Professional",
     category: ["Fresher", "Modern"],
     description: "Polished layout bridging academic excellence and professional readiness.",
     bestFor: ["Top University Graduates", "Professional Masters"],
@@ -637,7 +659,8 @@ export const ALL_TEMPLATES: TemplateConfig[] = [
   // ─── TECH ──────────────────────────────────────────────────────────────────
   {
     id: "ats-data-analyst",
-    name: "ATS Data Analyst",
+    number: 23,
+    name: "Template 23 — ATS Data Analyst",
     category: ["Tech", "Data", "Popular"],
     description: "Tools and methodology-forward layout for data analytics professionals.",
     bestFor: ["Data Analyst", "Business Intelligence", "Analytics"],
@@ -663,7 +686,8 @@ export const ALL_TEMPLATES: TemplateConfig[] = [
   },
   {
     id: "ats-data-scientist",
-    name: "ATS Data Scientist",
+    number: 24,
+    name: "Template 24 — ATS Data Scientist",
     category: ["Tech", "Data"],
     description: "ML/AI-focused layout highlighting models, research, and technical depth.",
     bestFor: ["Data Scientist", "ML Engineer", "AI Researcher"],
@@ -689,7 +713,8 @@ export const ALL_TEMPLATES: TemplateConfig[] = [
   },
   {
     id: "ats-business-analyst",
-    name: "ATS Business Analyst",
+    number: 25,
+    name: "Template 25 — ATS Business Analyst",
     category: ["Tech", "Business"],
     description: "Analytical thinking and business impact-focused format.",
     bestFor: ["Business Analyst", "Strategy", "Process Improvement"],
@@ -715,7 +740,8 @@ export const ALL_TEMPLATES: TemplateConfig[] = [
   },
   {
     id: "ats-software-developer",
-    name: "ATS Software Developer",
+    number: 26,
+    name: "Template 26 — ATS Software Developer",
     category: ["Tech", "Popular"],
     description: "Code and project-first layout for software development roles.",
     bestFor: ["Software Developer", "Full Stack", "Frontend", "Backend"],
@@ -741,7 +767,8 @@ export const ALL_TEMPLATES: TemplateConfig[] = [
   },
   {
     id: "ats-software-engineer",
-    name: "ATS Software Engineer",
+    number: 27,
+    name: "Template 27 — ATS Software Engineer",
     category: ["Tech"],
     description: "Systems and architecture-focused for senior engineering roles.",
     bestFor: ["Senior SWE", "Systems Engineer", "Principal Engineer"],
@@ -767,7 +794,8 @@ export const ALL_TEMPLATES: TemplateConfig[] = [
   },
   {
     id: "ats-it-professional",
-    name: "ATS IT Professional",
+    number: 28,
+    name: "Template 28 — ATS IT Professional",
     category: ["Tech"],
     description: "Infrastructure and systems-focused for IT operations roles.",
     bestFor: ["IT Manager", "System Admin", "DevOps", "Network Engineer"],
@@ -793,7 +821,8 @@ export const ALL_TEMPLATES: TemplateConfig[] = [
   },
   {
     id: "ats-machine-learning",
-    name: "ATS Machine Learning",
+    number: 29,
+    name: "Template 29 — ATS Machine Learning",
     category: ["Tech", "Data"],
     description: "Research-oriented layout for ML/AI and deep learning professionals.",
     bestFor: ["ML Engineer", "AI Scientist", "Deep Learning"],
@@ -819,7 +848,8 @@ export const ALL_TEMPLATES: TemplateConfig[] = [
   },
   {
     id: "ats-database-professional",
-    name: "ATS Database Professional",
+    number: 30,
+    name: "Template 30 — ATS Database Professional",
     category: ["Tech", "Data"],
     description: "Database and SQL-forward layout for data engineering roles.",
     bestFor: ["Database Administrator", "Data Engineer", "SQL Developer"],
@@ -845,7 +875,8 @@ export const ALL_TEMPLATES: TemplateConfig[] = [
   },
   {
     id: "ats-project-manager",
-    name: "ATS Project Manager",
+    number: 31,
+    name: "Template 31 — ATS Project Manager",
     category: ["Tech", "Management", "Business"],
     description: "Impact and delivery-focused for project and program management.",
     bestFor: ["Project Manager", "Program Manager", "Scrum Master"],
@@ -871,7 +902,8 @@ export const ALL_TEMPLATES: TemplateConfig[] = [
   },
   {
     id: "ats-product-manager",
-    name: "ATS Product Manager",
+    number: 32,
+    name: "Template 32 — ATS Product Manager",
     category: ["Tech", "Management"],
     description: "Outcome and metrics-driven layout for product leadership.",
     bestFor: ["Product Manager", "Product Owner", "Head of Product"],
@@ -899,7 +931,8 @@ export const ALL_TEMPLATES: TemplateConfig[] = [
   // ─── BUSINESS / FINANCE ───────────────────────────────────────────────────
   {
     id: "ats-finance",
-    name: "ATS Finance",
+    number: 33,
+    name: "Template 33 — ATS Finance",
     category: ["Finance"],
     description: "Conservative, number-oriented layout for financial services.",
     bestFor: ["Finance", "Investment Banking", "Financial Analyst"],
@@ -925,7 +958,8 @@ export const ALL_TEMPLATES: TemplateConfig[] = [
   },
   {
     id: "ats-accounting",
-    name: "ATS Accounting",
+    number: 34,
+    name: "Template 34 — ATS Accounting",
     category: ["Finance"],
     description: "Precision-focused layout for accounting and auditing professionals.",
     bestFor: ["Accountant", "Auditor", "CPA", "Tax Professional"],
@@ -951,7 +985,8 @@ export const ALL_TEMPLATES: TemplateConfig[] = [
   },
   {
     id: "ats-marketing",
-    name: "ATS Marketing",
+    number: 35,
+    name: "Template 35 — ATS Marketing",
     category: ["Marketing", "Business"],
     description: "Campaign and results-driven format for marketing professionals.",
     bestFor: ["Marketing Manager", "Digital Marketing", "Brand Manager"],
@@ -977,7 +1012,8 @@ export const ALL_TEMPLATES: TemplateConfig[] = [
   },
   {
     id: "ats-sales",
-    name: "ATS Sales",
+    number: 36,
+    name: "Template 36 — ATS Sales",
     category: ["Business", "Marketing"],
     description: "Achievement and quota-focused layout for sales professionals.",
     bestFor: ["Sales Manager", "Account Executive", "Business Development"],
@@ -1003,7 +1039,8 @@ export const ALL_TEMPLATES: TemplateConfig[] = [
   },
   {
     id: "ats-human-resources",
-    name: "ATS Human Resources",
+    number: 37,
+    name: "Template 37 — ATS Human Resources",
     category: ["Business", "Management"],
     description: "People and process-focused layout for HR and talent professionals.",
     bestFor: ["HR Manager", "Recruiter", "Talent Acquisition", "HRBP"],
@@ -1029,7 +1066,8 @@ export const ALL_TEMPLATES: TemplateConfig[] = [
   },
   {
     id: "ats-operations",
-    name: "ATS Operations",
+    number: 38,
+    name: "Template 38 — ATS Operations",
     category: ["Business", "Management"],
     description: "Process optimization and efficiency-focused for operations roles.",
     bestFor: ["Operations Manager", "COO", "Process Manager"],
@@ -1055,7 +1093,8 @@ export const ALL_TEMPLATES: TemplateConfig[] = [
   },
   {
     id: "ats-consulting",
-    name: "ATS Consulting",
+    number: 39,
+    name: "Template 39 — ATS Consulting",
     category: ["Business", "Management"],
     description: "Problem-solving and client impact-focused for consulting roles.",
     bestFor: ["Consultant", "Strategy", "Management Consulting"],
@@ -1081,7 +1120,8 @@ export const ALL_TEMPLATES: TemplateConfig[] = [
   },
   {
     id: "ats-customer-success",
-    name: "ATS Customer Success",
+    number: 40,
+    name: "Template 40 — ATS Customer Success",
     category: ["Business", "Marketing"],
     description: "Relationship and retention metrics-focused for CS roles.",
     bestFor: ["Customer Success", "Account Manager", "Customer Experience"],
@@ -1107,7 +1147,8 @@ export const ALL_TEMPLATES: TemplateConfig[] = [
   },
   {
     id: "ats-supply-chain",
-    name: "ATS Supply Chain",
+    number: 41,
+    name: "Template 41 — ATS Supply Chain",
     category: ["Business", "Management"],
     description: "Logistics and procurement-focused for supply chain professionals.",
     bestFor: ["Supply Chain Manager", "Procurement", "Logistics"],
@@ -1133,7 +1174,8 @@ export const ALL_TEMPLATES: TemplateConfig[] = [
   },
   {
     id: "ats-healthcare",
-    name: "ATS Healthcare",
+    number: 42,
+    name: "Template 42 — ATS Healthcare",
     category: ["Management"],
     description: "Credentials and clinical experience-forward for healthcare roles.",
     bestFor: ["Healthcare Manager", "Medical Professional", "Clinical"],
@@ -1159,7 +1201,8 @@ export const ALL_TEMPLATES: TemplateConfig[] = [
   },
   {
     id: "ats-engineering",
-    name: "ATS Engineering",
+    number: 43,
+    name: "Template 43 — ATS Engineering",
     category: ["Tech", "Management"],
     description: "Technical depth and project impact-focused for engineering professionals.",
     bestFor: ["Mechanical Engineer", "Civil Engineer", "Electrical Engineer"],
@@ -1185,7 +1228,8 @@ export const ALL_TEMPLATES: TemplateConfig[] = [
   },
   {
     id: "ats-management",
-    name: "ATS Management",
+    number: 44,
+    name: "Template 44 — ATS Management",
     category: ["Management"],
     description: "Leadership and team impact-focused for general management.",
     bestFor: ["General Manager", "Department Head", "Team Lead"],
@@ -1212,7 +1256,8 @@ export const ALL_TEMPLATES: TemplateConfig[] = [
   // ─── TWO-COLUMN / DESIGNER ────────────────────────────────────────────────
   {
     id: "ats-two-column-blue",
-    name: "Two-Column Blue Sidebar",
+    number: 45,
+    name: "Template 45 — Two-Column Blue Sidebar",
     category: ["Modern", "Popular"],
     description: "Visually striking layout with a distinct blue sidebar. Note: While designed safely, two-column formats can have slightly lower parsing reliability on older ATS.",
     bestFor: ["Designers", "Tech", "Marketing"],
@@ -1242,7 +1287,8 @@ export const ALL_TEMPLATES: TemplateConfig[] = [
   },
   {
     id: "ats-two-column-dark",
-    name: "Two-Column Navy Sidebar",
+    number: 46,
+    name: "Template 46 — Two-Column Navy Sidebar",
     category: ["Modern", "Tech", "Business"],
     description: "Professional navy blue sidebar layout. High contrast and clean separation of skills and experience.",
     bestFor: ["Data Analysts", "Engineers", "Management"],
@@ -1272,7 +1318,8 @@ export const ALL_TEMPLATES: TemplateConfig[] = [
   },
   {
     id: "ats-two-column-cream",
-    name: "Two-Column Cream Sidebar",
+    number: 47,
+    name: "Template 47 — Two-Column Cream Sidebar",
     category: ["Modern", "Classic"],
     description: "Elegant layout with a soft cream sidebar for a subtle but distinct visual hierarchy.",
     bestFor: ["Finance", "Consulting", "Creative"],
@@ -1303,7 +1350,8 @@ export const ALL_TEMPLATES: TemplateConfig[] = [
   // ─── PHOTO TEMPLATES ──────────────────────────────────────────────────────
   {
     id: "ats-photo-modern",
-    name: "Modern Photo Header",
+    number: 48,
+    name: "Template 48 — Modern Photo Header",
     category: ["Modern", "Popular"],
     description: "A clean, modern layout featuring a professional photo in the header. Excellent for real estate, acting, modeling, or customer-facing roles.",
     bestFor: ["Sales", "Customer Success", "Real Estate", "Creative"],
@@ -1331,7 +1379,8 @@ export const ALL_TEMPLATES: TemplateConfig[] = [
   },
   {
     id: "ats-photo-sidebar",
-    name: "Two-Column Photo",
+    number: 49,
+    name: "Template 49 — Two-Column Photo",
     category: ["Modern", "Classic"],
     description: "Two-column design with your photo prominently displayed at the top of the sidebar.",
     bestFor: ["Designers", "Marketing", "Consultants"],
