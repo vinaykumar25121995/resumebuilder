@@ -26,7 +26,9 @@ import {
   Key,
   X,
   Plus,
+  ShieldQuestion,
 } from "lucide-react";
+import { SECURITY_QUESTIONS } from "@/lib/constants";
 
 interface UserRecord {
   id: string;
@@ -35,6 +37,7 @@ interface UserRecord {
   created_at: string;
   last_login: string;
   plan: "free" | "pro" | string;
+  security_question?: string | null;
 }
 
 const ADMIN_EMAIL = "vinay22y95@gmail.com";
@@ -57,6 +60,11 @@ export default function AdminPage() {
   const [newUserPassword, setNewUserPassword] = useState("");
   const [newUserPlan, setNewUserPlan] = useState<"free" | "pro">("free");
   const [showNewUserPassword, setShowNewUserPassword] = useState(false);
+  const [newUserSecurityQuestion, setNewUserSecurityQuestion] = useState(
+    SECURITY_QUESTIONS[0]
+  );
+  const [newUserSecurityAnswer, setNewUserSecurityAnswer] = useState("");
+  const [showNewUserAnswer, setShowNewUserAnswer] = useState(false);
   const [createLoading, setCreateLoading] = useState(false);
   const [createError, setCreateError] = useState("");
 
@@ -191,6 +199,10 @@ export default function AdminPage() {
           email: newUserEmail.trim(),
           password: newUserPassword,
           plan: newUserPlan,
+          securityQuestion: newUserSecurityAnswer.trim()
+            ? newUserSecurityQuestion
+            : undefined,
+          securityAnswer: newUserSecurityAnswer.trim() || undefined,
         }),
       });
 
@@ -205,6 +217,7 @@ export default function AdminPage() {
         setNewUserName("");
         setNewUserEmail("");
         setNewUserPassword("");
+        setNewUserSecurityAnswer("");
         setNewUserPlan("free");
       } else {
         setCreateError(data.error || "Failed to create user.");
@@ -597,9 +610,16 @@ export default function AdminPage() {
                                   </span>
                                 )}
                               </div>
-                              <span className="text-gray-500 font-mono text-[11px]">
-                                {u.email}
-                              </span>
+                              <div className="flex items-center gap-1.5 flex-wrap">
+                                <span className="text-gray-500 font-mono text-[11px]">
+                                  {u.email}
+                                </span>
+                                {u.security_question && (
+                                  <span className="inline-flex items-center gap-0.5 text-[9px] bg-emerald-50 text-emerald-700 font-semibold px-1.5 py-0.5 rounded border border-emerald-200">
+                                    <ShieldQuestion className="w-2.5 h-2.5" /> Recovery Set
+                                  </span>
+                                )}
+                              </div>
                             </div>
                           </div>
                         </td>
@@ -830,6 +850,47 @@ export default function AdminPage() {
                       </div>
                     </div>
                   </label>
+                </div>
+              </div>
+
+              {/* Optional Security Question */}
+              <div className="pt-3 border-t border-gray-100 space-y-2">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-gray-700 uppercase tracking-wide">
+                  <ShieldQuestion className="w-3.5 h-3.5 text-blue-600" />
+                  <span>Security Question (Optional)</span>
+                </div>
+                <select
+                  value={newUserSecurityQuestion}
+                  onChange={(e) => setNewUserSecurityQuestion(e.target.value)}
+                  className="w-full rounded-xl border border-gray-300 p-2 text-xs bg-white text-gray-800 focus:ring-2 focus:ring-blue-500 outline-none"
+                >
+                  {SECURITY_QUESTIONS.map((q) => (
+                    <option key={q} value={q}>
+                      {q}
+                    </option>
+                  ))}
+                </select>
+                <div className="relative">
+                  <input
+                    type={showNewUserAnswer ? "text" : "password"}
+                    placeholder="Security answer (optional)"
+                    value={newUserSecurityAnswer}
+                    onChange={(e) => setNewUserSecurityAnswer(e.target.value)}
+                    className="w-full rounded-xl border border-gray-300 p-2 pr-10 text-xs focus:ring-2 focus:ring-blue-500 outline-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowNewUserAnswer(!showNewUserAnswer)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1"
+                    aria-label={showNewUserAnswer ? "Hide answer" : "Show answer"}
+                    tabIndex={-1}
+                  >
+                    {showNewUserAnswer ? (
+                      <EyeOff className="w-3.5 h-3.5 text-blue-600" />
+                    ) : (
+                      <Eye className="w-3.5 h-3.5 text-gray-400" />
+                    )}
+                  </button>
                 </div>
               </div>
 

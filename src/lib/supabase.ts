@@ -9,6 +9,8 @@ export interface SupabaseUser {
   created_at: string;
   last_login: string;
   plan: "free" | "pro" | string;
+  security_question?: string | null;
+  security_answer?: string | null;
 }
 
 function cleanEnvValue(val?: string | null): string {
@@ -95,7 +97,7 @@ function formatSupabaseError(error: any): string {
     error?.code === "PGRST301" ||
     error?.code === "401"
   ) {
-    return "Invalid Supabase API Key: The key provided in Netlify is invalid. In your Supabase Dashboard, go to Project Settings > API, click 'Reveal' on the service_role key (or copy the anon public key), and update SUPABASE_SERVICE_ROLE_KEY in Netlify Site configuration > Environment variables without quotes.";
+    return "Invalid Supabase API Key: Please verify SUPABASE_SERVICE_ROLE_KEY or NEXT_PUBLIC_SUPABASE_ANON_KEY in Netlify.";
   }
 
   if (lower.includes("does not exist") || error?.code === "42P01") {
@@ -106,9 +108,7 @@ function formatSupabaseError(error: any): string {
 }
 
 /**
- * Executes a Supabase operation with automatic fallback:
- * If service_role key returns "Invalid API key" or 401,
- * it retries with the anon public key.
+ * Executes a Supabase operation with automatic fallback between keys.
  */
 async function executeSupabaseOperation<T>(
   fn: (client: SupabaseClient) => Promise<{ data: T | null; error: any }>
@@ -144,7 +144,6 @@ async function executeSupabaseOperation<T>(
       }
       lastError = result.error;
 
-      // Check if error is authentication-related (retry with next key if available)
       const errMsg = (result.error.message || "").toLowerCase();
       const isAuthError =
         errMsg.includes("invalid api key") ||
@@ -173,19 +172,36 @@ export async function getSupabaseUserByEmail(
   if (!isSupabaseConfigured()) return null;
 
   try {
+    // 1. Try querying with security_question columns
     const { data, error } = await executeSupabaseOperation(async (client) => {
       return client
         .from("users")
-        .select("id, email, name, password, created_at, last_login, plan")
+        .select(
+          "id, email, name, password, created_at, last_login, plan, security_question, security_answer"
+        )
         .ilike("email", email.trim())
         .maybeSingle();
     });
 
-    if (error) {
-      console.warn("Supabase getSupabaseUserByEmail warning:", error.message);
-      return null;
+    if (!error && data) {
+      return data as unknown as SupabaseUser;
     }
-    return (data as unknown as SupabaseUser) || null;
+
+    // 2. If column does not exist yet in Supabase table, fallback to standard columns
+    if (error && (error.message?.includes("column") || error.code === "42703")) {
+      const fallback = await executeSupabaseOperation(async (client) => {
+        return client
+          .from("users")
+          .select("id, email, name, password, created_at, last_login, plan")
+          .ilike("email", email.trim())
+          .maybeSingle();
+      });
+      if (!fallback.error && fallback.data) {
+        return fallback.data as unknown as SupabaseUser;
+      }
+    }
+
+    return null;
   } catch (err) {
     console.warn("Supabase query error:", err);
     return null;
@@ -204,13 +220,32 @@ export async function getSupabaseUserById(
     const { data, error } = await executeSupabaseOperation(async (client) => {
       return client
         .from("users")
-        .select("id, email, name, password, created_at, last_login, plan")
+        .select(
+          "id, email, name, password, created_at, last_login, plan, security_question, security_answer"
+        )
         .eq("id", id)
         .maybeSingle();
     });
 
-    if (error) return null;
-    return (data as unknown as SupabaseUser) || null;
+    if (!error && data) {
+      return data as unknown as SupabaseUser;
+    }
+
+    // Fallback if security_question column not created yet
+    if (error && (error.message?.includes("column") || error.code === "42703")) {
+      const fallback = await executeSupabaseOperation(async (client) => {
+        return client
+          .from("users")
+          .select("id, email, name, password, created_at, last_login, plan")
+          .eq("id", id)
+          .maybeSingle();
+      });
+      if (!fallback.error && fallback.data) {
+        return fallback.data as unknown as SupabaseUser;
+      }
+    }
+
+    return null;
   } catch {
     return null;
   }
@@ -225,6 +260,8 @@ export async function upsertSupabaseUser(payload: {
   name?: string | null;
   password?: string | null;
   plan?: string;
+  security_question?: string | null;
+  security_answer?: string | null;
 }): Promise<{ user: SupabaseUser | null; error?: string }> {
   if (!isSupabaseConfigured()) {
     return {
@@ -246,21 +283,44 @@ export async function upsertSupabaseUser(payload: {
       };
       if (payload.name && !existing.name) updates.name = payload.name;
       if (payload.password) updates.password = payload.password;
+      if (payload.security_question)
+        updates.security_question = payload.security_question;
+      if (payload.security_answer)
+        updates.security_answer = payload.security_answer;
 
       const { data, error } = await executeSupabaseOperation(async (client) => {
         return client
           .from("users")
           .update(updates)
           .eq("id", existing.id)
-          .select("id, email, name, created_at, last_login, plan")
+          .select(
+            "id, email, name, created_at, last_login, plan, security_question"
+          )
           .single();
       });
 
-      if (error) {
-        console.error("Error updating Supabase user:", error.message);
-        return { user: existing, error: formatSupabaseError(error) };
+      if (!error && data) {
+        return { user: data as unknown as SupabaseUser };
       }
-      return { user: data as unknown as SupabaseUser };
+
+      // If updating with security columns failed because columns don't exist yet, retry without them
+      if (error && (error.message?.includes("column") || error.code === "42703")) {
+        delete updates.security_question;
+        delete updates.security_answer;
+        const retry = await executeSupabaseOperation(async (client) => {
+          return client
+            .from("users")
+            .update(updates)
+            .eq("id", existing.id)
+            .select("id, email, name, created_at, last_login, plan")
+            .single();
+        });
+        if (!retry.error && retry.data) {
+          return { user: retry.data as unknown as SupabaseUser };
+        }
+      }
+
+      return { user: existing, error: formatSupabaseError(error) };
     }
 
     // Insert new user in Supabase
@@ -273,21 +333,43 @@ export async function upsertSupabaseUser(payload: {
     };
     if (payload.id) insertData.id = payload.id;
     if (payload.password) insertData.password = payload.password;
+    if (payload.security_question)
+      insertData.security_question = payload.security_question;
+    if (payload.security_answer)
+      insertData.security_answer = payload.security_answer;
 
     const { data, error } = await executeSupabaseOperation(async (client) => {
       return client
         .from("users")
         .insert([insertData])
-        .select("id, email, name, created_at, last_login, plan")
+        .select(
+          "id, email, name, created_at, last_login, plan, security_question"
+        )
         .single();
     });
 
-    if (error) {
-      console.error("Error inserting Supabase user:", error.message);
-      return { user: null, error: formatSupabaseError(error) };
+    if (!error && data) {
+      return { user: data as unknown as SupabaseUser };
     }
 
-    return { user: data as unknown as SupabaseUser };
+    // If column security_question doesn't exist yet, fallback to inserting without it
+    if (error && (error.message?.includes("column") || error.code === "42703")) {
+      delete insertData.security_question;
+      delete insertData.security_answer;
+      const retry = await executeSupabaseOperation(async (client) => {
+        return client
+          .from("users")
+          .insert([insertData])
+          .select("id, email, name, created_at, last_login, plan")
+          .single();
+      });
+
+      if (!retry.error && retry.data) {
+        return { user: retry.data as unknown as SupabaseUser };
+      }
+    }
+
+    return { user: null, error: formatSupabaseError(error) };
   } catch (err: any) {
     console.error("Supabase insert exception:", err);
     return {
@@ -295,6 +377,88 @@ export async function upsertSupabaseUser(payload: {
       error: err?.message || "Failed to communicate with Supabase",
     };
   }
+}
+
+/**
+ * Update user's password directly (used by Forgot Password reset).
+ */
+export async function updateUserPassword(
+  email: string,
+  newHashedPassword: string
+): Promise<{ success: boolean; error?: string }> {
+  const cleanEmail = email.trim().toLowerCase();
+
+  if (isSupabaseConfigured()) {
+    try {
+      const { error } = await executeSupabaseOperation(async (client) => {
+        return client
+          .from("users")
+          .update({
+            password: newHashedPassword,
+            last_login: new Date().toISOString(),
+          })
+          .ilike("email", cleanEmail);
+      });
+
+      if (error) {
+        return { success: false, error: formatSupabaseError(error) };
+      }
+    } catch (err: any) {
+      return {
+        success: false,
+        error: err?.message || "Failed to update password in Supabase",
+      };
+    }
+  }
+
+  // Also sync to Prisma
+  try {
+    await prisma.user.updateMany({
+      where: { email: cleanEmail },
+      data: { password: newHashedPassword },
+    });
+  } catch (err) {
+    console.warn("Prisma password update fallback warning:", err);
+  }
+
+  return { success: true };
+}
+
+/**
+ * Update user's security question and answer.
+ */
+export async function updateUserSecurityQuestion(
+  email: string,
+  question: string,
+  hashedAnswer: string
+): Promise<{ success: boolean; error?: string }> {
+  const cleanEmail = email.trim().toLowerCase();
+
+  if (isSupabaseConfigured()) {
+    try {
+      const { error } = await executeSupabaseOperation(async (client) => {
+        return client
+          .from("users")
+          .update({
+            security_question: question,
+            security_answer: hashedAnswer,
+          })
+          .ilike("email", cleanEmail);
+      });
+
+      if (error) {
+        return { success: false, error: formatSupabaseError(error) };
+      }
+      return { success: true };
+    } catch (err: any) {
+      return {
+        success: false,
+        error: err?.message || "Failed to update security question in Supabase",
+      };
+    }
+  }
+
+  return { success: true };
 }
 
 /**
@@ -326,12 +490,25 @@ export async function getAllUsersForAdmin(): Promise<SupabaseUser[]> {
       const { data, error } = await executeSupabaseOperation(async (client) => {
         return client
           .from("users")
-          .select("id, email, name, created_at, last_login, plan")
+          .select("id, email, name, created_at, last_login, plan, security_question")
           .order("created_at", { ascending: false });
       });
 
       if (!error && data && Array.isArray(data) && data.length > 0) {
         return data as unknown as SupabaseUser[];
+      }
+
+      // Fallback if column does not exist
+      if (error && (error.message?.includes("column") || error.code === "42703")) {
+        const fallback = await executeSupabaseOperation(async (client) => {
+          return client
+            .from("users")
+            .select("id, email, name, created_at, last_login, plan")
+            .order("created_at", { ascending: false });
+        });
+        if (!fallback.error && fallback.data && Array.isArray(fallback.data)) {
+          return fallback.data as unknown as SupabaseUser[];
+        }
       }
     } catch (err) {
       console.warn("Supabase getAllUsers error, falling back to Prisma:", err);
@@ -400,7 +577,10 @@ export async function deleteSupabaseUser(
         return { success: false, error: formatSupabaseError(error) };
       }
     } catch (err: any) {
-      return { success: false, error: err?.message || "Failed to delete user from Supabase" };
+      return {
+        success: false,
+        error: err?.message || "Failed to delete user from Supabase",
+      };
     }
   }
 

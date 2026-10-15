@@ -16,6 +16,7 @@ function LoginContent() {
   const [showPassword, setShowPassword] = useState(false);
 
   const registered = searchParams.get("registered");
+  const reset = searchParams.get("reset");
   const authError = searchParams.get("error");
 
   const getErrorMessage = () => {
@@ -103,6 +104,13 @@ function LoginContent() {
           </div>
         )}
 
+        {reset && (
+          <div className="rounded-xl bg-green-50 p-3 text-xs text-green-800 border border-green-200 flex items-center gap-2">
+            <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0" />
+            <span>Password reset successfully! You can now sign in with your new password.</span>
+          </div>
+        )}
+
         {displayedError && (
           <div className="rounded-xl bg-red-50 p-3 text-xs text-red-800 border border-red-200 flex items-start gap-2">
             <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
@@ -164,9 +172,17 @@ function LoginContent() {
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">
-              Password
-            </label>
+            <div className="flex items-center justify-between mb-1">
+              <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide">
+                Password
+              </label>
+              <Link
+                href="/forgot-password"
+                className="text-xs font-semibold text-blue-600 hover:text-blue-700 hover:underline"
+              >
+                Forgot password?
+              </Link>
+            </div>
             <div className="relative">
               <input
                 name="password"

@@ -4,7 +4,8 @@ import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Sparkles, AlertCircle, Eye, EyeOff } from "lucide-react";
+import { Sparkles, AlertCircle, Eye, EyeOff, HelpCircle, ShieldQuestion } from "lucide-react";
+import { SECURITY_QUESTIONS } from "@/lib/constants";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -12,6 +13,8 @@ export default function RegisterPage() {
   const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [showAnswer, setShowAnswer] = useState(false);
+  const [selectedQuestion, setSelectedQuestion] = useState(SECURITY_QUESTIONS[0]);
 
   const handleGoogleSignUp = async () => {
     try {
@@ -33,12 +36,26 @@ export default function RegisterPage() {
     const name = formData.get("name");
     const email = formData.get("email");
     const password = formData.get("password");
+    const securityQuestion = formData.get("securityQuestion") || selectedQuestion;
+    const securityAnswer = formData.get("securityAnswer");
+
+    if (!securityAnswer || String(securityAnswer).trim().length === 0) {
+      setError("Please provide an answer to your security question. You will need it to recover your password if you ever forget it.");
+      setLoading(false);
+      return;
+    }
 
     try {
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify({
+          name,
+          email,
+          password,
+          securityQuestion,
+          securityAnswer: String(securityAnswer).trim(),
+        }),
       });
 
       if (res.ok) {
@@ -171,6 +188,63 @@ export default function RegisterPage() {
                   <Eye className="w-4 h-4 text-gray-400" />
                 )}
               </button>
+            </div>
+          </div>
+
+          {/* Security Question Section */}
+          <div className="pt-2 border-t border-gray-100 space-y-3">
+            <div className="flex items-center gap-1.5 text-xs font-bold text-gray-700 uppercase tracking-wide">
+              <ShieldQuestion className="w-4 h-4 text-blue-600" />
+              <span>Password Recovery Setup</span>
+            </div>
+            <p className="text-[11px] text-gray-500 leading-normal">
+              Choose a security question so you can securely reset your password if you ever forget it.
+            </p>
+
+            <div>
+              <label className="block text-[11px] font-semibold text-gray-600 mb-1">
+                Security Question
+              </label>
+              <select
+                name="securityQuestion"
+                value={selectedQuestion}
+                onChange={(e) => setSelectedQuestion(e.target.value)}
+                className="w-full rounded-xl border border-gray-300 p-2.5 text-xs text-gray-800 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none"
+              >
+                {SECURITY_QUESTIONS.map((q) => (
+                  <option key={q} value={q}>
+                    {q}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-[11px] font-semibold text-gray-600 mb-1">
+                Security Answer
+              </label>
+              <div className="relative">
+                <input
+                  name="securityAnswer"
+                  type={showAnswer ? "text" : "password"}
+                  required
+                  placeholder="Your secret answer (case-insensitive)"
+                  className="w-full rounded-xl border border-gray-300 p-2.5 pr-10 text-xs focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowAnswer(!showAnswer)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors focus:outline-none p-1"
+                  aria-label={showAnswer ? "Hide answer" : "Show answer"}
+                  tabIndex={-1}
+                >
+                  {showAnswer ? (
+                    <EyeOff className="w-4 h-4 text-blue-600" />
+                  ) : (
+                    <Eye className="w-4 h-4 text-gray-400" />
+                  )}
+                </button>
+              </div>
             </div>
           </div>
 

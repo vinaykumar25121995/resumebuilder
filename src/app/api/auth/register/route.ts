@@ -9,7 +9,7 @@ import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   try {
-    const { name, email, password } = await req.json();
+    const { name, email, password, securityQuestion, securityAnswer } = await req.json();
 
     if (!email || !password) {
       return NextResponse.json(
@@ -53,6 +53,11 @@ export async function POST(req: Request) {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    let hashedSecurityAnswer: string | null = null;
+    if (securityAnswer && typeof securityAnswer === "string" && securityAnswer.trim().length > 0) {
+      hashedSecurityAnswer = await bcrypt.hash(securityAnswer.trim().toLowerCase(), 10);
+    }
+
     // 3. Store in Supabase `users` table
     let createdUserId: string | null = null;
     let supabaseError: string | null = null;
@@ -63,6 +68,8 @@ export async function POST(req: Request) {
         name: cleanName,
         password: hashedPassword,
         plan: "free",
+        security_question: securityQuestion ? String(securityQuestion) : null,
+        security_answer: hashedSecurityAnswer,
       });
       if (sbResult.user) {
         createdUserId = sbResult.user.id;

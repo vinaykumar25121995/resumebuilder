@@ -68,7 +68,7 @@ export async function POST(req: Request) {
 
   try {
     const body = await req.json();
-    const { email, name, password, plan = "free" } = body;
+    const { email, name, password, plan = "free", securityQuestion, securityAnswer } = body;
 
     if (!email || !password) {
       return NextResponse.json(
@@ -92,11 +92,18 @@ export async function POST(req: Request) {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    let hashedSecurityAnswer: string | null = null;
+    if (securityAnswer && typeof securityAnswer === "string" && securityAnswer.trim().length > 0) {
+      hashedSecurityAnswer = await bcrypt.hash(securityAnswer.trim().toLowerCase(), 10);
+    }
+
     const sbResult = await upsertSupabaseUser({
       email: cleanEmail,
       name: cleanName,
       password: hashedPassword,
       plan: selectedPlan,
+      security_question: securityQuestion ? String(securityQuestion) : null,
+      security_answer: hashedSecurityAnswer,
     });
 
     if (!sbResult.user) {
