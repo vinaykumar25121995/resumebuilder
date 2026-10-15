@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState, useRef } from "react";
 import { motion } from "framer-motion";
+import FuturisticUniverseHero from "@/components/FuturisticUniverseHero";
 import { 
   Sparkles, FileText, CheckCircle, ArrowRight, Target, Zap, Shield, BarChart3, 
   Download, Brain, Star, ChevronDown, ChevronUp, Users, Award, TrendingUp,
@@ -85,24 +86,24 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-slate-50/30">
       {/* Navbar */}
-      <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-100 shadow-sm">
+      <nav className="sticky top-0 z-50 bg-[#030612]/90 backdrop-blur-md border-b border-white/10 shadow-lg shadow-black/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
-            <div className="flex items-center space-x-2 text-blue-600 font-bold text-xl">
-              <Sparkles className="w-6 h-6" />
-              <span>ATS Resume Builder</span>
+            <div className="flex items-center space-x-2 text-white font-bold text-xl">
+              <Sparkles className="w-6 h-6 text-cyan-400" />
+              <span className="bg-gradient-to-r from-white via-slate-100 to-cyan-200 bg-clip-text text-transparent">ATS Resume Builder</span>
             </div>
             <div className="hidden md:flex items-center space-x-8">
-              <a href="#how-it-works" className="text-gray-600 hover:text-gray-900 text-sm font-medium">How It Works</a>
-              <a href="#features" className="text-gray-600 hover:text-gray-900 text-sm font-medium">Features</a>
-              <a href="#templates" className="text-gray-600 hover:text-gray-900 text-sm font-medium">Templates</a>
-              <a href="#pricing" className="text-gray-600 hover:text-gray-900 text-sm font-medium">Pricing</a>
-              <a href="#contact" className="text-gray-600 hover:text-gray-900 text-sm font-medium">Contact Us</a>
-              <a href="#faq" className="text-gray-600 hover:text-gray-900 text-sm font-medium">FAQ</a>
+              <a href="#how-it-works" className="text-slate-300 hover:text-white text-sm font-medium transition-colors">How It Works</a>
+              <a href="#features" className="text-slate-300 hover:text-white text-sm font-medium transition-colors">Features</a>
+              <a href="#templates" className="text-slate-300 hover:text-white text-sm font-medium transition-colors">Templates</a>
+              <a href="#pricing" className="text-slate-300 hover:text-white text-sm font-medium transition-colors">Pricing</a>
+              <a href="#contact" className="text-slate-300 hover:text-white text-sm font-medium transition-colors">Contact Us</a>
+              <a href="#faq" className="text-slate-300 hover:text-white text-sm font-medium transition-colors">FAQ</a>
             </div>
             <div className="flex items-center space-x-3">
-              <Link href="/login" className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium">Log in</Link>
-              <Link href="/register" className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors">
+              <Link href="/login" className="text-slate-300 hover:text-white px-3 py-2 text-sm font-medium transition-colors">Log in</Link>
+              <Link href="/register" className="bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:from-blue-500 hover:to-indigo-500 transition-all shadow-md shadow-blue-500/20 border border-blue-400/30">
                 Get Started Free
               </Link>
             </div>
@@ -110,17 +111,13 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* Dynamic Scientific Hero Section */}
+      {/* Futuristic Corporate Universe Hero Section */}
       <div
         ref={heroRef}
-        className="relative overflow-hidden bg-gradient-to-b from-blue-50/40 via-white/60 to-slate-50/30 px-6 py-24 lg:py-32"
+        className="relative overflow-hidden bg-[#030612] px-6 py-24 lg:py-36 min-h-[720px] flex items-center justify-center border-b border-white/10"
       >
-        {/* Subtle Engineering Grid Backdrop */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#e2e8f0_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f0_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-30 pointer-events-none" />
-
-        {/* Soft Ambient Depth Glows */}
-        <div className="absolute top-1/4 left-1/6 w-96 h-96 bg-blue-300/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute top-1/3 right-1/6 w-[30rem] h-[30rem] bg-indigo-300/10 rounded-full blur-3xl pointer-events-none" />
+        {/* Futuristic Corporate Universe Background: Space, Venus, 10 Tech Towers */}
+        <FuturisticUniverseHero />
 
         {/* Floating Interactive Badge: Left */}
         <motion.div
@@ -131,17 +128,17 @@ export default function Home() {
             x: { duration: 0.8, delay: 0.4 },
             y: { duration: 5.5, repeat: Infinity, ease: "easeInOut" },
           }}
-          className="hidden xl:flex absolute left-8 top-1/3 items-center gap-3 bg-white/90 backdrop-blur-md px-4 py-3 rounded-2xl border border-blue-100/80 shadow-xl shadow-blue-900/5 z-20 pointer-events-auto hover:scale-105 transition-transform"
+          className="hidden xl:flex absolute left-8 top-1/3 items-center gap-3 bg-slate-900/85 backdrop-blur-md px-4 py-3 rounded-2xl border border-blue-500/30 shadow-2xl shadow-blue-950/50 z-20 pointer-events-auto hover:scale-105 transition-transform"
         >
-          <div className="w-10 h-10 rounded-xl bg-blue-600/10 flex items-center justify-center text-blue-600">
-            <Sparkles className="w-5 h-5 text-blue-600" />
+          <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center text-cyan-400 border border-blue-400/30">
+            <Sparkles className="w-5 h-5 text-cyan-400" />
           </div>
           <div className="text-left">
             <div className="flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-              <span className="text-xs font-bold text-gray-900">ATS Match Score</span>
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span className="text-xs font-bold text-white tracking-wide">ATS Match Score</span>
             </div>
-            <p className="text-xs text-blue-600 font-semibold">98% Compatibility</p>
+            <p className="text-xs text-cyan-400 font-semibold tracking-wide">98% Compatibility</p>
           </div>
         </motion.div>
 
@@ -151,9 +148,9 @@ export default function Home() {
             initial={{ opacity: 0, y: -16, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ duration: 0.55, ease: "easeOut" }}
-            className="inline-flex items-center bg-blue-50/90 backdrop-blur-sm text-blue-700 text-sm font-medium px-4 py-2 rounded-full mb-6 border border-blue-200/80 shadow-sm"
+            className="inline-flex items-center bg-blue-950/60 backdrop-blur-md text-cyan-300 text-sm font-medium px-4 py-2 rounded-full mb-6 border border-cyan-500/30 shadow-lg shadow-cyan-950/30"
           >
-            <Sparkles className="w-4 h-4 mr-2 text-blue-600 animate-spin" style={{ animationDuration: "8s" }} />
+            <Sparkles className="w-4 h-4 mr-2 text-cyan-400 animate-spin" style={{ animationDuration: "8s" }} />
             AI-Powered ATS Optimization
           </motion.div>
 
@@ -161,10 +158,10 @@ export default function Home() {
             initial={{ opacity: 0, y: 22 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.65, delay: 0.1, ease: "easeOut" }}
-            className="text-5xl lg:text-7xl font-bold tracking-tight text-gray-900 mb-6 drop-shadow-sm"
+            className="text-5xl lg:text-7xl font-extrabold tracking-tight text-white mb-6 drop-shadow-md"
           >
             Build Once.<br />
-            <span className="bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-600 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-cyan-300 via-blue-400 to-indigo-300 bg-clip-text text-transparent">
               Tailor for Every Job.
             </span>
           </motion.h1>
@@ -173,10 +170,10 @@ export default function Home() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.65, delay: 0.2, ease: "easeOut" }}
-            className="text-xl text-gray-700 max-w-2xl mx-auto mb-10 leading-relaxed font-normal"
+            className="text-xl text-slate-200 max-w-2xl mx-auto mb-10 leading-relaxed font-normal drop-shadow-sm"
           >
             Create an ATS-friendly master resume, then automatically optimize it for every job description using AI.
-            <span className="font-semibold text-gray-900"> Stop rewriting manually.</span>
+            <span className="font-semibold text-white"> Stop rewriting manually.</span>
           </motion.p>
 
           <motion.div
@@ -187,14 +184,14 @@ export default function Home() {
           >
             <Link
               href="/register"
-              className="w-full sm:w-auto inline-flex items-center justify-center bg-blue-600 text-white px-8 py-4 rounded-xl text-base font-semibold hover:bg-blue-700 hover:scale-105 active:scale-95 transition-all duration-200 shadow-xl shadow-blue-600/30 group"
+              className="w-full sm:w-auto inline-flex items-center justify-center bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 text-white px-8 py-4 rounded-xl text-base font-semibold hover:from-blue-500 hover:to-indigo-500 hover:scale-105 active:scale-95 transition-all duration-200 shadow-xl shadow-blue-500/30 border border-blue-400/30 group"
             >
               BUILD MY RESUME
               <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Link>
             <a
               href="#how-it-works"
-              className="w-full sm:w-auto inline-flex items-center justify-center bg-white/80 backdrop-blur-sm border border-gray-300 text-gray-700 px-8 py-4 rounded-xl text-base font-semibold hover:bg-white hover:border-gray-400 hover:scale-105 active:scale-95 transition-all duration-200 shadow-sm"
+              className="w-full sm:w-auto inline-flex items-center justify-center bg-white/10 backdrop-blur-md border border-white/25 text-white px-8 py-4 rounded-xl text-base font-semibold hover:bg-white/20 hover:border-white/40 hover:scale-105 active:scale-95 transition-all duration-200 shadow-md"
             >
               See How It Works
             </a>
@@ -204,16 +201,16 @@ export default function Home() {
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.45, ease: "easeOut" }}
-            className="mt-12 flex flex-wrap items-center justify-center gap-6 sm:gap-8 text-sm text-gray-600"
+            className="mt-12 flex flex-wrap items-center justify-center gap-6 sm:gap-8 text-sm text-slate-300"
           >
-            <div className="flex items-center gap-2 bg-white/70 backdrop-blur-xs px-3 py-1.5 rounded-full border border-gray-100 shadow-xs">
-              <CheckCircle className="w-4 h-4 text-emerald-500" /> No credit card required
+            <div className="flex items-center gap-2 bg-slate-900/60 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/15 shadow-sm">
+              <CheckCircle className="w-4 h-4 text-emerald-400" /> No credit card required
             </div>
-            <div className="flex items-center gap-2 bg-white/70 backdrop-blur-xs px-3 py-1.5 rounded-full border border-gray-100 shadow-xs">
-              <CheckCircle className="w-4 h-4 text-emerald-500" /> Free to start
+            <div className="flex items-center gap-2 bg-slate-900/60 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/15 shadow-sm">
+              <CheckCircle className="w-4 h-4 text-emerald-400" /> Free to start
             </div>
-            <div className="flex items-center gap-2 bg-white/70 backdrop-blur-xs px-3 py-1.5 rounded-full border border-gray-100 shadow-xs">
-              <CheckCircle className="w-4 h-4 text-emerald-500" /> ATS-Designed Templates
+            <div className="flex items-center gap-2 bg-slate-900/60 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/15 shadow-sm">
+              <CheckCircle className="w-4 h-4 text-emerald-400" /> ATS-Designed Templates
             </div>
           </motion.div>
         </div>

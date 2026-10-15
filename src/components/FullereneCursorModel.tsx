@@ -341,9 +341,9 @@ export default function FullereneCursorModel() {
     const commonUniforms = {
       uCursor: { value: cursorCurrent },
       uResolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
-      uRevealRadius: { value: isTouchDevice ? 280.0 : 250.0 },
-      uBaseOpacity: { value: 0.055 }, // Faint 5.5% resting opacity
-      uActiveOpacity: { value: 0.35 }, // 35% illuminated opacity
+      uRevealRadius: { value: isTouchDevice ? 260.0 : 230.0 },
+      uBaseOpacity: { value: 0.035 }, // Delicate 3.5% resting opacity for subtle celestial support
+      uActiveOpacity: { value: 0.28 }, // 28% illuminated opacity
     };
 
     // --- CONSTRUCT THE GIANT FOUR-LAYER FULLERENE STRUCTURE ---
