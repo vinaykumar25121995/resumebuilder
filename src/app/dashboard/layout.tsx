@@ -47,12 +47,43 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 </Link>
               );
             })}
+
+            {/* Admin Portal Link exclusively for vinay22y95@gmail.com */}
+            {session?.user?.email?.toLowerCase() === "vinay22y95@gmail.com" && (
+              <div className="pt-2 mt-2 border-t border-gray-100">
+                <Link
+                  href="/admin"
+                  className={cn(
+                    "flex items-center px-3 py-2 text-sm font-bold rounded-md transition-colors",
+                    pathname === "/admin"
+                      ? "bg-purple-100 text-purple-800"
+                      : "text-purple-700 bg-purple-50/70 hover:bg-purple-100"
+                  )}
+                >
+                  <span className="mr-3 text-base">🛡️</span>
+                  Admin Portal
+                </Link>
+              </div>
+            )}
           </nav>
         </div>
         <div className="p-4 border-t border-gray-200">
-          <div className="flex items-center">
+          <div className="flex items-center justify-between">
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-gray-900 truncate">{session?.user?.name}</p>
+              <div className="flex items-center gap-1.5">
+                <p className="text-sm font-bold text-gray-900 truncate">
+                  {session?.user?.name || "User"}
+                </p>
+                {session?.user?.plan === "pro" ? (
+                  <span className="text-[9px] bg-amber-100 text-amber-800 font-bold px-1.5 py-0.2 rounded uppercase">
+                    PRO
+                  </span>
+                ) : (
+                  <span className="text-[9px] bg-gray-100 text-gray-600 font-medium px-1.5 py-0.2 rounded uppercase">
+                    FREE
+                  </span>
+                )}
+              </div>
               <p className="text-xs text-gray-500 truncate">{session?.user?.email}</p>
             </div>
           </div>
