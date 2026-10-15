@@ -7,6 +7,7 @@
 
 export interface TemplateConfig {
   id: string;
+  number: number;
   name: string;
   category: string[];
   description: string;
