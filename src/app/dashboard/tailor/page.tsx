@@ -7,7 +7,7 @@ import { FileSearch, Target, CheckCircle, FileText } from "lucide-react";
 function TailorPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const templateParam = searchParams.get("template") || "ats-classic";
+  const templateParam = searchParams.get("template") || "ats-two-column-blue";
 
   const [jobDescription, setJobDescription] = useState("");
   const [loading, setLoading] = useState(false);

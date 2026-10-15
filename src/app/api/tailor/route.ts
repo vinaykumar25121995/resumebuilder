@@ -9,7 +9,7 @@ export async function POST(req: Request) {
     const session = await getServerSession(authOptions);
     if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const { jobAnalysisId, template = "classic" } = await req.json();
+    const { jobAnalysisId, template = "ats-two-column-blue" } = await req.json();
 
     if (!jobAnalysisId) {
       return NextResponse.json({ error: "Job analysis ID is required" }, { status: 400 });

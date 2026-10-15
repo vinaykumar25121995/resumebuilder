@@ -1249,7 +1249,7 @@ export default function ResumeEditorPage({
 
   const [data, setData] = useState<ResumeData | null>(null);
   const [resumeMeta, setResumeMeta] = useState<any>(null);
-  const [templateId, setTemplateId] = useState<string>("ats-classic");
+  const [templateId, setTemplateId] = useState<string>("ats-two-column-blue");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [syncing, setSyncing] = useState(false);
@@ -1282,7 +1282,7 @@ export default function ResumeEditorPage({
       if (res.ok) {
         const json = await res.json();
         setResumeMeta(json);
-        setTemplateId(json.template || "ats-classic");
+        setTemplateId(json.template || "ats-two-column-blue");
         const parsed = JSON.parse(json.content);
         setData(parsed);
       } else {

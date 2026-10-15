@@ -962,7 +962,7 @@ export default function Home() {
           <div className="text-center mb-12">
             <div className="inline-flex items-center gap-1.5 bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-400/40 px-3.5 py-1.5 rounded-full text-xs font-extrabold text-amber-300 mb-4 shadow-sm">
               <Crown className="w-4 h-4 text-amber-400 fill-amber-400" />
-              <span>19+ ATS-SAFE RESUME TEMPLATES</span>
+              <span>{ALL_TEMPLATES.length}+ ATS-SAFE RESUME TEMPLATES</span>
             </div>
             <h2 className="text-3xl md:text-5xl font-black text-white tracking-tight">
               Crafted for Real Jobs. Engineered for ATS.
@@ -981,7 +981,7 @@ export default function Home() {
                     : "bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 border border-slate-700"
                 }`}
               >
-                <span>📑 2-Column & Photo Templates (5)</span>
+                <span>📑 2-Column & Photo Templates ({ALL_TEMPLATES.filter((t) => t.number >= 45 && t.number <= 49).length})</span>
               </button>
               <button
                 onClick={() => setTemplateTab("pro")}
@@ -992,7 +992,7 @@ export default function Home() {
                 }`}
               >
                 <Crown className="w-3.5 h-3.5 fill-current" />
-                <span>👑 Premium Pro Collection (4)</span>
+                <span>👑 Premium Pro Collection ({ALL_TEMPLATES.filter((t) => t.isPro).length})</span>
               </button>
               <button
                 onClick={() => setTemplateTab("standard")}
@@ -1003,7 +1003,7 @@ export default function Home() {
                 }`}
               >
                 <FileText className="w-3.5 h-3.5" />
-                <span>Standard ATS Templates (40)</span>
+                <span>Standard ATS Templates ({ALL_TEMPLATES.filter((t) => !t.isPro).length})</span>
               </button>
               <button
                 onClick={() => setTemplateTab("all")}

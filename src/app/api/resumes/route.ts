@@ -40,7 +40,7 @@ export async function POST(req: Request) {
     if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const body = await req.json();
-    const { templateId = "ats-classic", title } = body;
+    const { templateId = "ats-two-column-blue", title } = body;
 
     // Fetch user and profile with all nested models
     const user = await prisma.user.findUnique({
