@@ -33,7 +33,7 @@ export async function POST(req: Request) {
   } catch (error: any) {
     console.error("Error processing contact form:", error);
     return NextResponse.json(
-      { error: "Failed to send message. Please try again or email support@atsresumebuilder.com directly." },
+      { error: "Failed to send message. Please try again or email atsfriendlyresumes.admin@gmail.com directly." },
       { status: 500 }
     );
   }

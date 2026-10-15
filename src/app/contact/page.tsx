@@ -16,6 +16,8 @@ import {
   Headphones,
   Users,
   CreditCard,
+  MessageCircle,
+  ExternalLink,
 } from "lucide-react";
 
 export default function ContactPage() {
@@ -129,16 +131,44 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">
-                      Customer Support
+                      Customer Support & Admin
                     </p>
                     <a
-                      href="mailto:support@atsresumebuilder.com"
-                      className="text-sm font-semibold text-blue-600 hover:underline"
+                      href="mailto:atsfriendlyresumes.admin@gmail.com"
+                      className="text-sm font-semibold text-blue-600 hover:underline break-all"
                     >
-                      support@atsresumebuilder.com
+                      atsfriendlyresumes.admin@gmail.com
                     </a>
                     <p className="text-xs text-gray-500 mt-0.5">
-                      For general questions, ATS troubleshooting & resume tips.
+                      For general questions, ATS troubleshooting & resume advice.
+                    </p>
+                  </div>
+                </div>
+
+                {/* WhatsApp Channel Help Desk */}
+                <div className="flex items-start gap-3.5 p-3.5 bg-emerald-50/70 rounded-2xl border border-emerald-200">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center flex-shrink-0 shadow-sm">
+                    <MessageCircle className="w-5 h-5" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between">
+                      <p className="text-xs font-bold text-emerald-950 uppercase tracking-wide">
+                        WhatsApp Channel Help Desk
+                      </p>
+                      <span className="text-[10px] bg-emerald-200/80 text-emerald-900 font-bold px-1.5 py-0.5 rounded">
+                        Official Channel
+                      </span>
+                    </div>
+                    <a
+                      href="https://whatsapp.com/channel/0029VbEHAMkADTO9BaH0Mh2O"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm font-bold text-emerald-700 hover:text-emerald-800 hover:underline inline-flex items-center gap-1.5 mt-1"
+                    >
+                      Join WhatsApp Help Desk <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
+                    <p className="text-xs text-emerald-800/80 mt-1 leading-relaxed">
+                      Instant assistance, ATS templates announcements, bug reporting & active help desk support.
                     </p>
                   </div>
                 </div>
@@ -153,10 +183,10 @@ export default function ContactPage() {
                       Sales & Teams Inquiries
                     </p>
                     <a
-                      href="mailto:sales@atsresumebuilder.com"
-                      className="text-sm font-semibold text-purple-600 hover:underline"
+                      href="mailto:atsfriendlyresumes.admin@gmail.com"
+                      className="text-sm font-semibold text-purple-600 hover:underline break-all"
                     >
-                      sales@atsresumebuilder.com
+                      atsfriendlyresumes.admin@gmail.com
                     </a>
                     <p className="text-xs text-gray-500 mt-0.5">
                       Custom volume licenses, university career centers & enterprise teams.
@@ -174,10 +204,10 @@ export default function ContactPage() {
                       Billing & Plans
                     </p>
                     <a
-                      href="mailto:billing@atsresumebuilder.com"
-                      className="text-sm font-semibold text-emerald-600 hover:underline"
+                      href="mailto:atsfriendlyresumes.admin@gmail.com"
+                      className="text-sm font-semibold text-emerald-600 hover:underline break-all"
                     >
-                      billing@atsresumebuilder.com
+                      atsfriendlyresumes.admin@gmail.com
                     </a>
                     <p className="text-xs text-gray-500 mt-0.5">
                       Invoices, receipts, subscription updates & transparent refunds.

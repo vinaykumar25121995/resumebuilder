@@ -5,7 +5,8 @@ import { useState } from "react";
 import { 
   Sparkles, FileText, CheckCircle, ArrowRight, Target, Zap, Shield, BarChart3, 
   Download, Brain, Star, ChevronDown, ChevronUp, Users, Award, TrendingUp,
-  BookOpen, Briefcase, GraduationCap, Mail, Clock, Send, Headphones, CreditCard, AlertCircle
+  BookOpen, Briefcase, GraduationCap, Mail, Clock, Send, Headphones, CreditCard, AlertCircle,
+  MessageCircle, ExternalLink
 } from "lucide-react";
 
 const faqs = [
@@ -73,7 +74,7 @@ export default function Home() {
       setContactSubmitted(true);
       setContactForm({ name: "", email: "", subject: "General Inquiry", message: "" });
     } catch (err: any) {
-      setContactError(err.message || "Something went wrong. Please email support@atsresumebuilder.com directly.");
+      setContactError(err.message || "Something went wrong. Please email atsfriendlyresumes.admin@gmail.com directly.");
     } finally {
       setContactSubmitting(false);
     }
@@ -572,46 +573,55 @@ export default function Home() {
                     <div>
                       <p className="text-xs font-bold text-gray-500 uppercase">Support & General</p>
                       <a
-                        href="mailto:support@atsresumebuilder.com"
-                        className="text-sm font-semibold text-blue-600 hover:underline"
+                        href="mailto:atsfriendlyresumes.admin@gmail.com"
+                        className="text-sm font-semibold text-blue-600 hover:underline break-all"
                       >
-                        support@atsresumebuilder.com
+                        atsfriendlyresumes.admin@gmail.com
                       </a>
                       <p className="text-xs text-gray-400 mt-0.5">Resume formatting, ATS scoring & troubleshooting</p>
                     </div>
                   </div>
 
-                  {/* Sales & Teams */}
+                  {/* WhatsApp Channel Help Desk */}
+                  <div className="flex items-start gap-3 p-3 bg-emerald-50/70 rounded-xl border border-emerald-200">
+                    <div className="w-9 h-9 rounded-lg bg-emerald-600 text-white flex items-center justify-center flex-shrink-0 shadow-sm">
+                      <MessageCircle className="w-5 h-5" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between">
+                        <p className="text-xs font-bold text-emerald-900 uppercase">WhatsApp Help Desk</p>
+                        <span className="text-[10px] bg-emerald-200/80 text-emerald-900 font-bold px-1.5 py-0.5 rounded">
+                          Official
+                        </span>
+                      </div>
+                      <a
+                        href="https://whatsapp.com/channel/0029VbEHAMkADTO9BaH0Mh2O"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs font-bold text-emerald-700 hover:text-emerald-800 hover:underline inline-flex items-center gap-1 mt-1"
+                      >
+                        Join WhatsApp Channel <ExternalLink className="w-3 h-3" />
+                      </a>
+                      <p className="text-[11px] text-emerald-700/80 mt-0.5 leading-snug">
+                        Instant announcements, resume assistance & live community updates
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Sales & Billing */}
                   <div className="flex items-start gap-3">
                     <div className="w-9 h-9 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center flex-shrink-0">
                       <Users className="w-4 h-4" />
                     </div>
                     <div>
-                      <p className="text-xs font-bold text-gray-500 uppercase">Sales & Team Plans</p>
+                      <p className="text-xs font-bold text-gray-500 uppercase">Sales & Billing</p>
                       <a
-                        href="mailto:sales@atsresumebuilder.com"
-                        className="text-sm font-semibold text-purple-600 hover:underline"
+                        href="mailto:atsfriendlyresumes.admin@gmail.com"
+                        className="text-sm font-semibold text-purple-600 hover:underline break-all"
                       >
-                        sales@atsresumebuilder.com
+                        atsfriendlyresumes.admin@gmail.com
                       </a>
-                      <p className="text-xs text-gray-400 mt-0.5">Custom quotes for 5+ seats & universities</p>
-                    </div>
-                  </div>
-
-                  {/* Billing */}
-                  <div className="flex items-start gap-3">
-                    <div className="w-9 h-9 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center flex-shrink-0">
-                      <CreditCard className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <p className="text-xs font-bold text-gray-500 uppercase">Billing & Invoices</p>
-                      <a
-                        href="mailto:billing@atsresumebuilder.com"
-                        className="text-sm font-semibold text-emerald-600 hover:underline"
-                      >
-                        billing@atsresumebuilder.com
-                      </a>
-                      <p className="text-xs text-gray-400 mt-0.5">Receipts, payment methods & subscriptions</p>
+                      <p className="text-xs text-gray-400 mt-0.5">Custom plans, invoices & subscriptions</p>
                     </div>
                   </div>
 
@@ -785,9 +795,27 @@ export default function Home() {
                 <span>ATS Resume Builder</span>
               </div>
               <p className="text-sm">Build once. Tailor for every job. Get noticed by ATS.</p>
-              <div className="mt-4 text-xs space-y-1">
-                <p>Support: <a href="mailto:support@atsresumebuilder.com" className="text-blue-400 hover:underline">support@atsresumebuilder.com</a></p>
-                <p>Sales: <a href="mailto:sales@atsresumebuilder.com" className="text-blue-400 hover:underline">sales@atsresumebuilder.com</a></p>
+              <div className="mt-4 text-xs space-y-1.5">
+                <p>
+                  Email:{" "}
+                  <a
+                    href="mailto:atsfriendlyresumes.admin@gmail.com"
+                    className="text-blue-400 hover:underline break-all"
+                  >
+                    atsfriendlyresumes.admin@gmail.com
+                  </a>
+                </p>
+                <p>
+                  Help Desk:{" "}
+                  <a
+                    href="https://whatsapp.com/channel/0029VbEHAMkADTO9BaH0Mh2O"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-emerald-400 hover:underline inline-flex items-center gap-1"
+                  >
+                    WhatsApp Channel <ExternalLink className="w-3 h-3" />
+                  </a>
+                </p>
               </div>
             </div>
             <div>
@@ -804,6 +832,16 @@ export default function Home() {
                 <li><a href="#faq" className="hover:text-white">FAQ</a></li>
                 <li><a href="#how-it-works" className="hover:text-white">How It Works</a></li>
                 <li><a href="#contact" className="hover:text-white">Contact Us</a></li>
+                <li>
+                  <a
+                    href="https://whatsapp.com/channel/0029VbEHAMkADTO9BaH0Mh2O"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-emerald-400 hover:underline flex items-center gap-1 font-medium"
+                  >
+                    WhatsApp Channel <ExternalLink className="w-3 h-3" />
+                  </a>
+                </li>
                 <li><Link href="/contact" className="hover:text-white">Support Center</Link></li>
               </ul>
             </div>
