@@ -1251,7 +1251,383 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
 
     // ─── DEDICATED PREMIUM PRO TEMPLATE RENDERERS ─────────────────────────────
 
-    // 1. Catherine Barnett — 3D Character Animator
+    // 1. Michelle Dhamar — Healthcare Industry Volunteer
+    const renderProMichelle = () => {
+      const email = data.personalInfo?.email;
+      const phone = data.personalInfo?.phone;
+      const location = data.personalInfo?.location;
+      const portfolio = data.personalInfo?.portfolio;
+      const linkedin = data.personalInfo?.linkedin;
+      const photoUrl =
+        data.personalInfo?.photoUrl ||
+        "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&w=400&q=80";
+
+      const allSkills = [
+        ...(data.skills?.technical || []),
+        ...(data.skills?.tools || []),
+        ...(data.skills?.concepts || []),
+        ...(data.skills?.soft || []),
+      ];
+
+      const renderDoubleUnderlineHeader = (title: string) => (
+        <div style={{ marginTop: "12px", marginBottom: "6px" }}>
+          <div
+            style={{
+              fontSize: "10pt",
+              fontWeight: "800",
+              textTransform: "uppercase",
+              letterSpacing: "0.8px",
+              color: "#1e293b",
+              display: "inline-block",
+              borderBottom: "3px double #be675e",
+              paddingBottom: "2px",
+              width: "100%",
+            }}
+          >
+            {title}
+          </div>
+        </div>
+      );
+
+      return (
+        <div
+          ref={ref}
+          style={{
+            fontFamily: cs.fontFamily || "'Inter', Arial, sans-serif",
+            width: pageDim.width,
+            minHeight: pageDim.height,
+            backgroundColor: "#ffffff",
+            padding: "15mm 16mm",
+            boxSizing: "border-box",
+            color: "#1e293b",
+          }}
+        >
+          <style
+            dangerouslySetInnerHTML={{
+              __html: `@page { size: ${pageDim.width} ${pageDim.height}; margin: 0; }`,
+            }}
+          />
+
+          {/* Top Header: 3-column layout */}
+          <div style={{ display: "flex", alignItems: "flex-start", gap: "16px", marginBottom: "12px" }}>
+            {/* Left: Name, Title & Summary */}
+            <div style={{ flex: "1 1 44%", minWidth: 0 }}>
+              <h1
+                style={{
+                  fontSize: nameFontSize || "24pt",
+                  fontWeight: "700",
+                  color: "#be675e",
+                  letterSpacing: "-0.5px",
+                  margin: "0 0 2px 0",
+                  lineHeight: 1.15,
+                }}
+              >
+                {data.personalInfo?.fullName || "Michelle Dhamar"}
+              </h1>
+              <p
+                style={{
+                  fontSize: "10.5pt",
+                  fontWeight: "500",
+                  color: "#8c6b67",
+                  margin: "0 0 8px 0",
+                }}
+              >
+                {data.personalInfo?.title || "Healthcare Industry Volunteer"}
+              </p>
+              {data.summary && (
+                <p
+                  style={{
+                    fontSize: "8.5pt",
+                    color: "#334155",
+                    lineHeight: 1.45,
+                    margin: 0,
+                    textAlign: "justify",
+                  }}
+                >
+                  {renderFormattedText(data.summary)}
+                </p>
+              )}
+            </div>
+
+            {/* Center: Photo */}
+            <div style={{ flex: "0 0 100px", display: "flex", justifyContent: "center", alignItems: "flex-start" }}>
+              <img
+                src={photoUrl}
+                alt={data.personalInfo?.fullName || "Profile"}
+                style={{
+                  width: "95px",
+                  height: "115px",
+                  borderRadius: "16px",
+                  objectFit: "cover",
+                  border: "1.5px solid #e2e8f0",
+                  display: "block",
+                  boxShadow: "0 2px 6px rgba(0,0,0,0.06)",
+                }}
+              />
+            </div>
+
+            {/* Right: Contact Information */}
+            <div
+              style={{
+                flex: "1 1 36%",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "flex-end",
+                justifyContent: "flex-start",
+                gap: "5px",
+                paddingTop: "4px",
+              }}
+            >
+              {email && (
+                <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "8.5pt", color: "#334155" }}>
+                  <span>{email}</span>
+                  <Mail style={{ width: "12px", height: "12px", color: "#be675e", flexShrink: 0 }} />
+                </div>
+              )}
+              {phone && (
+                <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "8.5pt", color: "#334155" }}>
+                  <span>{phone}</span>
+                  <Phone style={{ width: "12px", height: "12px", color: "#be675e", flexShrink: 0 }} />
+                </div>
+              )}
+              {location && (
+                <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "8.5pt", color: "#334155" }}>
+                  <span>{location}</span>
+                  <MapPin style={{ width: "12px", height: "12px", color: "#be675e", flexShrink: 0 }} />
+                </div>
+              )}
+              {linkedin && (
+                <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "8.5pt", color: "#334155" }}>
+                  <span>{linkedin.replace(/^https?:\/\//, "")}</span>
+                  <LinkedinIcon style={{ width: "12px", height: "12px", color: "#be675e", flexShrink: 0 }} />
+                </div>
+              )}
+              {portfolio && (
+                <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "8.5pt", color: "#334155" }}>
+                  <span>{portfolio.replace(/^https?:\/\//, "")}</span>
+                  <Globe style={{ width: "12px", height: "12px", color: "#be675e", flexShrink: 0 }} />
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Body: 2-Column Layout */}
+          <div style={{ display: "flex", gap: "24px", marginTop: "8px" }}>
+            {/* Left Column (52%): Education & Work Experience */}
+            <div style={{ flex: "1 1 52%", minWidth: 0 }}>
+              {/* EDUCATION */}
+              {data.education && data.education.length > 0 && (
+                <div>
+                  {renderDoubleUnderlineHeader("EDUCATION")}
+                  <div style={{ display: "flex", flexDirection: "column", gap: "7px" }}>
+                    {data.education.map((edu, idx) => (
+                      <div key={edu.id || idx}>
+                        <div style={{ fontSize: "9.5pt", fontWeight: "700", color: "#0f172a", lineHeight: 1.25 }}>
+                          {edu.degree}
+                        </div>
+                        <div style={{ fontSize: "8.5pt", color: "#334155" }}>
+                          {edu.school}
+                        </div>
+                        {edu.date && (
+                          <div style={{ fontSize: "8pt", color: "#64748b" }}>
+                            {edu.date}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* WORK EXPERIENCE */}
+              {data.experience && data.experience.length > 0 && (
+                <div>
+                  {renderDoubleUnderlineHeader("WORK EXPERIENCE")}
+                  <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                    {data.experience.map((exp, idx) => (
+                      <div key={exp.id || idx}>
+                        <div style={{ fontSize: "9.5pt", fontWeight: "700", color: "#0f172a" }}>
+                          {exp.title}
+                        </div>
+                        <div style={{ fontSize: "8.5pt", color: "#334155" }}>
+                          {exp.company}
+                        </div>
+                        <div
+                          style={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            fontSize: "8pt",
+                            color: "#64748b",
+                            margin: "1px 0 3px 0",
+                          }}
+                        >
+                          <span>{exp.date}</span>
+                          <span>{exp.location}</span>
+                        </div>
+                        <div
+                          style={{
+                            fontSize: "7.5pt",
+                            color: "#475569",
+                            fontStyle: "italic",
+                            marginBottom: "3px",
+                          }}
+                        >
+                          Clinical Care & Patient Interaction
+                        </div>
+                        {exp.bullets && exp.bullets.length > 0 && (
+                          <ul style={{ margin: "2px 0 0 0", paddingLeft: "14px" }}>
+                            {exp.bullets.map((b, bIdx) => (
+                              <li
+                                key={bIdx}
+                                style={{
+                                  fontSize: "8.5pt",
+                                  color: "#334155",
+                                  lineHeight: 1.4,
+                                  marginBottom: "2px",
+                                }}
+                              >
+                                {renderFormattedText(b)}
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Right Column (48%): Areas of Expertise, Projects, Organizations, Certificates, Languages */}
+            <div style={{ flex: "1 1 48%", minWidth: 0 }}>
+              {/* AREAS OF EXPERTISE */}
+              <div>
+                {renderDoubleUnderlineHeader("AREAS OF EXPERTISE")}
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "5px" }}>
+                  {(allSkills.length > 0
+                    ? allSkills.slice(0, 8)
+                    : [
+                        "Time Management",
+                        "Strong Interpersonal Skills",
+                        "Reception & Patient Fronting",
+                        "Records Maintenance",
+                        "First Aid & Patient Care",
+                        "Teamwork & Collaboration",
+                        "Inventory Management",
+                      ]
+                  ).map((skill, idx) => (
+                    <span
+                      key={idx}
+                      style={{
+                        backgroundColor: "#e59086",
+                        color: "#ffffff",
+                        padding: "3px 8px",
+                        borderRadius: "5px",
+                        fontSize: "8pt",
+                        fontWeight: "600",
+                        letterSpacing: "0.2px",
+                      }}
+                    >
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {/* PERSONAL PROJECTS */}
+              {data.projects && data.projects.length > 0 && (
+                <div>
+                  {renderDoubleUnderlineHeader("PERSONAL PROJECTS")}
+                  <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                    {data.projects.map((proj, idx) => (
+                      <div key={proj.id || idx}>
+                        <div style={{ fontSize: "9pt", fontWeight: "700", color: "#0f172a" }}>
+                          {proj.name}
+                        </div>
+                        <ul style={{ margin: "2px 0 0 0", paddingLeft: "14px" }}>
+                          <li style={{ fontSize: "8.5pt", color: "#334155", lineHeight: 1.4 }}>
+                            {proj.description}
+                          </li>
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* ORGANIZATIONS */}
+              {data.achievements && data.achievements.length > 0 && (
+                <div>
+                  {renderDoubleUnderlineHeader("ORGANIZATIONS")}
+                  <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
+                    {data.achievements.map((ach, idx) => (
+                      <div key={ach.id || idx}>
+                        <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>
+                          {ach.title}
+                        </div>
+                        {ach.description && (
+                          <div style={{ fontSize: "8pt", color: "#64748b" }}>
+                            {ach.description}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* CERTIFICATES */}
+              {data.certifications && data.certifications.length > 0 && (
+                <div>
+                  {renderDoubleUnderlineHeader("CERTIFICATES")}
+                  <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                    {data.certifications.map((cert, idx) => (
+                      <div key={cert.id || idx}>
+                        <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>
+                          {cert.name}
+                        </div>
+                        {cert.issuer && (
+                          <div style={{ fontSize: "8pt", color: "#64748b" }}>
+                            {cert.issuer}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* LANGUAGES */}
+              {data.languages && data.languages.length > 0 && (
+                <div>
+                  {renderDoubleUnderlineHeader("LANGUAGES")}
+                  <div
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "1fr 1fr",
+                      gap: "6px 12px",
+                    }}
+                  >
+                    {data.languages.map((lang, idx) => (
+                      <div key={lang.id || idx}>
+                        <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>
+                          {lang.name}
+                        </div>
+                        <div style={{ fontSize: "7.5pt", color: "#64748b" }}>
+                          {lang.proficiency}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // 2. Catherine Barnett — 3D Character Animator
     const renderProCatherine = () => {
       const email = data.personalInfo?.email;
       const phone = data.personalInfo?.phone;
@@ -2482,6 +2858,9 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
     };
 
     // Route to dedicated Pro template renderers if matched
+    if (template.id === "pro-michelle") {
+      return renderProMichelle();
+    }
     if (template.id === "pro-catherine") {
       return renderProCatherine();
     }

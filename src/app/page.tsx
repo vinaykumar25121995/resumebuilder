@@ -99,7 +99,7 @@ export default function Home() {
               <a href="#templates" className="text-slate-300 hover:text-white text-sm font-medium transition-colors flex items-center gap-1.5">
                 <span>Templates</span>
                 <span className="text-[10px] bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-extrabold px-1.5 py-0.5 rounded-full leading-none">
-                  4 PRO
+                  5 PRO
                 </span>
               </a>
               <a href="#pricing" className="text-slate-300 hover:text-white text-sm font-medium transition-colors">Pricing</a>
@@ -371,7 +371,7 @@ export default function Home() {
               Crafted for Real Jobs. Engineered for ATS.
             </h2>
             <p className="text-slate-300 mt-4 max-w-2xl mx-auto text-sm md:text-base leading-relaxed">
-              Featuring our <strong className="text-amber-300">4 New Premium Pro Templates</strong> (Catherine Barnett, Chris Flims, Will Tribian, Amanda Smith) alongside proven corporate layouts.
+              Featuring our <strong className="text-amber-300">5 New Premium Pro Templates</strong> (Michelle Dhamar, Cathy Barnett, Chris Flims, Will Tribian, Amanda) alongside proven corporate layouts.
             </p>
 
             {/* Filter Tabs */}

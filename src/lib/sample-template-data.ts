@@ -6,6 +6,149 @@ import { ResumeData } from "@/components/ResumeTemplateRenderer";
  * Provides realistic, fully populated demonstration content for every template.
  */
 
+export const SAMPLE_PRO_MICHELLE: ResumeData = {
+  personalInfo: {
+    fullName: "Michelle Dhamar",
+    title: "Healthcare Industry Volunteer",
+    email: "michelle@example.com",
+    phone: "(123) 456-7890",
+    location: "Oklahoma City, OK",
+    linkedin: "michelle.com/n/michelledhamar",
+    portfolio: "@michelledhamar",
+    photoUrl: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&w=400&q=80",
+  },
+  summary:
+    "Dedicated healthcare volunteer with hands-on experience in patient care and patient reception protocols. Proficient in managing clinical operations, supporting healthcare teams in fast-paced clinical environments, and fostering modern compassionate patient experience. Fluent in English, Spanish, and Mandarin with a steadfast commitment to cultural sensitivity in clinical delivery.",
+  skills: {
+    technical: [
+      "Time Management",
+      "Strong Interpersonal Skills",
+      "Reception & Patient Fronting",
+      "Records Maintenance",
+      "First Aid & Patient Care",
+      "Teamwork & Collaboration",
+      "Inventory Management",
+    ],
+    tools: [
+      "Epic EHR",
+      "Cerner",
+      "Vital Signs Monitoring",
+      "HIPAA Compliance",
+      "Sterilization Protocols",
+    ],
+    concepts: [
+      "Patient Triage",
+      "Clinical Documentation",
+      "Compassionate Care",
+      "Outpatient Transport",
+    ],
+    soft: [
+      "Time Management",
+      "Strong Interpersonal Skills",
+      "Reception & Patient Fronting",
+      "Records Maintenance",
+      "First Aid & Patient Care",
+      "Teamwork & Collaboration",
+      "Inventory Management",
+    ],
+  },
+  experience: [
+    {
+      id: "exp-1",
+      title: "Hospital Volunteer",
+      company: "Care & Cure Premium Hospital",
+      location: "Oklahoma City, OK",
+      date: "03/2021 – Present",
+      bullets: [
+        "Deliver efficient assistance to nurses and clinical care staff in coordinating patient admittance and outpatient transport.",
+        "Provide patient reception support, resolving inquiries promptly and maintaining accurate triage logs across department units.",
+        "Participate in outreach campaigns and local community wellness events to guide preventative health education.",
+        "Maintain sanitary standards and replenish sterilized supplies across clinical preparation and examination bays.",
+      ],
+    },
+    {
+      id: "exp-2",
+      title: "Volunteer Nursing Assistant",
+      company: "Healthy&More Medicare",
+      location: "Oklahoma City, OK",
+      date: "07/2017 – 02/2021",
+      bullets: [
+        "Monitored patient records to ensure that all clinical documentation adhered strictly to HIPAA compliance protocols.",
+        "Observed patient vital signs, logged physical symptoms, and reported condition shifts immediately to supervising doctors.",
+        "Assisted in patient mobilization, rehabilitation exercises, and daily comfort routines under supervision.",
+      ],
+    },
+  ],
+  education: [
+    {
+      id: "edu-1",
+      degree: "Master of Science in Healthcare Administration (Anticipated May 2026)",
+      school: "University of Oklahoma Health Sciences Center",
+      date: "Anticipated May 2026",
+      location: "Oklahoma City, OK",
+    },
+    {
+      id: "edu-2",
+      degree: "Bachelor of Science in Nursing",
+      school: "Oklahoma University",
+      date: "2017 – 2021",
+      location: "Norman, OK",
+    },
+  ],
+  projects: [
+    {
+      id: "proj-1",
+      name: "Patient Education Initiative",
+      description: "Developed suite of bilingual educational booklets and digital resources to educate patients on care management and post-discharge recovery.",
+      tech: "Bilingual Patient Outreach",
+    },
+    {
+      id: "proj-2",
+      name: "Volunteer Induction Coordinator Study",
+      description: "Authored structured orientation workflows and onboarding checklists, training 25+ incoming hospital volunteers on patient interaction ethics.",
+      tech: "Healthcare Operations",
+    },
+  ],
+  achievements: [
+    {
+      id: "ach-1",
+      title: "National Association of Healthcare Assistants (NAHCA)",
+      description: "Active Member & Volunteer Chapter Lead (2021 – Present)",
+    },
+    {
+      id: "ach-2",
+      title: "National Network of Career Nursing Assistants",
+      description: "Member & Annual Conference Delegate (2017 – Present)",
+    },
+  ],
+  certifications: [
+    {
+      id: "cert-1",
+      name: "Basic Life Support (BLS) (2021)",
+      issuer: "American Heart Association (AHA)",
+      date: "2021",
+    },
+    {
+      id: "cert-2",
+      name: "Certified Nursing Assistant (CNA) (2021)",
+      issuer: "Oklahoma State Department of Health",
+      date: "2021",
+    },
+    {
+      id: "cert-3",
+      name: "Mental Health First Aid Certification (2022)",
+      issuer: "National Council for Mental Wellbeing",
+      date: "2022",
+    },
+  ],
+  languages: [
+    { id: "lang-1", name: "English", proficiency: "Native / Bilingual Proficiency" },
+    { id: "lang-2", name: "Spanish", proficiency: "Professional Working Proficiency" },
+    { id: "lang-3", name: "Chinese (Mandarin)", proficiency: "Clinical Healthcare Proficiency" },
+    { id: "lang-4", name: "Japanese", proficiency: "Conversational Healthcare Proficiency" },
+  ],
+};
+
 export const SAMPLE_PRO_CATHERINE: ResumeData = {
   personalInfo: {
     fullName: "Catherine Barnett",
@@ -1966,9 +2109,10 @@ export const SAMPLE_ATS_PHOTO_SIDEBAR: ResumeData = {
 };
 
 /**
- * Mapping of all 13 active templates to their dedicated, fully populated sample data.
+ * Mapping of all 14 active templates to their dedicated, fully populated sample data.
  */
 export const TEMPLATE_SAMPLE_MAP: Record<string, ResumeData> = {
+  "pro-michelle": SAMPLE_PRO_MICHELLE,
   "pro-catherine": SAMPLE_PRO_CATHERINE,
   "pro-chris-flims": SAMPLE_PRO_CHRIS_FLIMS,
   "pro-will-tribian": SAMPLE_PRO_WILL_TRIBIAN,
