@@ -3959,6 +3959,829 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
       );
     };
 
+
+    // 11. Ivana Johnson — HR Professional
+    const renderProIvana = () => {
+      const email = data.personalInfo?.email;
+      const phone = data.personalInfo?.phone;
+      const location = data.personalInfo?.location;
+      const portfolio = data.personalInfo?.portfolio;
+      const linkedin = data.personalInfo?.linkedin;
+
+      const hardSkills = [
+        ...(data.skills?.technical || []),
+        ...(data.skills?.tools || []),
+      ];
+
+      const renderIvanaHeader = (title: string, icon: React.ReactNode) => (
+        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "14px", marginBottom: "8px" }}>
+          <div
+            style={{
+              width: "22px",
+              height: "22px",
+              backgroundColor: "#174375",
+              borderRadius: "4px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
+            }}
+          >
+            {icon}
+          </div>
+          <span
+            style={{
+              fontSize: "10pt",
+              fontWeight: "800",
+              textTransform: "uppercase",
+              letterSpacing: "0.8px",
+              color: "#1e293b",
+            }}
+          >
+            {title}
+          </span>
+        </div>
+      );
+
+      return (
+        <div
+          ref={ref}
+          style={{
+            fontFamily: cs.fontFamily || "'Inter', Arial, sans-serif",
+            width: pageDim.width,
+            minHeight: pageDim.height,
+            backgroundColor: "#ffffff",
+            padding: "14mm 16mm",
+            boxSizing: "border-box",
+            color: "#1e293b",
+          }}
+        >
+          <style
+            dangerouslySetInnerHTML={{
+              __html: `@page { size: ${pageDim.width} ${pageDim.height}; margin: 0; }`,
+            }}
+          />
+
+          {/* Deep Marine Header Card */}
+          <div
+            style={{
+              backgroundColor: "#174375",
+              borderRadius: "12px",
+              padding: "16px 20px",
+              color: "#ffffff",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "flex-start",
+              gap: "20px",
+              boxShadow: "0 4px 12px rgba(23, 67, 117, 0.15)",
+              marginBottom: "12px",
+            }}
+          >
+            <div style={{ flex: "1 1 58%" }}>
+              <h1 style={{ fontSize: nameFontSize || "26pt", fontWeight: "800", margin: "0 0 2px 0", letterSpacing: "-0.5px" }}>
+                {data.personalInfo?.fullName || "Ivana Johnson"}
+              </h1>
+              <p style={{ fontSize: "11.5pt", color: "#bfdbfe", fontWeight: "600", margin: "0 0 8px 0" }}>
+                {data.personalInfo?.title || "HR Professional"}
+              </p>
+              {data.summary && (
+                <p style={{ fontSize: "8.5pt", color: "#f8fafc", lineHeight: 1.45, margin: 0, opacity: 0.95 }}>
+                  {renderFormattedText(data.summary)}
+                </p>
+              )}
+            </div>
+
+            <div style={{ flex: "1 1 38%", display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "5px", fontSize: "8pt", color: "#e2e8f0" }}>
+              {email && (
+                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                  <span>{email}</span>
+                  <Mail style={{ width: 12, height: 12, color: "#93c5fd" }} />
+                </div>
+              )}
+              {phone && (
+                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                  <span>{phone}</span>
+                  <Phone style={{ width: 12, height: 12, color: "#93c5fd" }} />
+                </div>
+              )}
+              {location && (
+                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                  <span>{location}</span>
+                  <MapPin style={{ width: 12, height: 12, color: "#93c5fd" }} />
+                </div>
+              )}
+              {linkedin && (
+                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                  <span>{linkedin.replace(/^https?:\/\//, "")}</span>
+                  <LinkedinIcon style={{ width: 12, height: 12, color: "#93c5fd" }} />
+                </div>
+              )}
+              {portfolio && (
+                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                  <span>{portfolio.replace(/^https?:\/\//, "")}</span>
+                  <Globe style={{ width: 12, height: 12, color: "#93c5fd" }} />
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* 2-Column Body */}
+          <div style={{ display: "flex", gap: "24px" }}>
+            {/* Left Column (55%): Work Experience */}
+            <div style={{ flex: "1 1 55%" }}>
+              {data.experience && data.experience.length > 0 && (
+                <div>
+                  {renderIvanaHeader("WORK EXPERIENCE", <Briefcase style={{ width: 12, height: 12, color: "#ffffff" }} />)}
+                  <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                    {data.experience.map((exp, idx) => (
+                      <div key={idx}>
+                        <div style={{ fontSize: "9.5pt", fontWeight: "700", color: "#0f172a" }}>{exp.title}</div>
+                        <div style={{ fontSize: "8.5pt", color: "#174375", fontWeight: "600" }}>{exp.company}</div>
+                        <div style={{ display: "flex", justifyContent: "space-between", fontSize: "7.5pt", color: "#64748b", margin: "1px 0" }}>
+                          <span>{exp.date}</span>
+                          <span>{exp.location}</span>
+                        </div>
+                        {exp.bullets && exp.bullets.length > 0 && (
+                          <ul style={{ margin: "2px 0 0 0", paddingLeft: "14px" }}>
+                            {exp.bullets.map((b, bIdx) => (
+                              <li key={bIdx} style={{ fontSize: "8.5pt", color: "#334155", lineHeight: 1.4, marginBottom: "2px" }}>
+                                {renderFormattedText(b)}
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Right Column (45%): Skills, Courses, Certificates, Education, Languages */}
+            <div style={{ flex: "1 1 45%" }}>
+              {/* SKILLS & COMPETENCIES */}
+              <div>
+                {renderIvanaHeader("SKILLS & COMPETENCIES", <Cpu style={{ width: 12, height: 12, color: "#ffffff" }} />)}
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
+                  {(hardSkills.length > 0
+                    ? hardSkills.slice(0, 10)
+                    : ["HRIS", "Intake Analysis", "Onboarding", "Skill Coaching", "Programs Evaluation", "SAP HR", "Data Analysis", "Labor Law Compliance"]
+                  ).map((s, idx) => (
+                    <span
+                      key={idx}
+                      style={{
+                        backgroundColor: "#8da9c4",
+                        color: "#ffffff",
+                        padding: "3px 8px",
+                        borderRadius: "4px",
+                        fontSize: "7.5pt",
+                        fontWeight: "600",
+                      }}
+                    >
+                      {s}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {/* COURSES & TRAINING / ACHIEVEMENTS */}
+              {data.achievements && data.achievements.length > 0 && (
+                <div>
+                  {renderIvanaHeader("COURSES & TRAINING", <Bookmark style={{ width: 12, height: 12, color: "#ffffff" }} />)}
+                  <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
+                    {data.achievements.map((ach, idx) => (
+                      <div key={idx}>
+                        <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{ach.title}</div>
+                        {ach.description && <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{ach.description}</div>}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* CERTIFICATES */}
+              {data.certifications && data.certifications.length > 0 && (
+                <div>
+                  {renderIvanaHeader("CERTIFICATES", <Award style={{ width: 12, height: 12, color: "#ffffff" }} />)}
+                  <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
+                    {data.certifications.map((c, idx) => (
+                      <div key={idx}>
+                        <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{c.name}</div>
+                        {c.issuer && <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{c.issuer}</div>}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* EDUCATION */}
+              {data.education && data.education.length > 0 && (
+                <div>
+                  {renderIvanaHeader("EDUCATION", <GraduationCap style={{ width: 12, height: 12, color: "#ffffff" }} />)}
+                  <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                    {data.education.map((edu, idx) => (
+                      <div key={idx}>
+                        <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{edu.school}</div>
+                        <div style={{ fontSize: "8pt", color: "#334155" }}>{edu.degree}</div>
+                        {edu.date && <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{edu.date}</div>}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* LANGUAGES */}
+              {data.languages && data.languages.length > 0 && (
+                <div>
+                  {renderIvanaHeader("LANGUAGES", <Globe style={{ width: 12, height: 12, color: "#ffffff" }} />)}
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px 12px" }}>
+                    {data.languages.map((l, idx) => (
+                      <div key={idx}>
+                        <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{l.name}</div>
+                        <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{l.proficiency}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // 12. Melissa Ware — Copywriter
+    const renderProMelissa = () => {
+      const email = data.personalInfo?.email;
+      const phone = data.personalInfo?.phone;
+      const location = data.personalInfo?.location;
+      const portfolio = data.personalInfo?.portfolio;
+      const linkedin = data.personalInfo?.linkedin;
+      const photoUrl =
+        data.personalInfo?.photoUrl ||
+        "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80";
+
+      const renderMelissaHeader = (title: string) => (
+        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "14px", marginBottom: "8px" }}>
+          <div
+            style={{
+              width: "18px",
+              height: "18px",
+              backgroundColor: "#0f172a",
+              borderRadius: "3px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              transform: "rotate(45deg)",
+              flexShrink: 0,
+            }}
+          >
+            <div style={{ width: "6px", height: "6px", backgroundColor: "#d4af37", borderRadius: "1px" }} />
+          </div>
+          <span
+            style={{
+              fontSize: "10pt",
+              fontWeight: "800",
+              textTransform: "uppercase",
+              letterSpacing: "0.8px",
+              color: "#0f172a",
+            }}
+          >
+            {title}
+          </span>
+        </div>
+      );
+
+      return (
+        <div
+          ref={ref}
+          style={{
+            fontFamily: cs.fontFamily || "'Inter', Arial, sans-serif",
+            width: pageDim.width,
+            minHeight: pageDim.height,
+            backgroundColor: "#ffffff",
+            padding: "14mm 16mm",
+            boxSizing: "border-box",
+            color: "#0f172a",
+          }}
+        >
+          <style
+            dangerouslySetInnerHTML={{
+              __html: `@page { size: ${pageDim.width} ${pageDim.height}; margin: 0; }`,
+            }}
+          />
+
+          {/* Header Row: Navy Bio Capsule + Gold Framed Photo + Contact */}
+          <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "12px", position: "relative" }}>
+            <div
+              style={{
+                flex: "1 1 45%",
+                backgroundColor: "#0f172a",
+                borderRadius: "8px",
+                padding: "16px 20px",
+                color: "#ffffff",
+              }}
+            >
+              <h1 style={{ fontSize: nameFontSize || "24pt", fontWeight: "800", margin: "0 0 2px 0", letterSpacing: "-0.5px" }}>
+                {data.personalInfo?.fullName || "Melissa Ware"}
+              </h1>
+              <p style={{ fontSize: "11pt", color: "#d4af37", fontWeight: "600", margin: "0 0 8px 0" }}>
+                {data.personalInfo?.title || "Copywriter"}
+              </p>
+              {data.summary && (
+                <p style={{ fontSize: "8.5pt", color: "#cbd5e1", lineHeight: 1.45, margin: 0 }}>
+                  {renderFormattedText(data.summary)}
+                </p>
+              )}
+            </div>
+
+            <div style={{ flex: "0 0 100px", display: "flex", justifyContent: "center" }}>
+              <img
+                src={photoUrl}
+                alt={data.personalInfo?.fullName || "Melissa Ware"}
+                style={{
+                  width: "95px",
+                  height: "95px",
+                  borderRadius: "50%",
+                  objectFit: "cover",
+                  border: "4px solid #d4af37",
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                }}
+              />
+            </div>
+
+            <div style={{ flex: "1 1 35%", display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "5px", fontSize: "8pt", color: "#334155" }}>
+              {email && (
+                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                  <span>{email}</span>
+                  <Mail style={{ width: 12, height: 12, color: "#0f172a" }} />
+                </div>
+              )}
+              {phone && (
+                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                  <span>{phone}</span>
+                  <Phone style={{ width: 12, height: 12, color: "#0f172a" }} />
+                </div>
+              )}
+              {location && (
+                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                  <span>{location}</span>
+                  <MapPin style={{ width: 12, height: 12, color: "#0f172a" }} />
+                </div>
+              )}
+              {linkedin && (
+                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                  <span>{linkedin.replace(/^https?:\/\//, "")}</span>
+                  <LinkedinIcon style={{ width: 12, height: 12, color: "#0f172a" }} />
+                </div>
+              )}
+              {portfolio && (
+                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                  <span>{portfolio.replace(/^https?:\/\//, "")}</span>
+                  <Globe style={{ width: 12, height: 12, color: "#0f172a" }} />
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Golden Center Node Separator */}
+          <div style={{ position: "relative", borderBottom: "1.5px solid #e2e8f0", margin: "14px 0 12px 0" }}>
+            <div
+              style={{
+                position: "absolute",
+                left: "48%",
+                top: "-4px",
+                width: "8px",
+                height: "8px",
+                borderRadius: "50%",
+                backgroundColor: "#d4af37",
+              }}
+            />
+          </div>
+
+          {/* 2-Column Body */}
+          <div style={{ display: "flex", gap: "22px" }}>
+            {/* Left Column (52%): Work Experience & Education with Timeline Rule */}
+            <div style={{ flex: "1 1 52%" }}>
+              {data.experience && data.experience.length > 0 && (
+                <div>
+                  {renderMelissaHeader("WORK EXPERIENCE")}
+                  <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                    {data.experience.map((exp, idx) => (
+                      <div key={idx} style={{ position: "relative", paddingLeft: "16px" }}>
+                        <div
+                          style={{
+                            position: "absolute",
+                            left: 0,
+                            top: "4px",
+                            width: "8px",
+                            height: "8px",
+                            borderRadius: "50%",
+                            border: "2px solid #0f172a",
+                            backgroundColor: "#ffffff",
+                          }}
+                        />
+                        <div
+                          style={{
+                            position: "absolute",
+                            left: "3.5px",
+                            top: "14px",
+                            bottom: "-8px",
+                            width: "1.5px",
+                            backgroundColor: "#cbd5e1",
+                          }}
+                        />
+
+                        <div style={{ fontSize: "9.5pt", fontWeight: "700", color: "#0f172a" }}>{exp.title}</div>
+                        <div style={{ fontSize: "8.5pt", color: "#334155", fontWeight: "600" }}>{exp.company}</div>
+                        <div style={{ display: "flex", justifyContent: "space-between", fontSize: "7.5pt", color: "#64748b", margin: "1px 0" }}>
+                          <span>{exp.date}</span>
+                          <span style={{ color: "#d4af37", fontWeight: "700" }}>2 Achievements</span>
+                        </div>
+                        {exp.bullets && exp.bullets.length > 0 && (
+                          <ul style={{ margin: "2px 0 0 0", paddingLeft: "14px" }}>
+                            {exp.bullets.map((b, bIdx) => (
+                              <li key={bIdx} style={{ fontSize: "8.5pt", color: "#334155", lineHeight: 1.4, marginBottom: "2px" }}>
+                                {renderFormattedText(b)}
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {data.education && data.education.length > 0 && (
+                <div style={{ marginTop: "12px" }}>
+                  {renderMelissaHeader("EDUCATION")}
+                  {data.education.map((edu, idx) => (
+                    <div key={idx} style={{ position: "relative", paddingLeft: "16px" }}>
+                      <div
+                        style={{
+                          position: "absolute",
+                          left: 0,
+                          top: "4px",
+                          width: "8px",
+                          height: "8px",
+                          borderRadius: "50%",
+                          border: "2px solid #0f172a",
+                          backgroundColor: "#ffffff",
+                        }}
+                      />
+                      <div style={{ fontSize: "9.5pt", fontWeight: "700", color: "#0f172a" }}>{edu.degree}</div>
+                      <div style={{ fontSize: "8.5pt", color: "#334155" }}>{edu.school}</div>
+                      {edu.date && <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{edu.date}</div>}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Right Column (48%): Soft Grey Card Container */}
+            <div
+              style={{
+                flex: "1 1 48%",
+                backgroundColor: "#f8fafc",
+                borderRadius: "12px",
+                padding: "14px 16px",
+                border: "1px solid #f1f5f9",
+              }}
+            >
+              {/* GENERAL SKILLS */}
+              <div>
+                {renderMelissaHeader("GENERAL SKILLS")}
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "5px", fontSize: "8pt", color: "#334155" }}>
+                  {[
+                    "Copywriting", "Establishing Tone",
+                    "Identifying Audience", "WordPress",
+                    "SEO", "Digital Marketing",
+                    "Attention to Detail", "Time-management",
+                    "Creative Writing", "Editing"
+                  ].map((s, idx) => (
+                    <div key={idx} style={{ padding: "1px 0" }}>{s}</div>
+                  ))}
+                </div>
+              </div>
+
+              {/* PERSONAL PROJECTS */}
+              {data.projects && data.projects.length > 0 && (
+                <div>
+                  {renderMelissaHeader("PERSONAL PROJECTS")}
+                  <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                    {data.projects.map((p, idx) => (
+                      <div key={idx}>
+                        <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{p.name}</div>
+                        <p style={{ fontSize: "8pt", color: "#334155", lineHeight: 1.35, margin: "2px 0 0 0" }}>
+                          {p.description}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* LANGUAGES: Radial Circular Gauge Meters */}
+              {data.languages && data.languages.length > 0 && (
+                <div>
+                  {renderMelissaHeader("LANGUAGES")}
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px 12px" }}>
+                    {data.languages.map((l, idx) => {
+                      const percent = l.name === "English" || l.name === "Spanish" ? 100 : l.name === "German" ? 65 : 45;
+                      const strokeDash = 2 * Math.PI * 10;
+                      const strokeOffset = strokeDash - (percent / 100) * strokeDash;
+
+                      return (
+                        <div key={idx} style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                          <svg width="24" height="24" viewBox="0 0 24 24" style={{ transform: "rotate(-90deg)", flexShrink: 0 }}>
+                            <circle cx="12" cy="12" r="10" stroke="#cbd5e1" strokeWidth="2.5" fill="none" />
+                            <circle
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              stroke="#0f172a"
+                              strokeWidth="2.5"
+                              fill="none"
+                              strokeDasharray={strokeDash}
+                              strokeDashoffset={strokeOffset}
+                              strokeLinecap="round"
+                            />
+                          </svg>
+                          <div>
+                            <div style={{ fontSize: "8pt", fontWeight: "700", color: "#0f172a" }}>{l.name}</div>
+                            <div style={{ fontSize: "7pt", color: "#64748b" }}>{l.proficiency}</div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* INTERESTS */}
+              <div style={{ marginTop: "12px" }}>
+                {renderMelissaHeader("INTERESTS")}
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "5px", fontSize: "7.5pt", color: "#334155" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
+                    <Sparkles style={{ width: 11, height: 11, color: "#d4af37" }} />
+                    <span>Renewable Energy</span>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
+                    <Layers style={{ width: 11, height: 11, color: "#d4af37" }} />
+                    <span>Calligraphy</span>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
+                    <Globe style={{ width: 11, height: 11, color: "#d4af37" }} />
+                    <span>Gardening</span>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
+                    <Compass style={{ width: 11, height: 11, color: "#d4af37" }} />
+                    <span>Astronomy</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // 13. Veronica Cook — AWS Certified DevOps Engineer
+    const renderProVeronica = () => {
+      const email = data.personalInfo?.email;
+      const phone = data.personalInfo?.phone;
+      const location = data.personalInfo?.location;
+      const portfolio = data.personalInfo?.portfolio;
+      const linkedin = data.personalInfo?.linkedin;
+      const github = data.personalInfo?.github;
+
+      const techSkills = [
+        ...(data.skills?.technical || []),
+        ...(data.skills?.tools || []),
+      ];
+
+      const renderVeronicaHeader = (title: string, icon: React.ReactNode) => (
+        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "14px", marginBottom: "8px" }}>
+          <div
+            style={{
+              width: "22px",
+              height: "22px",
+              backgroundColor: "#c85a48",
+              borderRadius: "4px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
+            }}
+          >
+            {icon}
+          </div>
+          <span
+            style={{
+              fontSize: "10pt",
+              fontWeight: "800",
+              textTransform: "uppercase",
+              letterSpacing: "0.8px",
+              color: "#1e3a5f",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {title}
+          </span>
+          <div style={{ width: "50px", height: "2.5px", backgroundColor: "#c85a48", margin: "0 4px" }} />
+          <div style={{ flex: 1, height: "2.5px", backgroundColor: "#1e3a5f" }} />
+        </div>
+      );
+
+      return (
+        <div
+          ref={ref}
+          style={{
+            fontFamily: cs.fontFamily || "'Inter', Arial, sans-serif",
+            width: pageDim.width,
+            minHeight: pageDim.height,
+            backgroundColor: "#ffffff",
+            padding: "14mm 16mm",
+            boxSizing: "border-box",
+            color: "#1e293b",
+          }}
+        >
+          <style
+            dangerouslySetInnerHTML={{
+              __html: `@page { size: ${pageDim.width} ${pageDim.height}; margin: 0; }`,
+            }}
+          />
+
+          {/* Top Header: Name/Title/Bio on Left + Floating Navy Contact Card on Right */}
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "24px", marginBottom: "10px" }}>
+            <div style={{ flex: "1 1 60%" }}>
+              <h1 style={{ fontSize: nameFontSize || "28pt", fontWeight: "800", color: "#1e3a5f", margin: "0 0 2px 0", letterSpacing: "-0.5px" }}>
+                {data.personalInfo?.fullName || "Veronica Cook"}
+              </h1>
+              <p style={{ fontSize: "11.5pt", color: "#c85a48", fontWeight: "700", margin: "0 0 8px 0" }}>
+                {data.personalInfo?.title || "AWS Certified DevOps Engineer"}
+              </p>
+              {data.summary && (
+                <p style={{ fontSize: "8.5pt", color: "#334155", lineHeight: 1.45, margin: 0 }}>
+                  {renderFormattedText(data.summary)}
+                </p>
+              )}
+            </div>
+
+            {/* Floating Navy Contact Card */}
+            <div
+              style={{
+                flex: "0 0 220px",
+                backgroundColor: "#1e3a5f",
+                borderRadius: "12px",
+                padding: "12px 16px",
+                color: "#ffffff",
+                boxShadow: "0 4px 14px rgba(30, 58, 95, 0.15)",
+                display: "flex",
+                flexDirection: "column",
+                gap: "5px",
+                fontSize: "7.5pt",
+              }}
+            >
+              {email && (
+                <div style={{ display: "flex", alignItems: "center", gap: "8px", wordBreak: "break-all" }}>
+                  <div style={{ width: 16, height: 16, backgroundColor: "rgba(255,255,255,0.15)", borderRadius: 3, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    <Mail style={{ width: 10, height: 10, color: "#ffffff" }} />
+                  </div>
+                  <span>{email}</span>
+                </div>
+              )}
+              {phone && (
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  <div style={{ width: 16, height: 16, backgroundColor: "rgba(255,255,255,0.15)", borderRadius: 3, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    <Phone style={{ width: 10, height: 10, color: "#ffffff" }} />
+                  </div>
+                  <span>{phone}</span>
+                </div>
+              )}
+              {location && (
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  <div style={{ width: 16, height: 16, backgroundColor: "rgba(255,255,255,0.15)", borderRadius: 3, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    <MapPin style={{ width: 10, height: 10, color: "#ffffff" }} />
+                  </div>
+                  <span>{location}</span>
+                </div>
+              )}
+              {linkedin && (
+                <div style={{ display: "flex", alignItems: "center", gap: "8px", wordBreak: "break-all" }}>
+                  <div style={{ width: 16, height: 16, backgroundColor: "rgba(255,255,255,0.15)", borderRadius: 3, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    <LinkedinIcon style={{ width: 10, height: 10, color: "#ffffff" }} />
+                  </div>
+                  <span>{linkedin.replace(/^https?:\/\//, "")}</span>
+                </div>
+              )}
+              {github && (
+                <div style={{ display: "flex", alignItems: "center", gap: "8px", wordBreak: "break-all" }}>
+                  <div style={{ width: 16, height: 16, backgroundColor: "rgba(255,255,255,0.15)", borderRadius: 3, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    <Globe style={{ width: 10, height: 10, color: "#ffffff" }} />
+                  </div>
+                  <span>{github.replace(/^https?:\/\//, "")}</span>
+                </div>
+              )}
+              {portfolio && (
+                <div style={{ display: "flex", alignItems: "center", gap: "8px", wordBreak: "break-all" }}>
+                  <div style={{ width: 16, height: 16, backgroundColor: "rgba(255,255,255,0.15)", borderRadius: 3, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    <Sparkles style={{ width: 10, height: 10, color: "#ffffff" }} />
+                  </div>
+                  <span>{portfolio.replace(/^https?:\/\//, "")}</span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* 1. TECHNICAL SKILLS: Full-width blue-gray pill badges */}
+          <div>
+            {renderVeronicaHeader("TECHNICAL SKILLS", <Cpu style={{ width: 12, height: 12, color: "#ffffff" }} />)}
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "5px" }}>
+              {(techSkills.length > 0
+                ? techSkills.slice(0, 14)
+                : ["Python", "CI/CD", "Deployment", "Programming", "Linux/BASH", "Docker/Swarm", "Kubernetes", "Jenkins", "Terraform / IaC", "Cloud Infrastructure", "GCP", "AWS", "Scrum", "Agile"]
+              ).map((s, idx) => (
+                <span
+                  key={idx}
+                  style={{
+                    backgroundColor: "#64748b",
+                    color: "#ffffff",
+                    padding: "3px 9px",
+                    borderRadius: "4px",
+                    fontSize: "7.5pt",
+                    fontWeight: "600",
+                  }}
+                >
+                  {s}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* 2. WORK EXPERIENCE: Full-width with square terracotta bullet markers */}
+          {data.experience && data.experience.length > 0 && (
+            <div>
+              {renderVeronicaHeader("WORK EXPERIENCE", <Briefcase style={{ width: 12, height: 12, color: "#ffffff" }} />)}
+              <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                {data.experience.map((exp, idx) => (
+                  <div key={idx}>
+                    <div style={{ fontSize: "9.5pt", fontWeight: "700", color: "#0f172a" }}>{exp.title}</div>
+                    <div style={{ fontSize: "8.5pt", color: "#1e3a5f", fontWeight: "600" }}>{exp.company}</div>
+                    {exp.date && <div style={{ fontSize: "7.5pt", color: "#c85a48", margin: "1px 0" }}>{exp.date}</div>}
+                    {exp.bullets && exp.bullets.length > 0 && (
+                      <ul style={{ margin: "2px 0 0 0", paddingLeft: "14px", listStyleType: "none" }}>
+                        {exp.bullets.map((b, bIdx) => (
+                          <li
+                            key={bIdx}
+                            style={{
+                              fontSize: "8.5pt",
+                              color: "#334155",
+                              lineHeight: 1.4,
+                              marginBottom: "2px",
+                              position: "relative",
+                              paddingLeft: "12px",
+                            }}
+                          >
+                            <span
+                              style={{
+                                position: "absolute",
+                                left: 0,
+                                top: "5px",
+                                width: "5px",
+                                height: "5px",
+                                backgroundColor: "#c85a48",
+                              }}
+                            />
+                            {renderFormattedText(b)}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* 3. EDUCATION */}
+          {data.education && data.education.length > 0 && (
+            <div>
+              {renderVeronicaHeader("EDUCATION", <GraduationCap style={{ width: 12, height: 12, color: "#ffffff" }} />)}
+              {data.education.map((edu, idx) => (
+                <div key={idx}>
+                  <div style={{ fontSize: "9.5pt", fontWeight: "700", color: "#0f172a" }}>{edu.degree}</div>
+                  <div style={{ fontSize: "8.5pt", color: "#334155" }}>{edu.school}</div>
+                  {edu.date && <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{edu.date}</div>}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      );
+    };
+
     // 4. Amanda Smith — Chief Information Officer (CIO)
     const renderProAmandaSmith = () => {
       const email = data.personalInfo?.email;
@@ -4262,6 +5085,15 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
     }
     if (template.id === "pro-lisa") {
       return renderProLisa();
+    }
+    if (template.id === "pro-ivana") {
+      return renderProIvana();
+    }
+    if (template.id === "pro-melissa") {
+      return renderProMelissa();
+    }
+    if (template.id === "pro-veronica") {
+      return renderProVeronica();
     }
 
     if (isTwoColumn) {

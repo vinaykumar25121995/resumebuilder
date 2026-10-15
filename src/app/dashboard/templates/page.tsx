@@ -433,7 +433,7 @@ export default function TemplatesPage() {
                   : "bg-slate-800/80 hover:bg-slate-700/80 text-amber-300 border-amber-500/30"
               }`}
             >
-              <span>View 10 Premium Templates</span>
+              <span>View 13 Premium Templates</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
@@ -764,14 +764,14 @@ export default function TemplatesPage() {
                     is an exclusive Pro template. Upgrade today to unlock this template and all executive designs instantly.
                   </>
                 ) : (
-                  "Upgrade to Pro to unlock all 10 exclusive executive & creative templates, designed for senior professionals and creative leaders."
+                  "Upgrade to Pro to unlock all 13 exclusive executive & creative templates, designed for senior professionals and creative leaders."
                 )}
               </p>
 
               {/* Showcase the 4 Pro Templates */}
               <div className="bg-slate-950/60 border border-slate-800 rounded-2xl p-4">
                 <div className="text-xs font-bold uppercase tracking-wider text-amber-400 mb-3 flex items-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5" /> 10 Premium Pro Templates Included:
+                  <Sparkles className="w-3.5 h-3.5" /> 13 Premium Pro Templates Included:
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 text-xs text-slate-200">
                   <div className="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 flex items-center gap-2">
@@ -843,6 +843,30 @@ export default function TemplatesPage() {
                     <div>
                       <div className="font-bold">Lisa Neumann</div>
                       <div className="text-[10px] text-slate-400">Mechanical Engineer</div>
+                    </div>
+                  </div>
+
+                  <div className="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-sky-400" />
+                    <div>
+                      <div className="font-bold">Ivana Johnson</div>
+                      <div className="text-[10px] text-slate-400">HR Professional</div>
+                    </div>
+                  </div>
+
+                  <div className="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-amber-300" />
+                    <div>
+                      <div className="font-bold">Melissa Ware</div>
+                      <div className="text-[10px] text-slate-400">Senior Copywriter</div>
+                    </div>
+                  </div>
+
+                  <div className="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-orange-500" />
+                    <div>
+                      <div className="font-bold">Veronica Cook</div>
+                      <div className="text-[10px] text-slate-400">AWS DevOps Engineer</div>
                     </div>
                   </div>
 

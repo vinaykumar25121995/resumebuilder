@@ -565,6 +565,287 @@ export const SAMPLE_PRO_LISA: ResumeData = {
   ],
 };
 
+export const SAMPLE_PRO_IVANA: ResumeData = {
+  personalInfo: {
+    fullName: "Ivana Johnson",
+    title: "HR Professional",
+    email: "invia@ivanajohnson.com",
+    phone: "(813) 2234 450",
+    location: "Newsslegins, UK",
+    linkedin: "linkedin.com/in/ivanajohnson",
+    portfolio: "@mancuhnson",
+  },
+  summary:
+    "Experienced, people-centered Human Resources Professional with 7+ years of experience in HR management, employee relations, and talent operations. Solid commitment to ensuring high quality support for staff growth, compliance adherence, and performance enhancement. Expert in designing employee lifecycle workflows, conflict resolution, and retention strategies.",
+  skills: {
+    technical: [
+      "HRIS",
+      "Intake Analysis",
+      "Onboarding & Offboarding",
+      "Skill Coaching",
+      "Programs Evaluation",
+      "Conflict Evaluation",
+      "SAP HR",
+      "Data Analysis",
+      "Labor Law & Regulatory Compliance",
+      "Training & Performance Management",
+    ],
+    tools: ["Workday", "BambooHR", "SAP", "Excel Advanced", "Jira HR"],
+    concepts: ["Employee Lifecycle", "Labor Law Compliance", "360 Performance Reviews", "Talent Acquisition"],
+    soft: ["Empathetic Communication", "Active Listening", "Mediation", "Strategic Planning", "Organizational Agility"],
+  },
+  experience: [
+    {
+      id: "exp-1",
+      title: "HR Generalist",
+      company: "The Good Hire Solutions",
+      location: "Montserrat, UK",
+      date: "2021 – Present",
+      bullets: [
+        "Directed end-to-end employee lifecycle for 350+ team members across 4 international operational hubs.",
+        "Spearheaded pre-employment onboarding initiatives, standardizing background checks and shortening ramp-up time by 28%.",
+        "Provided formal conflict mediation and leadership coaching to department managers, lowering involuntary turnover by 18%.",
+        "Maintained organizational compliance with regional employment standards, labor audits, and statutory benefits laws.",
+        "Collaborated with executive leadership to implement quarterly 360-degree performance evaluation frameworks.",
+      ],
+    },
+    {
+      id: "exp-2",
+      title: "HR Coordinator",
+      company: "Britee People Management Corp.",
+      location: "London, UK",
+      date: "2018 – 2021",
+      bullets: [
+        "Oversaw recruitment workflows, resume screening, and panel interview coordination for 80+ annual requisitions.",
+        "Devised and deployed internal wellness surveys that identified retention roadblocks and elevated team morale by 22%.",
+        "Assisted the HR Director in updating handbook policies, employee benefits packages, and compliance reporting.",
+      ],
+    },
+  ],
+  education: [
+    {
+      id: "edu-1",
+      degree: "MBA in Human Resources & Organizational Psychology",
+      school: "University of Indianapolis",
+      date: "2016 – 2018",
+      location: "Indianapolis, IN",
+    },
+    {
+      id: "edu-2",
+      degree: "Bachelor of Arts in Applied Psychology",
+      school: "Indiana University - Purdue University Indianapolis",
+      date: "2012 – 2016",
+      location: "Indianapolis, IN",
+    },
+  ],
+  certifications: [
+    {
+      id: "cert-1",
+      name: "Certified Professional Human Resources (PHR) (2020)",
+      issuer: "HR Certification Institute (HRCI)",
+      date: "2020",
+    },
+    {
+      id: "cert-2",
+      name: "Behavioral Interviewing Certification (2019)",
+      issuer: "Natural Alignment Consulting",
+      date: "2019",
+    },
+  ],
+  achievements: [
+    {
+      id: "ach-1",
+      title: "Data Handling & People Analytics Training (2021)",
+      description: "2 Credits in NuCurai People Operations & Alignment Consulting",
+    },
+    {
+      id: "ach-2",
+      title: "General Industry Safety & Health Training (OSHA) (2020)",
+      description: "Certified Workplace Safety & Compliance Standards",
+    },
+  ],
+  languages: [
+    { id: "lang-1", name: "English", proficiency: "Native / Required Proficiency" },
+    { id: "lang-2", name: "Spanish", proficiency: "Full Professional Proficiency" },
+    { id: "lang-3", name: "German", proficiency: "Professional Working Proficiency" },
+    { id: "lang-4", name: "Italian", proficiency: "Professional Working Proficiency" },
+  ],
+};
+
+export const SAMPLE_PRO_MELISSA: ResumeData = {
+  personalInfo: {
+    fullName: "Melissa Ware",
+    title: "Senior Copywriter & Content Strategist",
+    email: "mellisa@touveware.com",
+    phone: "(113) 444-444",
+    location: "Columbus, OH",
+    linkedin: "linkedin.com/in/melissaware",
+    portfolio: "melissaware.com",
+    photoUrl: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80",
+  },
+  summary:
+    "Results-obsessed, creative Copywriter with 6+ years of agency experience crafting high-converting B2B and B2C campaigns, email sequences, and brand storytelling. Expert in tone-of-voice development and SEO copywriting. Increased client social media engagement on Facebook and Instagram by 87% in 4 months, driving an 87% surge in qualified inbound leads.",
+  skills: {
+    technical: [
+      "Copywriting",
+      "Establishing Tone",
+      "Identifying Audience",
+      "WordPress & CMS",
+      "SEO & Keyword Research",
+      "Digital Marketing",
+      "Attention to Detail",
+      "Time Management",
+      "Creative Writing",
+      "Editorial Proofreading",
+    ],
+    tools: ["WordPress", "HubSpot", "Google Analytics", "Ahrefs", "Figma", "Mailchimp"],
+    concepts: ["Brand Storytelling", "Conversion Rate Optimization (CRO)", "Email Drip Sequences", "A/B Testing"],
+    soft: ["Audience Empathy", "Creative Vision", "Strategic Communication", "High-Volume Delivery"],
+  },
+  experience: [
+    {
+      id: "exp-1",
+      title: "Lead Copywriter",
+      company: "Burton Agency",
+      location: "Columbus, OH",
+      date: "2022 – Present",
+      bullets: [
+        "Authored high-performing social copy across 7 weekly Facebook and Instagram campaigns, scaling follower base from 6,030 to 30,000+ in 2 months.",
+        "Engineered weekly newsletter campaigns reaching 120,000+ active subscribers with an industry-leading 38% open rate.",
+        "Developed proprietary brand voice guides for 8 enterprise clients, aligning cross-channel messaging and landing pages.",
+        "Collaborated with art directors to sculpt viral hook variations that boosted product launch conversions by 67% in 30 days.",
+      ],
+    },
+    {
+      id: "exp-2",
+      title: "Copywriter",
+      company: "Think Co.",
+      location: "Cleveland, OH",
+      date: "2020 – 2022",
+      bullets: [
+        "Rewrote 10+ core SaaS product landing pages, leading to a 10% increase in conversion velocity within 4 months.",
+        "Authored 5 weekly long-form pillar articles in English and Spanish, generating over 100,000+ monthly organic views.",
+        "Increased organic search traffic by 40% year-over-year through strategic keyword mapping and on-page metadata optimization.",
+      ],
+    },
+  ],
+  education: [
+    {
+      id: "edu-1",
+      degree: "BA in Journalism (Minor in Marketing)",
+      school: "The Ohio State University",
+      date: "2017 – 2021",
+      location: "Columbus, OH",
+    },
+  ],
+  projects: [
+    {
+      id: "proj-1",
+      name: "Freelance Fiction Writer (2017 – Present)",
+      description: "Authored long-form fiction and serialized narrative prose for independent publishing houses. Developed intricate worldbuilding, plot outlines, and nuanced character arcs tailored to commercial fiction demographics.",
+    },
+  ],
+  languages: [
+    { id: "lang-1", name: "English", proficiency: "Native or Bilingual" },
+    { id: "lang-2", name: "Spanish", proficiency: "Full Professional" },
+    { id: "lang-3", name: "German", proficiency: "Professional Working" },
+    { id: "lang-4", name: "French", proficiency: "Conversational" },
+  ],
+  achievements: [
+    { id: "ach-1", title: "Renewable Energy Advocate", description: "Clean tech enthusiast" },
+    { id: "ach-2", title: "Calligraphy & Typography", description: "Artistic lettering" },
+    { id: "ach-3", title: "Urban Gardening", description: "Community initiatives" },
+    { id: "ach-4", title: "Astronomy", description: "Stargazing and astrophotography" },
+  ],
+};
+
+export const SAMPLE_PRO_VERONICA: ResumeData = {
+  personalInfo: {
+    fullName: "Veronica Cook",
+    title: "AWS Certified DevOps Engineer",
+    email: "veronica@morrename.com",
+    phone: "+1 (19) 234-367",
+    location: "Chicago, IL",
+    linkedin: "linkedin.com/in/veronicacook",
+    github: "github.com/veronicacook",
+    portfolio: "veronicacook.cloud",
+  },
+  summary:
+    "High-impact DevOps Engineer with 8+ years of experience designing, automating, and scaling cloud infrastructure across multi-region AWS and GCP environments. Proven expertise in Jenkins, Terraform, Docker, and Kubernetes orchestration. Successfully eliminated 70% of manual release workflows and reduced monthly cloud expenditure by $24,400 while maintaining 99.99% service availability.",
+  skills: {
+    technical: [
+      "Python",
+      "CI/CD",
+      "Deployment Automation",
+      "BASH Scripting",
+      "Linux Administration",
+      "Docker",
+      "Kubernetes",
+      "Jenkins Automation Server",
+      "Terraform / IaC",
+      "Cloud Infrastructure",
+      "Google Cloud Platform",
+      "AWS",
+      "Scrum Methodology",
+      "Agile Methodologies",
+    ],
+    tools: ["AWS CodeDeploy", "Jenkins", "Terraform", "Docker", "Kubernetes", "Datadog", "Prometheus", "Git"],
+    concepts: ["Infrastructure as Code (IaC)", "Zero-Downtime Rollbacks", "Cost Optimization", "Site Reliability Engineering"],
+    soft: ["High-Pressure Troubleshooting", "Cross-Functional Collaboration", "Root Cause Analysis", "Agile Leadership"],
+  },
+  experience: [
+    {
+      id: "exp-1",
+      title: "DevOps Engineer",
+      company: "Peer Computers Inc.",
+      location: "Chicago, IL",
+      date: "03/2021 – Present",
+      bullets: [
+        "Updated infrastructure security configurations and automated patch management, cutting risk of system breaches by 65%.",
+        "Designed hybrid cloud migration architectures from on-premise hardware to Google Cloud Platform (GCP) and AWS.",
+        "Engineered automated CI/CD deployment pipelines using GitHub webhooks and Jenkins, accelerating deployment frequency by 4x.",
+        "Reduced monthly cloud costs by $24,400 by auditing underutilized compute nodes, rightsizing RDS instances, and enforcing reserved capacity.",
+        "Integrated real-time APM telemetry and Datadog synthetic monitors, improving mean time to resolution (MTTR) by 45%.",
+      ],
+    },
+    {
+      id: "exp-2",
+      title: "DevOps Engineer",
+      company: "Original Software",
+      location: "Evanston, IL",
+      date: "2018/10 – 2021/03",
+      bullets: [
+        "Configured and managed high-availability clusters across a network of 40+ Linux production servers.",
+        "Automated build and testing pipelines in Jenkins, driving the elimination of 70% of manual deployment workloads.",
+        "Orchestrated local container deployments with Kubernetes, establishing automated rolling updates and zero-downtime rollbacks.",
+      ],
+    },
+  ],
+  education: [
+    {
+      id: "edu-1",
+      degree: "Master's in Computer Science",
+      school: "University of California, Berkeley",
+      date: "2011 – 2014",
+      location: "Berkeley, CA",
+    },
+  ],
+  certifications: [
+    {
+      id: "cert-1",
+      name: "AWS Certified DevOps Engineer – Professional",
+      issuer: "Amazon Web Services",
+      date: "2023",
+    },
+    {
+      id: "cert-2",
+      name: "Certified Kubernetes Administrator (CKA)",
+      issuer: "Cloud Native Computing Foundation (CNCF)",
+      date: "2022",
+    },
+  ],
+};
+
 export const SAMPLE_PRO_MICHELLE: ResumeData = {
   personalInfo: {
     fullName: "Michelle Dhamar",
@@ -2668,7 +2949,7 @@ export const SAMPLE_ATS_PHOTO_SIDEBAR: ResumeData = {
 };
 
 /**
- * Mapping of all 19 active templates to their dedicated, fully populated sample data.
+ * Mapping of all 22 active templates to their dedicated, fully populated sample data.
  */
 export const TEMPLATE_SAMPLE_MAP: Record<string, ResumeData> = {
   "pro-michelle": SAMPLE_PRO_MICHELLE,
@@ -2677,6 +2958,9 @@ export const TEMPLATE_SAMPLE_MAP: Record<string, ResumeData> = {
   "pro-adam": SAMPLE_PRO_ADAM,
   "pro-nick": SAMPLE_PRO_NICK,
   "pro-lisa": SAMPLE_PRO_LISA,
+  "pro-ivana": SAMPLE_PRO_IVANA,
+  "pro-melissa": SAMPLE_PRO_MELISSA,
+  "pro-veronica": SAMPLE_PRO_VERONICA,
   "pro-catherine": SAMPLE_PRO_CATHERINE,
   "pro-chris-flims": SAMPLE_PRO_CHRIS_FLIMS,
   "pro-will-tribian": SAMPLE_PRO_WILL_TRIBIAN,

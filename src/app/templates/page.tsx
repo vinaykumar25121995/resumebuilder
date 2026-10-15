@@ -79,7 +79,7 @@ export default function PublicTemplatesPage() {
               >
                 <span>Templates</span>
                 <span className="text-[10px] bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-extrabold px-1.5 py-0.5 rounded-full leading-none">
-                  10 PRO
+                  13 PRO
                 </span>
               </Link>
               <Link
@@ -122,9 +122,9 @@ export default function PublicTemplatesPage() {
             Choose from all {ALL_TEMPLATES.length} ATS-optimized templates,
             including our{" "}
             <strong className="text-amber-300">
-              4 New Premium Pro Templates
+              13 Premium Pro Templates
             </strong>{" "}
-            (Catherine Barnett, Chris Flims, Will Tribian, Amanda Smith).
+            (Michelle Dhamar, Catherine Barnett, Chris Flims, Will Tribian, Amanda, Claire Russel, Jessica Blakely, Adam Stotch, Nick Koe, Lisa Neumann, Ivana Johnson, Melissa Ware, Veronica Cook).
           </p>
         </div>
 
@@ -137,7 +137,7 @@ export default function PublicTemplatesPage() {
                 <span>NEW IN PRO SUBSCRIPTION</span>
               </div>
               <h2 className="text-xl md:text-2xl font-black text-white tracking-tight">
-                4 Exclusive Executive & Creative Templates
+                13 Exclusive Executive & Creative Templates
               </h2>
               <p className="text-xs md:text-sm text-slate-300 leading-relaxed">
                 Dual columns, slate sidebars, cyan contact banners, diamond divider
@@ -166,7 +166,7 @@ export default function PublicTemplatesPage() {
                 className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-600 hover:to-orange-700 text-slate-950 px-5 py-2.5 rounded-xl text-xs font-black shadow-lg shadow-amber-500/20 transition-all"
               >
                 <Crown className="w-4 h-4 fill-slate-950" />
-                <span>Filter 4 Pro Templates</span>
+                <span>Filter 13 Pro Templates</span>
               </button>
               <Link
                 href="/register?plan=pro"
