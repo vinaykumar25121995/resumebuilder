@@ -526,7 +526,7 @@ export default function TemplatesPage() {
         <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-lg p-2.5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs">
           <span className="text-blue-900 font-medium flex items-center gap-1.5">
             <span>📑 Looking for Two-Column Sidebars & Photo CVs?</span>
-            <span className="text-blue-600 font-bold">(Templates #45–#49: Blue, Navy, Cream)</span>
+            <span className="text-blue-600 font-bold">(Templates #18–#22: Blue, Navy, Cream)</span>
           </span>
           <div className="flex items-center gap-1.5 flex-wrap">
             <button

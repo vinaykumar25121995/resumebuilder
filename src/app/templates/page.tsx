@@ -197,7 +197,7 @@ export default function PublicTemplatesPage() {
           <div className="bg-gradient-to-r from-blue-950/80 to-indigo-950/80 border border-cyan-500/30 rounded-xl p-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs">
             <span className="text-cyan-200 font-medium flex items-center gap-1.5">
               <span>📑 Looking for Two-Column Sidebars & Photo CVs?</span>
-              <span className="text-cyan-400 font-bold">(Templates #45–#49: Blue, Navy, Cream)</span>
+              <span className="text-cyan-400 font-bold">(Templates #18–#22: Blue, Navy, Cream)</span>
             </span>
             <div className="flex items-center gap-2 flex-wrap">
               <button
@@ -255,24 +255,9 @@ export default function PublicTemplatesPage() {
                   : "border-slate-800 hover:border-blue-500"
               }`}
             >
-              {/* Visual Preview */}
+                            {/* Visual Preview */}
               <div className="relative">
                 <TemplateMiniPreview template={tmpl} onPreviewClick={() => setPreviewTemplate(tmpl)} />
-
-                {tmpl.isPro && (
-                  <div className="absolute top-2.5 left-2.5 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 text-white text-[10px] font-black px-2.5 py-0.5 rounded-full shadow-md flex items-center gap-1 border border-amber-300/40">
-                    <Crown className="w-3 h-3 text-amber-200 fill-amber-200" />
-                    <span>PRO EXCLUSIVE</span>
-                  </div>
-                )}
-
-                <div className="absolute top-2.5 right-2.5 bg-emerald-500 text-slate-950 text-[10px] font-black px-2 py-0.5 rounded-full shadow">
-                  ATS {tmpl.atsScore}%
-                </div>
-
-                <div className="absolute bottom-2 left-2 bg-slate-950/85 backdrop-blur-sm text-cyan-300 text-[10px] font-mono font-black px-2 py-0.5 rounded-md border border-cyan-500/30 shadow">
-                  Template #{String(tmpl.number || 0).padStart(2, "0")}
-                </div>
               </div>
 
               {/* Information */}
@@ -286,11 +271,16 @@ export default function PublicTemplatesPage() {
                     }`}>
                       Template #{String(tmpl.number || 0).padStart(2, "0")}
                     </span>
-                    {tmpl.isPro && (
-                      <span className="text-[10px] text-amber-400 font-bold flex items-center gap-0.5">
-                        <Crown className="w-2.5 h-2.5 fill-current" /> Pro
+                    <div className="flex items-center gap-1.5">
+                      {tmpl.isPro && (
+                        <span className="text-[10px] text-amber-400 font-bold flex items-center gap-0.5">
+                          <Crown className="w-2.5 h-2.5 fill-current" /> Pro
+                        </span>
+                      )}
+                      <span className="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold px-2 py-0.5 rounded-full">
+                        ATS {tmpl.atsScore}%
                       </span>
-                    )}
+                    </div>
                   </div>
                   <h3 className="font-extrabold text-white text-sm group-hover:text-amber-300 transition-colors">
                     {tmpl.name}

@@ -263,7 +263,7 @@ export default function DashboardPage() {
             </div>
             <h3 className="font-bold text-gray-900 text-sm mb-1">Browse Templates</h3>
             <p className="text-xs text-gray-500">
-              Explore 15+ proven, recruiter-approved ATS formats.
+              Explore 20+ proven, recruiter-approved ATS formats.
             </p>
           </Link>
         </div>

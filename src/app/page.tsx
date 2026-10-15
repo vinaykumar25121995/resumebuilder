@@ -28,13 +28,13 @@ const features = [
   { icon: Target, title: "ATS Score Engine", desc: "Get a detailed 0-100 ATS compatibility score with actionable recommendations for every section of your resume." },
   { icon: BarChart3, title: "Keyword Matcher", desc: "Identify matched and missing keywords from the job description before you apply." },
   { icon: Shield, title: "Anti-Hallucination AI", desc: "Our AI never invents skills, experience, or metrics. It only works with information you've provided." },
-  { icon: FileText, title: "15+ ATS Templates", desc: "Choose from templates designed specifically for ATS parsing — no graphics, no images, only clean machine-readable text." },
+  { icon: FileText, title: "20+ ATS Templates", desc: "Choose from templates designed specifically for ATS parsing — no graphics, no images, only clean machine-readable text." },
   { icon: Zap, title: "Bullet Point Optimizer", desc: "One-click improvement of any experience bullet to use stronger action verbs and relevant keywords." },
 ];
 
 const steps = [
   { num: "01", title: "Build Your Profile", desc: "Enter your complete career information once — experience, education, skills, projects, and certifications. This becomes your master resume database.", icon: Users },
-  { num: "02", title: "Choose an ATS Template", desc: "Select from 15+ ATS-friendly templates. Each is designed for machine readability with standard fonts, headings, and bullet points.", icon: FileText },
+  { num: "02", title: "Choose an ATS Template", desc: "Select from 20+ ATS-friendly templates. Each is designed for machine readability with standard fonts, headings, and bullet points.", icon: FileText },
   { num: "03", title: "Paste a Job Description", desc: "Found a job you want? Paste the description or URL. Our AI extracts all keywords, requirements, and priority skills.", icon: Briefcase },
   { num: "04", title: "Download Your Resume", desc: "Get a job-specific tailored resume with your ATS score. Download as PDF — ready to submit.", icon: Download },
 ];
@@ -50,7 +50,7 @@ export default function Home() {
   const heroRef = useRef<HTMLDivElement>(null);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [billingCycle, setBillingCycle] = useState<"monthly" | "annual">("monthly");
-  const [templateTab, setTemplateTab] = useState<"twocolumn" | "pro" | "standard" | "all">("twocolumn");
+  const [templateTab, setTemplateTab] = useState<"twocolumn" | "pro" | "standard" | "all">("all");
   const [landingPreviewTemplate, setLandingPreviewTemplate] = useState<TemplateConfig | null>(null);
   const [contactForm, setContactForm] = useState({
     name: "",
@@ -248,7 +248,7 @@ export default function Home() {
       <div className="bg-blue-600 py-12">
         <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
           {[
-            { num: "15+", label: "ATS-Friendly Templates" },
+            { num: "20+", label: "ATS-Friendly Templates" },
             { num: "90%", label: "Average ATS Score Improvement" },
             { num: "100%", label: "Truthful — Never Fabricates" },
           ].map((stat, i) => (
@@ -384,7 +384,7 @@ export default function Home() {
                     : "bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 border border-slate-700"
                 }`}
               >
-                <span>📑 2-Column & Photo Templates ({ALL_TEMPLATES.filter((t) => t.number >= 45 && t.number <= 49).length})</span>
+                <span>📑 2-Column & Photo Templates ({ALL_TEMPLATES.filter((t) => t.number >= 18 && t.number <= 22).length})</span>
               </button>
               <button
                 onClick={() => setTemplateTab("pro")}
@@ -426,7 +426,7 @@ export default function Home() {
             {(templateTab === "pro"
               ? ALL_TEMPLATES.filter((t) => t.isPro)
               : templateTab === "twocolumn"
-              ? ALL_TEMPLATES.filter((t) => t.number >= 45 && t.number <= 49)
+              ? ALL_TEMPLATES.filter((t) => t.number >= 18 && t.number <= 22)
               : templateTab === "standard"
               ? ALL_TEMPLATES.filter((t) => !t.isPro)
               : ALL_TEMPLATES
@@ -439,24 +439,9 @@ export default function Home() {
                     : "border-slate-700 hover:border-blue-500"
                 }`}
               >
-                {/* Visual Preview */}
+                                {/* Visual Preview */}
                 <div className="relative">
                   <TemplateMiniPreview template={tmpl} onPreviewClick={() => setLandingPreviewTemplate(tmpl)} />
-
-                  {tmpl.isPro && (
-                    <div className="absolute top-2.5 left-2.5 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 text-white text-[10px] font-black px-2.5 py-0.5 rounded-full shadow-md flex items-center gap-1 border border-amber-300/40">
-                      <Crown className="w-3 h-3 text-amber-200 fill-amber-200" />
-                      <span>PRO EXCLUSIVE</span>
-                    </div>
-                  )}
-
-                  <div className="absolute top-2.5 right-2.5 bg-emerald-500 text-slate-950 text-[10px] font-black px-2 py-0.5 rounded-full shadow">
-                    ATS {tmpl.atsScore}%
-                  </div>
-
-                  <div className="absolute bottom-2 left-2 bg-slate-950/85 backdrop-blur-sm text-cyan-300 text-[10px] font-mono font-black px-2 py-0.5 rounded-md border border-cyan-500/30 shadow">
-                    Template #{String(tmpl.number || 0).padStart(2, "0")}
-                  </div>
                 </div>
 
                 {/* Information */}
@@ -470,11 +455,16 @@ export default function Home() {
                       }`}>
                         Template #{String(tmpl.number || 0).padStart(2, "0")}
                       </span>
-                      {tmpl.isPro && (
-                        <span className="text-[10px] text-amber-400 font-bold flex items-center gap-0.5">
-                          <Crown className="w-2.5 h-2.5 fill-current" /> Pro
+                      <div className="flex items-center gap-1.5">
+                        {tmpl.isPro && (
+                          <span className="text-[10px] text-amber-400 font-bold flex items-center gap-0.5">
+                            <Crown className="w-2.5 h-2.5 fill-current" /> Pro
+                          </span>
+                        )}
+                        <span className="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold px-2 py-0.5 rounded-full">
+                          ATS {tmpl.atsScore}%
                         </span>
-                      )}
+                      </div>
                     </div>
                     <h3 className="font-extrabold text-white text-sm group-hover:text-amber-300 transition-colors">
                       {tmpl.name}
@@ -702,7 +692,7 @@ export default function Home() {
                 <ul className="space-y-3 mb-8">
                   {[
                     "1 Master Profile (Unlimited edits)",
-                    "All 15+ ATS-Optimized Templates",
+                    "All 20+ ATS-Optimized Templates",
                     "Unlimited Job Description Analyses",
                     "Both PDF & Word (.docx) Downloads",
                     "Full 0-100 ATS Scoring Engine",

@@ -452,8 +452,8 @@ export const ALL_TEMPLATES: TemplateConfig[] = [
   // ─── STANDARD ATS TEMPLATES (RETAINED) ───────────────────────────────────
   {
     id: "ats-supply-chain",
-    number: 41,
-    name: "Template 41 — ATS Supply Chain",
+    number: 14,
+    name: "Template 14 — ATS Supply Chain",
     category: ["Business", "Management"],
     description: "Logistics and procurement-focused for supply chain professionals.",
     bestFor: ["Supply Chain Manager", "Procurement", "Logistics"],
@@ -479,8 +479,8 @@ export const ALL_TEMPLATES: TemplateConfig[] = [
   },
   {
     id: "ats-healthcare",
-    number: 42,
-    name: "Template 42 — ATS Healthcare",
+    number: 15,
+    name: "Template 15 — ATS Healthcare",
     category: ["Management"],
     description: "Credentials and clinical experience-forward for healthcare roles.",
     bestFor: ["Healthcare Manager", "Medical Professional", "Clinical"],
@@ -506,8 +506,8 @@ export const ALL_TEMPLATES: TemplateConfig[] = [
   },
   {
     id: "ats-engineering",
-    number: 43,
-    name: "Template 43 — ATS Engineering",
+    number: 16,
+    name: "Template 16 — ATS Engineering",
     category: ["Tech", "Management"],
     description: "Technical depth and project impact-focused for engineering professionals.",
     bestFor: ["Mechanical Engineer", "Civil Engineer", "Electrical Engineer"],
@@ -533,8 +533,8 @@ export const ALL_TEMPLATES: TemplateConfig[] = [
   },
   {
     id: "ats-management",
-    number: 44,
-    name: "Template 44 — ATS Management",
+    number: 17,
+    name: "Template 17 — ATS Management",
     category: ["Management"],
     description: "Leadership and team impact-focused for general management.",
     bestFor: ["General Manager", "Department Head", "Team Lead"],
@@ -561,8 +561,8 @@ export const ALL_TEMPLATES: TemplateConfig[] = [
   // ─── TWO-COLUMN / DESIGNER ────────────────────────────────────────────────
   {
     id: "ats-two-column-blue",
-    number: 45,
-    name: "Template 45 — Two-Column Blue Sidebar",
+    number: 18,
+    name: "Template 18 — Two-Column Blue Sidebar",
     category: ["2-Column", "Modern", "Popular"],
     description: "Visually striking layout with a distinct blue sidebar. Note: While designed safely, two-column formats can have slightly lower parsing reliability on older ATS.",
     bestFor: ["Designers", "Tech", "Marketing"],
@@ -592,8 +592,8 @@ export const ALL_TEMPLATES: TemplateConfig[] = [
   },
   {
     id: "ats-two-column-dark",
-    number: 46,
-    name: "Template 46 — Two-Column Navy Sidebar",
+    number: 19,
+    name: "Template 19 — Two-Column Navy Sidebar",
     category: ["2-Column", "Modern", "Tech", "Business"],
     description: "Professional navy blue sidebar layout. High contrast and clean separation of skills and experience.",
     bestFor: ["Data Analysts", "Engineers", "Management"],
@@ -623,8 +623,8 @@ export const ALL_TEMPLATES: TemplateConfig[] = [
   },
   {
     id: "ats-two-column-cream",
-    number: 47,
-    name: "Template 47 — Two-Column Cream Sidebar",
+    number: 20,
+    name: "Template 20 — Two-Column Cream Sidebar",
     category: ["2-Column", "Modern", "Classic"],
     description: "Elegant layout with a soft cream sidebar for a subtle but distinct visual hierarchy.",
     bestFor: ["Finance", "Consulting", "Creative"],
@@ -655,8 +655,8 @@ export const ALL_TEMPLATES: TemplateConfig[] = [
   // ─── PHOTO TEMPLATES ──────────────────────────────────────────────────────
   {
     id: "ats-photo-modern",
-    number: 48,
-    name: "Template 48 — Modern Photo Header",
+    number: 21,
+    name: "Template 21 — Modern Photo Header",
     category: ["Photo", "Modern", "Popular"],
     description: "A clean, modern layout featuring a professional photo in the header. Excellent for real estate, acting, modeling, or customer-facing roles.",
     bestFor: ["Sales", "Customer Success", "Real Estate", "Creative"],
@@ -684,8 +684,8 @@ export const ALL_TEMPLATES: TemplateConfig[] = [
   },
   {
     id: "ats-photo-sidebar",
-    number: 49,
-    name: "Template 49 — Two-Column Photo",
+    number: 22,
+    name: "Template 22 — Two-Column Photo",
     category: ["Photo", "2-Column", "Modern", "Classic"],
     description: "Two-column design with your photo prominently displayed at the top of the sidebar.",
     bestFor: ["Designers", "Marketing", "Consultants"],
