@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useRef } from "react";
+import { motion } from "framer-motion";
+import HeroCursorVideo from "@/components/HeroCursorVideo";
 import { 
   Sparkles, FileText, CheckCircle, ArrowRight, Target, Zap, Shield, BarChart3, 
   Download, Brain, Star, ChevronDown, ChevronUp, Users, Award, TrendingUp,
@@ -47,6 +49,7 @@ const testimonials = [
 ];
 
 export default function Home() {
+  const heroRef = useRef<HTMLDivElement>(null);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [billingCycle, setBillingCycle] = useState<"monthly" | "annual">("monthly");
   const [contactForm, setContactForm] = useState({
@@ -108,38 +111,142 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* Hero */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-blue-50 via-white to-indigo-50 px-6 py-24 lg:py-32">
-        <div className="absolute inset-0 opacity-5">
-          <div className="absolute top-10 left-10 w-72 h-72 bg-blue-600 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-10 right-10 w-96 h-96 bg-indigo-600 rounded-full blur-3xl"></div>
-        </div>
-        <div className="relative mx-auto max-w-4xl text-center">
-          <div className="inline-flex items-center bg-blue-50 text-blue-700 text-sm font-medium px-4 py-2 rounded-full mb-6 border border-blue-100">
-            <Sparkles className="w-4 h-4 mr-2" />
-            AI-Powered ATS Optimization
+      {/* Dynamic Interactive Hero with Cursor-Following Video Spotlight */}
+      <div
+        ref={heroRef}
+        className="relative overflow-hidden bg-gradient-to-br from-blue-50/80 via-white to-indigo-50/80 px-6 py-24 lg:py-32 select-none"
+      >
+        {/* Cursor-Following Video Spotlight Canvas */}
+        <HeroCursorVideo
+          parentRef={heroRef}
+          config={{
+            spotlightRadius: 280,
+            featherSize: 85,
+            smoothing: 0.08,
+            videoOpacity: 0.95,
+            ambientOpacity: 0.12,
+            glowIntensity: 0.32,
+            hoverScale: 1.05,
+          }}
+        />
+
+        {/* Floating Interactive Badge: Left */}
+        <motion.div
+          initial={{ opacity: 0, x: -30 }}
+          animate={{ opacity: 1, x: 0, y: [-4, 6, -4] }}
+          transition={{
+            opacity: { duration: 0.8, delay: 0.4 },
+            x: { duration: 0.8, delay: 0.4 },
+            y: { duration: 5.5, repeat: Infinity, ease: "easeInOut" },
+          }}
+          className="hidden xl:flex absolute left-8 top-1/3 items-center gap-3 bg-white/90 backdrop-blur-md px-4 py-3 rounded-2xl border border-blue-100/80 shadow-xl shadow-blue-900/5 z-20 pointer-events-auto hover:scale-105 transition-transform"
+        >
+          <div className="w-10 h-10 rounded-xl bg-blue-600/10 flex items-center justify-center text-blue-600">
+            <Sparkles className="w-5 h-5 text-blue-600" />
           </div>
-          <h1 className="text-5xl lg:text-7xl font-bold tracking-tight text-gray-900 mb-6">
+          <div className="text-left">
+            <div className="flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span className="text-xs font-bold text-gray-900">ATS Match Score</span>
+            </div>
+            <p className="text-xs text-blue-600 font-semibold">98% Compatibility</p>
+          </div>
+        </motion.div>
+
+        {/* Floating Interactive Badge: Right */}
+        <motion.div
+          initial={{ opacity: 0, x: 30 }}
+          animate={{ opacity: 1, x: 0, y: [6, -4, 6] }}
+          transition={{
+            opacity: { duration: 0.8, delay: 0.5 },
+            x: { duration: 0.8, delay: 0.5 },
+            y: { duration: 6, repeat: Infinity, ease: "easeInOut" },
+          }}
+          className="hidden xl:flex absolute right-8 top-1/3 items-center gap-3 bg-white/90 backdrop-blur-md px-4 py-3 rounded-2xl border border-indigo-100/80 shadow-xl shadow-indigo-900/5 z-20 pointer-events-auto hover:scale-105 transition-transform"
+        >
+          <div className="w-10 h-10 rounded-xl bg-indigo-600/10 flex items-center justify-center text-indigo-600">
+            <Shield className="w-5 h-5 text-indigo-600" />
+          </div>
+          <div className="text-left">
+            <div className="flex items-center gap-1.5">
+              <CheckCircle className="w-3.5 h-3.5 text-emerald-500" />
+              <span className="text-xs font-bold text-gray-900">Zero Hallucinations</span>
+            </div>
+            <p className="text-xs text-gray-500">100% Fact-Checked</p>
+          </div>
+        </motion.div>
+
+        {/* Content Container (z-20 and pointer-events-auto for full interactivity) */}
+        <div className="relative z-20 mx-auto max-w-4xl text-center pointer-events-auto">
+          <motion.div
+            initial={{ opacity: 0, y: -16, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 0.55, ease: "easeOut" }}
+            className="inline-flex items-center bg-blue-50/90 backdrop-blur-sm text-blue-700 text-sm font-medium px-4 py-2 rounded-full mb-6 border border-blue-200/80 shadow-sm"
+          >
+            <Sparkles className="w-4 h-4 mr-2 text-blue-600 animate-spin" style={{ animationDuration: "8s" }} />
+            AI-Powered ATS Optimization
+          </motion.div>
+
+          <motion.h1
+            initial={{ opacity: 0, y: 22 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.65, delay: 0.1, ease: "easeOut" }}
+            className="text-5xl lg:text-7xl font-bold tracking-tight text-gray-900 mb-6 drop-shadow-sm"
+          >
             Build Once.<br />
-            <span className="text-blue-600">Tailor for Every Job.</span>
-          </h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-10 leading-relaxed">
+            <span className="bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-600 bg-clip-text text-transparent">
+              Tailor for Every Job.
+            </span>
+          </motion.h1>
+
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.65, delay: 0.2, ease: "easeOut" }}
+            className="text-xl text-gray-700 max-w-2xl mx-auto mb-10 leading-relaxed font-normal"
+          >
             Create an ATS-friendly master resume, then automatically optimize it for every job description using AI.
             <span className="font-semibold text-gray-900"> Stop rewriting manually.</span>
-          </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link href="/register" className="w-full sm:w-auto inline-flex items-center justify-center bg-blue-600 text-white px-8 py-4 rounded-xl text-base font-semibold hover:bg-blue-700 transition-colors shadow-lg shadow-blue-600/25">
-              BUILD MY RESUME <ArrowRight className="ml-2 w-5 h-5" />
+          </motion.p>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.65, delay: 0.3, ease: "easeOut" }}
+            className="flex flex-col sm:flex-row items-center justify-center gap-4"
+          >
+            <Link
+              href="/register"
+              className="w-full sm:w-auto inline-flex items-center justify-center bg-blue-600 text-white px-8 py-4 rounded-xl text-base font-semibold hover:bg-blue-700 hover:scale-105 active:scale-95 transition-all duration-200 shadow-xl shadow-blue-600/30 group"
+            >
+              BUILD MY RESUME
+              <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Link>
-            <a href="#how-it-works" className="w-full sm:w-auto inline-flex items-center justify-center border border-gray-300 text-gray-700 px-8 py-4 rounded-xl text-base font-semibold hover:bg-gray-50 transition-colors">
+            <a
+              href="#how-it-works"
+              className="w-full sm:w-auto inline-flex items-center justify-center bg-white/80 backdrop-blur-sm border border-gray-300 text-gray-700 px-8 py-4 rounded-xl text-base font-semibold hover:bg-white hover:border-gray-400 hover:scale-105 active:scale-95 transition-all duration-200 shadow-sm"
+            >
               See How It Works
             </a>
-          </div>
-          <div className="mt-12 flex items-center justify-center gap-8 text-sm text-gray-500">
-            <div className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-green-500" /> No credit card required</div>
-            <div className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-green-500" /> Free to start</div>
-            <div className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-green-500" /> ATS-Designed Templates</div>
-          </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.45, ease: "easeOut" }}
+            className="mt-12 flex flex-wrap items-center justify-center gap-6 sm:gap-8 text-sm text-gray-600"
+          >
+            <div className="flex items-center gap-2 bg-white/70 backdrop-blur-xs px-3 py-1.5 rounded-full border border-gray-100 shadow-xs">
+              <CheckCircle className="w-4 h-4 text-emerald-500" /> No credit card required
+            </div>
+            <div className="flex items-center gap-2 bg-white/70 backdrop-blur-xs px-3 py-1.5 rounded-full border border-gray-100 shadow-xs">
+              <CheckCircle className="w-4 h-4 text-emerald-500" /> Free to start
+            </div>
+            <div className="flex items-center gap-2 bg-white/70 backdrop-blur-xs px-3 py-1.5 rounded-full border border-gray-100 shadow-xs">
+              <CheckCircle className="w-4 h-4 text-emerald-500" /> ATS-Designed Templates
+            </div>
+          </motion.div>
         </div>
       </div>
 
