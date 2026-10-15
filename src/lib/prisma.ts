@@ -1,6 +1,5 @@
 import { PrismaClient } from "@prisma/client";
 
-// Fallback DATABASE_URL so Prisma never throws "Environment variable not found: DATABASE_URL"
 const defaultDbUrl = process.env.DATABASE_URL || "file:./dev.db";
 if (!process.env.DATABASE_URL) {
   process.env.DATABASE_URL = defaultDbUrl;
