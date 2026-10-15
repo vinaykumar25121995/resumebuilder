@@ -295,8 +295,13 @@ export default function FullereneCursorModel() {
   useEffect(() => {
     const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
     const touchQuery = window.matchMedia("(hover: none), (pointer: coarse)");
-    setPrefersReducedMotion(motionQuery.matches);
-    setIsTouchDevice(touchQuery.matches);
+    
+    const updatePreferences = () => {
+      setPrefersReducedMotion(motionQuery.matches);
+      setIsTouchDevice(touchQuery.matches);
+    };
+
+    const timer = setTimeout(updatePreferences, 0);
 
     const onMotion = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches);
     const onTouch = (e: MediaQueryListEvent) => setIsTouchDevice(e.matches);
@@ -304,10 +309,12 @@ export default function FullereneCursorModel() {
     touchQuery.addEventListener("change", onTouch);
 
     return () => {
+      clearTimeout(timer);
       motionQuery.removeEventListener("change", onMotion);
       touchQuery.removeEventListener("change", onTouch);
     };
   }, []);
+
 
   useEffect(() => {
     const container = containerRef.current;
