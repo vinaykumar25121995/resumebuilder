@@ -7,26 +7,31 @@ import { runATSCheck } from "@/lib/ai";
 import { getTemplateById } from "@/lib/templates";
 
 export async function GET() {
-  const session = await getServerSession(authOptions);
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const resumes = await prisma.resume.findMany({
-    where: { userId: session.user.id },
-    orderBy: { updatedAt: "desc" },
-    select: {
-      id: true,
-      title: true,
-      targetJobTitle: true,
-      company: true,
-      atsScore: true,
-      matchScore: true,
-      template: true,
-      createdAt: true,
-      updatedAt: true,
-    },
-  });
+    const resumes = await prisma.resume.findMany({
+      where: { userId: session.user.id },
+      orderBy: { updatedAt: "desc" },
+      select: {
+        id: true,
+        title: true,
+        targetJobTitle: true,
+        company: true,
+        atsScore: true,
+        matchScore: true,
+        template: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
 
-  return NextResponse.json(resumes);
+    return NextResponse.json(resumes);
+  } catch (err) {
+    console.warn("Could not fetch resumes from database:", err);
+    return NextResponse.json([]);
+  }
 }
 
 export async function POST(req: Request) {

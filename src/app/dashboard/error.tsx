@@ -1,0 +1,51 @@
+"use client";
+
+import { useEffect } from "react";
+import Link from "next/link";
+import { AlertCircle, RefreshCw, Home } from "lucide-react";
+
+export default function DashboardError({
+  error,
+  reset,
+}: {
+  error: Error & { digest?: string };
+  reset: () => void;
+}) {
+  useEffect(() => {
+    console.error("Dashboard error boundary caught:", error);
+  }, [error]);
+
+  return (
+    <div className="min-h-[60vh] flex items-center justify-center p-4">
+      <div className="max-w-md w-full bg-white rounded-2xl p-8 shadow-sm border border-gray-100 text-center space-y-5">
+        <div className="w-14 h-14 bg-red-50 text-red-600 rounded-2xl flex items-center justify-center mx-auto">
+          <AlertCircle className="w-7 h-7" />
+        </div>
+        <div className="space-y-2">
+          <h2 className="text-xl font-bold text-gray-900">
+            Dashboard couldn't load
+          </h2>
+          <p className="text-sm text-gray-500">
+            A temporary connection issue occurred while loading your dashboard data.
+          </p>
+        </div>
+        <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
+          <button
+            onClick={() => reset()}
+            className="inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition-colors"
+          >
+            <RefreshCw className="w-4 h-4" />
+            Try Again
+          </button>
+          <Link
+            href="/dashboard/profile"
+            className="inline-flex items-center justify-center gap-2 border border-gray-200 hover:bg-gray-50 text-gray-700 px-5 py-2.5 rounded-xl font-semibold text-sm transition-colors"
+          >
+            <Home className="w-4 h-4" />
+            My Profile
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
