@@ -647,7 +647,7 @@ export default function Home() {
   const heroRef = useRef<HTMLDivElement>(null);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [billingCycle, setBillingCycle] = useState<"monthly" | "annual">("monthly");
-  const [templateTab, setTemplateTab] = useState<"pro" | "twocolumn" | "standard" | "all">("pro");
+  const [templateTab, setTemplateTab] = useState<"twocolumn" | "pro" | "standard" | "all">("twocolumn");
   const [landingPreviewTemplate, setLandingPreviewTemplate] = useState<TemplateConfig | null>(null);
   const [contactForm, setContactForm] = useState({
     name: "",
@@ -974,6 +974,16 @@ export default function Home() {
             {/* Filter Tabs */}
             <div className="flex items-center justify-center gap-2 mt-8 flex-wrap">
               <button
+                onClick={() => setTemplateTab("twocolumn")}
+                className={`px-4 py-2.5 rounded-xl text-xs font-black transition-all flex items-center gap-2 ${
+                  templateTab === "twocolumn"
+                    ? "bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-600 text-white shadow-lg shadow-cyan-500/30 scale-105 border border-cyan-400"
+                    : "bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 border border-slate-700"
+                }`}
+              >
+                <span>📑 2-Column & Photo Templates (5)</span>
+              </button>
+              <button
                 onClick={() => setTemplateTab("pro")}
                 className={`px-4 py-2.5 rounded-xl text-xs font-extrabold transition-all flex items-center gap-2 ${
                   templateTab === "pro"
@@ -983,16 +993,6 @@ export default function Home() {
               >
                 <Crown className="w-3.5 h-3.5 fill-current" />
                 <span>👑 Premium Pro Collection (4)</span>
-              </button>
-              <button
-                onClick={() => setTemplateTab("twocolumn")}
-                className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
-                  templateTab === "twocolumn"
-                    ? "bg-cyan-600 text-white shadow-lg shadow-cyan-500/25 scale-105"
-                    : "bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 border border-slate-700"
-                }`}
-              >
-                <span>📑 2-Column & Photo (5)</span>
               </button>
               <button
                 onClick={() => setTemplateTab("standard")}

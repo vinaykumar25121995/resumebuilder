@@ -686,6 +686,13 @@ export default function TemplatesPage() {
 
   useEffect(() => {
     fetchProfile();
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const cat = params.get("category");
+      if (cat) setSelectedCategory(cat);
+      const q = params.get("q");
+      if (q) setSearchQuery(q);
+    }
   }, []);
 
   const fetchProfile = async () => {
@@ -978,6 +985,36 @@ export default function TemplatesPage() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
+        </div>
+
+        {/* Quick jump to 2-Column & Photo templates */}
+        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-lg p-2.5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs">
+          <span className="text-blue-900 font-medium flex items-center gap-1.5">
+            <span>📑 Looking for Two-Column Sidebars & Photo CVs?</span>
+            <span className="text-blue-600 font-bold">(Templates #45–#49: Blue, Navy, Cream)</span>
+          </span>
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <button
+              onClick={() => setSelectedCategory("2-Column")}
+              className={`px-3 py-1 rounded-lg font-bold transition-colors ${
+                selectedCategory === "2-Column"
+                  ? "bg-blue-600 text-white shadow"
+                  : "bg-white text-blue-700 hover:bg-blue-100 border border-blue-200"
+              }`}
+            >
+              📑 View 2-Column Sidebars
+            </button>
+            <button
+              onClick={() => setSelectedCategory("Photo")}
+              className={`px-3 py-1 rounded-lg font-bold transition-colors ${
+                selectedCategory === "Photo"
+                  ? "bg-blue-600 text-white shadow"
+                  : "bg-white text-blue-700 hover:bg-blue-100 border border-blue-200"
+              }`}
+            >
+              📷 View Photo CVs
+            </button>
+          </div>
         </div>
 
         {/* Category tabs */}

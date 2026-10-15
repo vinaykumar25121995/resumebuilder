@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import {
   ALL_TEMPLATES,
@@ -1107,6 +1107,16 @@ export default function PublicTemplatesPage() {
     null
   );
 
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const cat = params.get("category");
+      if (cat) setSelectedCategory(cat);
+      const q = params.get("q");
+      if (q) setSearchQuery(q);
+    }
+  }, []);
+
   const filteredTemplates = useMemo(() => {
     return filterTemplates(selectedCategory, searchQuery);
   }, [selectedCategory, searchQuery]);
@@ -1257,6 +1267,36 @@ export default function PublicTemplatesPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
+          </div>
+
+          {/* Quick jump to 2-Column & Photo templates */}
+          <div className="bg-gradient-to-r from-blue-950/80 to-indigo-950/80 border border-cyan-500/30 rounded-xl p-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs">
+            <span className="text-cyan-200 font-medium flex items-center gap-1.5">
+              <span>📑 Looking for Two-Column Sidebars & Photo CVs?</span>
+              <span className="text-cyan-400 font-bold">(Templates #45–#49: Blue, Navy, Cream)</span>
+            </span>
+            <div className="flex items-center gap-2 flex-wrap">
+              <button
+                onClick={() => setSelectedCategory("2-Column")}
+                className={`px-3 py-1.5 rounded-lg font-bold transition-all ${
+                  selectedCategory === "2-Column"
+                    ? "bg-cyan-500 text-slate-950 shadow-md shadow-cyan-500/30"
+                    : "bg-slate-800 text-cyan-300 hover:bg-slate-700 border border-cyan-500/40"
+                }`}
+              >
+                📑 View 2-Column Sidebars
+              </button>
+              <button
+                onClick={() => setSelectedCategory("Photo")}
+                className={`px-3 py-1.5 rounded-lg font-bold transition-all ${
+                  selectedCategory === "Photo"
+                    ? "bg-cyan-500 text-slate-950 shadow-md shadow-cyan-500/30"
+                    : "bg-slate-800 text-cyan-300 hover:bg-slate-700 border border-cyan-500/40"
+                }`}
+              >
+                📷 View Photo CVs
+              </button>
+            </div>
           </div>
 
           {/* Categories */}
