@@ -8,8 +8,10 @@ import {
   Sparkles, FileText, CheckCircle, ArrowRight, Target, Zap, Shield, BarChart3, 
   Download, Brain, Star, ChevronDown, ChevronUp, Users, Award, TrendingUp,
   BookOpen, Briefcase, GraduationCap, Mail, Clock, Send, Headphones, CreditCard, AlertCircle,
-  MessageCircle, ExternalLink
+  MessageCircle, ExternalLink, Crown, Eye, Lock, X
 } from "lucide-react";
+import { ALL_TEMPLATES, TemplateConfig } from "@/lib/templates";
+import ResumeTemplateRenderer from "@/components/ResumeTemplateRenderer";
 
 const faqs = [
   { q: "What is an ATS and why does it matter?", a: "An Applicant Tracking System (ATS) is software used by employers to manage job applications. It scans resumes for keywords and formatting before a human ever sees them. A resume not optimized for ATS may be automatically filtered out, even if you're qualified." },
@@ -35,12 +37,269 @@ const steps = [
   { num: "04", title: "Download Your Resume", desc: "Get a job-specific tailored resume with your ATS score. Download as PDF — ready to submit.", icon: Download },
 ];
 
-const templates = [
-  { name: "ATS Classic", best: "Corporate Applications", compat: "Excellent" },
-  { name: "ATS Data Analyst", best: "Data & Analytics Roles", compat: "Excellent" },
-  { name: "ATS Technical", best: "Software Engineering", compat: "Excellent" },
-  { name: "ATS Fresher", best: "Entry Level & Graduates", compat: "Excellent" },
-];
+const sampleLandingResumeData = {
+  personalInfo: {
+    fullName: "Alex Johnson",
+    title: "Lead Systems Architect & Engineer",
+    email: "alex.johnson@example.com",
+    phone: "+1 (555) 019-2834",
+    location: "San Francisco, CA",
+    linkedin: "linkedin.com/in/alexjohnson",
+    portfolio: "alexjohnson.dev",
+  },
+  summary:
+    "High-performing technology leader with 8+ years architecting enterprise distributed systems, microservices, and high-conversion ATS platforms with 99.9% uptime. Proven track record leading cross-functional teams.",
+  skills: {
+    technical: ["React", "Next.js", "TypeScript", "Node.js", "Python", "GraphQL", "PostgreSQL", "Docker", "AWS"],
+    soft: ["Cross-functional Leadership", "Agile & Scrum", "Strategic Roadmaps", "Mentorship"],
+    tools: ["Docker", "Git", "Kubernetes", "Figma", "Jira", "CI/CD"],
+  },
+  experience: [
+    {
+      title: "Lead Systems Architect",
+      company: "Apex Global Technologies",
+      date: "2021 – Present",
+      location: "San Francisco, CA",
+      bullets: [
+        "Architected enterprise distributed platform serving over 1.8M active daily users with zero downtime.",
+        "Spearheaded cloud migration to Next.js and microservices, reducing p99 response times by 42%.",
+        "Mentored a team of 14 senior engineers and established standard CI/CD deployment pipelines."
+      ],
+    },
+    {
+      title: "Senior Software Engineer",
+      company: "Starlight Digital Corp",
+      date: "2018 – 2021",
+      location: "Austin, TX",
+      bullets: [
+        "Engineered real-time analytics streaming pipelines processing 50M+ events daily.",
+        "Collaborated with product leadership to build ATS-compatible document export features."
+      ],
+    },
+  ],
+  education: [
+    {
+      degree: "B.S. in Computer Science",
+      school: "University of California, Berkeley",
+      date: "2014 – 2018",
+      location: "Berkeley, CA",
+      score: "3.9 GPA",
+    },
+  ],
+  certifications: [
+    {
+      name: "AWS Certified Solutions Architect — Professional",
+      issuer: "Amazon Web Services",
+      date: "2023",
+    },
+    {
+      name: "Certified Scrum Master (CSM)",
+      issuer: "Scrum Alliance",
+      date: "2022",
+    },
+  ],
+};
+
+function LandingMiniPreview({ template }: { template: TemplateConfig }) {
+  if (template.id === "pro-catherine") {
+    return (
+      <div className="w-full h-48 bg-slate-950 border-b border-slate-800 flex items-center justify-center overflow-hidden select-none">
+        <div className="bg-white shadow-xl rounded overflow-hidden flex" style={{ width: "135px", height: "175px", fontSize: "3px" }}>
+          <div style={{ width: "35%", backgroundColor: "#1e293b", color: "#f8fafc", padding: "6px 4px", display: "flex", flexDirection: "column", gap: "2px" }}>
+            <div style={{ fontSize: "3.5px", fontWeight: "bold", color: "#38bdf8", textTransform: "uppercase" }}>CONTACT</div>
+            <div style={{ background: "rgba(255,255,255,0.08)", padding: "1px 2px", borderRadius: "2px", fontSize: "2.2px", color: "#e2e8f0" }}>✉ catherine@email</div>
+            <div style={{ background: "rgba(255,255,255,0.08)", padding: "1px 2px", borderRadius: "2px", fontSize: "2.2px", color: "#e2e8f0" }}>✆ +1 (555) 0192</div>
+            <div style={{ background: "rgba(255,255,255,0.08)", padding: "1px 2px", borderRadius: "2px", fontSize: "2.2px", color: "#e2e8f0" }}>⚲ Los Angeles, CA</div>
+            <div style={{ fontSize: "3.5px", fontWeight: "bold", color: "#38bdf8", marginTop: "3px" }}>HARD SKILLS</div>
+            <div style={{ fontSize: "2.3px", color: "#cbd5e1", lineHeight: "1.3" }}>
+              • Maya & Blender<br/>• Rigging & Mocap<br/>• Unreal Engine
+            </div>
+            <div style={{ fontSize: "3.5px", fontWeight: "bold", color: "#38bdf8", marginTop: "3px" }}>SOFT SKILLS</div>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "1px" }}>
+              <span style={{ background: "#334155", padding: "1px 2px", borderRadius: "1px", fontSize: "2px" }}>Storytelling</span>
+              <span style={{ background: "#334155", padding: "1px 2px", borderRadius: "1px", fontSize: "2px" }}>Leadership</span>
+            </div>
+          </div>
+          <div style={{ flex: 1, padding: "6px 5px", display: "flex", flexDirection: "column", gap: "2px" }}>
+            <div style={{ fontSize: "5.5px", fontWeight: "900", color: "#0f172a", textTransform: "uppercase", lineHeight: "1.1" }}>Catherine Barnett</div>
+            <div style={{ fontSize: "3.2px", color: "#0284c7", fontWeight: "bold", marginBottom: "2px" }}>3D Character Animator</div>
+            <div style={{ fontSize: "2.3px", color: "#475569", lineHeight: "1.2", marginBottom: "3px" }}>
+              Creative animator with 7+ years in feature film & AAA games specializing in lifelike movement.
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "2px", fontSize: "3.2px", fontWeight: "bold", color: "#0f172a" }}>
+              <span style={{ background: "#0284c7", color: "#fff", width: "7px", height: "7px", borderRadius: "50%", display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: "3px" }}>★</span>
+              WORK EXPERIENCE
+            </div>
+            <div style={{ fontSize: "2.8px", fontWeight: "bold", color: "#1e293b" }}>Lead Animator</div>
+            <div style={{ fontSize: "2.2px", color: "#0284c7", fontStyle: "italic" }}>Pixar Studios • 2021-Pres</div>
+            <div style={{ fontSize: "2.1px", color: "#64748b" }}>• Directed key character sequences for feature film</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (template.id === "pro-chris-flims") {
+    return (
+      <div className="w-full h-48 bg-stone-950 border-b border-stone-800 flex items-center justify-center overflow-hidden select-none">
+        <div className="bg-white shadow-xl rounded overflow-hidden p-2.5 flex flex-col gap-1.5" style={{ width: "135px", height: "175px", fontSize: "3px" }}>
+          <div>
+            <div style={{ fontSize: "6.5px", fontWeight: "900", color: "#c84b31", letterSpacing: "0.2px" }}>CHRIS FLIMS</div>
+            <div style={{ fontSize: "3.2px", fontWeight: "bold", color: "#374151" }}>Project Manager — Remote Agile Leader</div>
+          </div>
+          <div style={{ fontSize: "2.4px", color: "#4b5563", lineHeight: "1.2" }}>
+            Results-driven Project Manager overseeing distributed global delivery teams with 98% on-time records.
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2px", fontSize: "2.3px", color: "#6b7280", borderTop: "0.5px solid #e5e7eb", borderBottom: "0.5px solid #e5e7eb", padding: "1px 0" }}>
+            <span>✉ chris.flims@email</span>
+            <span>✆ +1 (555) 9021</span>
+            <span>⚲ Austin, TX (Remote)</span>
+            <span>🌐 linkedin.com/flims</span>
+          </div>
+          <div>
+            <div style={{ display: "flex", alignItems: "center", gap: "2px", marginBottom: "1px" }}>
+              <span style={{ color: "#c84b31", fontSize: "3.5px" }}>◈</span>
+              <span style={{ fontSize: "3.4px", fontWeight: "bold", color: "#111827" }}>AREAS OF EXPERTISE</span>
+              <div style={{ flex: 1, height: "0.5px", background: "#c84b31" }} />
+              <div style={{ width: "2px", height: "2px", borderRadius: "50%", background: "#c84b31" }} />
+            </div>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "1.5px" }}>
+              {["Scrum Agile", "Sprint Planning", "Jira & Confluence", "Budget P&L"].map((s, i) => (
+                <span key={i} style={{ background: "#e2e8f0", color: "#1e293b", padding: "1px 2px", borderRadius: "1px", fontSize: "2px", fontWeight: "600" }}>{s}</span>
+              ))}
+            </div>
+          </div>
+          <div>
+            <div style={{ display: "flex", alignItems: "center", gap: "2px", marginBottom: "1px" }}>
+              <span style={{ color: "#c84b31", fontSize: "3.5px" }}>◈</span>
+              <span style={{ fontSize: "3.4px", fontWeight: "bold", color: "#111827" }}>WORK EXPERIENCE</span>
+              <div style={{ flex: 1, height: "0.5px", background: "#c84b31" }} />
+              <div style={{ width: "2px", height: "2px", borderRadius: "50%", background: "#c84b31" }} />
+            </div>
+            <div style={{ display: "flex", justifyContent: "space-between", fontSize: "2.8px", fontWeight: "bold" }}>
+              <span>Senior Technical PM</span>
+              <span style={{ color: "#6b7280", fontSize: "2.3px" }}>2020 – Present</span>
+            </div>
+            <div style={{ fontSize: "2.3px", color: "#c84b31", fontStyle: "italic" }}>Global Cloud Systems</div>
+            <div style={{ fontSize: "2.2px", color: "#4b5563" }}>• Spearheaded remote team sprints with 0 blocker rate</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (template.id === "pro-will-tribian") {
+    return (
+      <div className="w-full h-48 bg-slate-950 border-b border-slate-800 flex items-center justify-center overflow-hidden select-none">
+        <div className="bg-white shadow-xl rounded overflow-hidden p-2 flex flex-col gap-1.5" style={{ width: "135px", height: "175px", fontSize: "3px" }}>
+          <div style={{ display: "flex", gap: "3px", alignItems: "center" }}>
+            <div style={{ width: "18px", height: "18px", borderRadius: "50%", background: "linear-gradient(135deg, #0891b2, #1e293b)", border: "1px solid #0891b2", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: "5px", fontWeight: "bold", flexShrink: 0 }}>
+              WT
+            </div>
+            <div>
+              <div style={{ fontSize: "6px", fontWeight: "900", color: "#0f172a" }}>WILL TRIBIAN</div>
+              <div style={{ fontSize: "3.2px", color: "#0891b2", fontWeight: "bold" }}>Theater Actor & Performer</div>
+            </div>
+          </div>
+          <div style={{ background: "#1e293b", color: "#e2e8f0", padding: "2px 3px", borderRadius: "2px", fontSize: "2.4px", lineHeight: "1.2" }}>
+            Dynamic stage actor trained in classical theater, voice projection, and improvisational performance.
+          </div>
+          <div style={{ background: "#0891b2", color: "#ffffff", padding: "2px 3px", borderRadius: "2px", fontSize: "2.3px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1px" }}>
+            <span>✉ will.tribian@email</span>
+            <span>✆ +1 (555) 7731</span>
+            <span>⚲ New York, NY</span>
+            <span>🌐 willtribian.actor</span>
+          </div>
+          <div style={{ display: "flex", gap: "4px" }}>
+            <div style={{ flex: "1 1 58%" }}>
+              <div style={{ fontSize: "3.4px", fontWeight: "bold", color: "#0f172a", borderBottom: "0.5px solid #0891b2", paddingBottom: "1px", marginBottom: "1px" }}>WORK EXPERIENCE</div>
+              <div style={{ fontSize: "2.8px", fontWeight: "bold" }}>Lead Actor — Hamlet</div>
+              <div style={{ fontSize: "2.3px", color: "#0891b2" }}>Broadway Playhouse | 2022</div>
+              <div style={{ fontSize: "2.1px", color: "#475569" }}>• Performed 65 sold-out shows with acclaim</div>
+            </div>
+            <div style={{ flex: "1 1 42%" }}>
+              <div style={{ fontSize: "3.4px", fontWeight: "bold", color: "#0f172a", borderBottom: "0.5px solid #0891b2", paddingBottom: "1px", marginBottom: "1px" }}>HARD SKILLS</div>
+              <div style={{ fontSize: "2.3px", color: "#475569" }}>• Classical Shakespearian<br/>• Stage Combat<br/>• Baritone Vocalist</div>
+              <div style={{ fontSize: "3.4px", fontWeight: "bold", color: "#0f172a", marginTop: "2px", borderBottom: "0.5px solid #0891b2", paddingBottom: "1px", marginBottom: "1px" }}>SOFT SKILLS</div>
+              <span style={{ background: "#e2e8f0", padding: "1px 2px", borderRadius: "1px", fontSize: "2px" }}>Stage Presence</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (template.id === "pro-amanda-smith") {
+    return (
+      <div className="w-full h-48 bg-zinc-950 border-b border-zinc-800 flex items-center justify-center overflow-hidden select-none">
+        <div className="bg-white shadow-xl rounded overflow-hidden p-2 flex flex-col gap-1.5" style={{ width: "135px", height: "175px", fontSize: "3px" }}>
+          <div style={{ display: "flex", gap: "3px", alignItems: "center" }}>
+            <div style={{ width: "17px", height: "19px", borderRadius: "2px", background: "linear-gradient(135deg, #71717a, #18181b)", border: "0.5px solid #cbd5e1", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: "5px", fontWeight: "bold" }}>
+              AS
+            </div>
+            <div>
+              <div style={{ fontSize: "6px", fontWeight: "900", color: "#18181b" }}>AMANDA SMITH</div>
+              <div style={{ fontSize: "3.2px", color: "#52525b", fontWeight: "bold" }}>Chief Information Officer (CIO)</div>
+            </div>
+          </div>
+          <div style={{ fontSize: "2.4px", color: "#52525b", lineHeight: "1.2" }}>
+            Visionary CIO guiding enterprise technology transformation, cybersecurity governance, and cloud architectures.
+          </div>
+          <div style={{ background: "#18181b", color: "#ffffff", padding: "2px 3px", borderRadius: "2px", fontSize: "2.3px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1px" }}>
+            <span>✉ amanda.smith@email</span>
+            <span>✆ +1 (555) 4412</span>
+            <span>⚲ Chicago, IL</span>
+            <span>🌐 amandasmith.cio</span>
+          </div>
+          <div style={{ display: "flex", gap: "4px" }}>
+            <div style={{ flex: "1 1 55%" }}>
+              <div style={{ fontSize: "3.4px", fontWeight: "bold", color: "#18181b", marginBottom: "1px" }}>▤ WORK EXPERIENCE</div>
+              <div style={{ fontSize: "2.8px", fontWeight: "bold" }}>CIO & VP Technology</div>
+              <div style={{ fontSize: "2.3px", color: "#52525b", fontStyle: "italic" }}>Pear Global Systems | 2018–Pres</div>
+              <div style={{ fontSize: "2.1px", color: "#666" }}>• Scaled global cloud footprint across 12 datacenters</div>
+            </div>
+            <div style={{ flex: "1 1 45%" }}>
+              <div style={{ fontSize: "3.4px", fontWeight: "bold", color: "#18181b", marginBottom: "1px" }}>▤ GENERAL SKILLS</div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1px", fontSize: "2.2px", color: "#444" }}>
+                <span>Agile CI/CD</span><span>Multi-Cloud</span>
+                <span>Security</span><span>Data Lakes</span>
+              </div>
+              <div style={{ fontSize: "3.4px", fontWeight: "bold", color: "#18181b", marginTop: "2px" }}>▤ CERTIFICATIONS</div>
+              <div style={{ fontSize: "2.2px", color: "#555" }}>CISM Certified CIO</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Fallback for standard templates
+  return (
+    <div className="w-full h-48 bg-slate-900 border-b border-slate-800 flex items-center justify-center overflow-hidden select-none">
+      <div className="bg-white shadow-xl rounded overflow-hidden p-3 flex flex-col gap-1.5" style={{ width: "135px", height: "175px", fontSize: "3px" }}>
+        <div style={{ borderBottom: `1px solid ${template.style.accentColor || "#2563eb"}`, paddingBottom: "2px" }}>
+          <div style={{ fontSize: "6px", fontWeight: "900", color: template.style.nameColor || "#0f172a" }}>Alex Johnson</div>
+          <div style={{ fontSize: "3.2px", color: template.style.accentColor || "#2563eb", fontWeight: "600" }}>Lead Software Engineer</div>
+          <div style={{ fontSize: "2.2px", color: "#64748b" }}>San Francisco, CA • alex@example.com • (555) 0192</div>
+        </div>
+        <div>
+          <div style={{ fontSize: "3.4px", fontWeight: "bold", color: template.style.headingColor || "#0f172a", textTransform: "uppercase" }}>Summary</div>
+          <div style={{ fontSize: "2.2px", color: "#475569", lineHeight: "1.2" }}>Experienced professional with a proven track record delivering scalable applications and clean architectures.</div>
+        </div>
+        <div>
+          <div style={{ fontSize: "3.4px", fontWeight: "bold", color: template.style.headingColor || "#0f172a", textTransform: "uppercase" }}>Experience</div>
+          <div style={{ fontSize: "2.8px", fontWeight: "bold", color: "#1e293b" }}>Senior Lead Specialist</div>
+          <div style={{ fontSize: "2.2px", color: "#64748b", fontStyle: "italic" }}>Acme Global Tech | 2021 – Present</div>
+          <div style={{ fontSize: "2.1px", color: "#475569" }}>• Spearheaded enterprise deliverables with 99.9% uptime</div>
+        </div>
+        <div>
+          <div style={{ fontSize: "3.4px", fontWeight: "bold", color: template.style.headingColor || "#0f172a", textTransform: "uppercase" }}>Skills</div>
+          <div style={{ fontSize: "2.2px", color: "#475569" }}>React, Next.js, TypeScript, Node.js, Python, PostgreSQL, AWS</div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 const testimonials = [
   { name: "Priya S.", role: "Data Analyst, hired at a major tech firm", text: "I uploaded my resume and it scored 71 on the ATS check. After tailoring with this tool for a specific job description, it jumped to 93. I got an interview within a week.", rating: 5 },
@@ -52,6 +311,8 @@ export default function Home() {
   const heroRef = useRef<HTMLDivElement>(null);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [billingCycle, setBillingCycle] = useState<"monthly" | "annual">("monthly");
+  const [templateTab, setTemplateTab] = useState<"pro" | "standard" | "all">("pro");
+  const [landingPreviewTemplate, setLandingPreviewTemplate] = useState<TemplateConfig | null>(null);
   const [contactForm, setContactForm] = useState({
     name: "",
     email: "",
@@ -96,7 +357,12 @@ export default function Home() {
             <div className="hidden md:flex items-center space-x-8">
               <a href="#how-it-works" className="text-slate-300 hover:text-white text-sm font-medium transition-colors">How It Works</a>
               <a href="#features" className="text-slate-300 hover:text-white text-sm font-medium transition-colors">Features</a>
-              <a href="#templates" className="text-slate-300 hover:text-white text-sm font-medium transition-colors">Templates</a>
+              <a href="#templates" className="text-slate-300 hover:text-white text-sm font-medium transition-colors flex items-center gap-1.5">
+                <span>Templates</span>
+                <span className="text-[10px] bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-extrabold px-1.5 py-0.5 rounded-full leading-none">
+                  4 PRO
+                </span>
+              </a>
               <a href="#pricing" className="text-slate-300 hover:text-white text-sm font-medium transition-colors">Pricing</a>
               <a href="#contact" className="text-slate-300 hover:text-white text-sm font-medium transition-colors">Contact Us</a>
               <a href="#faq" className="text-slate-300 hover:text-white text-sm font-medium transition-colors">FAQ</a>
@@ -350,53 +616,233 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Templates */}
-      <div id="templates" className="py-24 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-16">
-            <p className="text-blue-600 font-semibold text-sm uppercase tracking-wider mb-3">Template Gallery</p>
-            <h2 className="text-4xl font-bold text-gray-900">15+ ATS-First Resume Templates</h2>
-            <p className="text-gray-600 mt-4">No graphics. No skill bars. No images. Just clean, machine-readable resumes.</p>
+      {/* 👑 Templates Showcase */}
+      <div id="templates" className="py-24 bg-slate-900 text-white relative overflow-hidden">
+        {/* Ambient Glows */}
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="max-w-7xl mx-auto px-6 relative z-10">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-1.5 bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-400/40 px-3.5 py-1.5 rounded-full text-xs font-extrabold text-amber-300 mb-4 shadow-sm">
+              <Crown className="w-4 h-4 text-amber-400 fill-amber-400" />
+              <span>19+ ATS-SAFE RESUME TEMPLATES</span>
+            </div>
+            <h2 className="text-3xl md:text-5xl font-black text-white tracking-tight">
+              Crafted for Real Jobs. Engineered for ATS.
+            </h2>
+            <p className="text-slate-300 mt-4 max-w-2xl mx-auto text-sm md:text-base leading-relaxed">
+              Featuring our <strong className="text-amber-300">4 New Premium Pro Templates</strong> (Catherine Barnett, Chris Flims, Will Tribian, Amanda Smith) alongside proven corporate layouts.
+            </p>
+
+            {/* Filter Tabs */}
+            <div className="flex items-center justify-center gap-2 mt-8 flex-wrap">
+              <button
+                onClick={() => setTemplateTab("pro")}
+                className={`px-4 py-2.5 rounded-xl text-xs font-extrabold transition-all flex items-center gap-2 ${
+                  templateTab === "pro"
+                    ? "bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 text-slate-950 shadow-lg shadow-amber-500/30 scale-105"
+                    : "bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 border border-slate-700"
+                }`}
+              >
+                <Crown className="w-3.5 h-3.5 fill-current" />
+                <span>👑 Premium Pro Collection (4)</span>
+              </button>
+              <button
+                onClick={() => setTemplateTab("standard")}
+                className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
+                  templateTab === "standard"
+                    ? "bg-blue-600 text-white shadow-lg shadow-blue-500/25 scale-105"
+                    : "bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 border border-slate-700"
+                }`}
+              >
+                <FileText className="w-3.5 h-3.5" />
+                <span>Standard ATS Templates</span>
+              </button>
+              <button
+                onClick={() => setTemplateTab("all")}
+                className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
+                  templateTab === "all"
+                    ? "bg-blue-600 text-white shadow-lg shadow-blue-500/25 scale-105"
+                    : "bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 border border-slate-700"
+                }`}
+              >
+                <span>All Templates ({ALL_TEMPLATES.length})</span>
+              </button>
+            </div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {templates.map((tmpl, i) => (
-              <div key={i} className="bg-white rounded-2xl border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow">
-                <div className="h-48 bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center border-b border-gray-100">
-                  <div className="w-32 h-40 bg-white shadow-md rounded p-3 space-y-2">
-                    <div className="h-2 bg-gray-800 rounded w-20 mx-auto"></div>
-                    <div className="h-1 bg-gray-400 rounded w-24 mx-auto"></div>
-                    <div className="h-0.5 bg-gray-200 rounded w-full mt-2"></div>
-                    <div className="space-y-1">
-                      <div className="h-1 bg-gray-600 rounded w-12"></div>
-                      <div className="h-1 bg-gray-300 rounded w-full"></div>
-                      <div className="h-1 bg-gray-300 rounded w-5/6"></div>
-                      <div className="h-1 bg-gray-300 rounded w-4/6"></div>
+
+          {/* Template Cards Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {(templateTab === "pro"
+              ? ALL_TEMPLATES.filter((t) => t.isPro)
+              : templateTab === "standard"
+              ? ALL_TEMPLATES.filter((t) => !t.isPro).slice(0, 8)
+              : ALL_TEMPLATES
+            ).map((tmpl) => (
+              <div
+                key={tmpl.id}
+                className={`bg-slate-800/90 rounded-2xl border overflow-hidden hover:shadow-2xl transition-all duration-200 flex flex-col justify-between group ${
+                  tmpl.isPro
+                    ? "border-amber-500/50 hover:border-amber-400 shadow-amber-500/5"
+                    : "border-slate-700 hover:border-blue-500"
+                }`}
+              >
+                {/* Visual Preview */}
+                <div className="relative">
+                  <LandingMiniPreview template={tmpl} />
+
+                  {tmpl.isPro && (
+                    <div className="absolute top-2.5 left-2.5 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 text-white text-[10px] font-black px-2.5 py-0.5 rounded-full shadow-md flex items-center gap-1 border border-amber-300/40">
+                      <Crown className="w-3 h-3 text-amber-200 fill-amber-200" />
+                      <span>PRO EXCLUSIVE</span>
                     </div>
-                    <div className="h-0.5 bg-gray-200 rounded w-full"></div>
-                    <div className="space-y-1">
-                      <div className="h-1 bg-gray-600 rounded w-16"></div>
-                      <div className="h-1 bg-gray-300 rounded w-full"></div>
-                      <div className="h-1 bg-gray-300 rounded w-4/5"></div>
-                    </div>
+                  )}
+
+                  <div className="absolute top-2.5 right-2.5 bg-emerald-500 text-slate-950 text-[10px] font-black px-2 py-0.5 rounded-full shadow">
+                    ATS {tmpl.atsScore}%
                   </div>
                 </div>
-                <div className="p-5">
-                  <h3 className="font-bold text-gray-900">{tmpl.name}</h3>
-                  <p className="text-sm text-gray-500 mt-1">Best for: {tmpl.best}</p>
-                  <div className="mt-3 flex items-center">
-                    <span className="bg-green-50 text-green-700 text-xs font-medium px-2 py-1 rounded-full border border-green-100">ATS: {tmpl.compat}</span>
+
+                {/* Information */}
+                <div className="p-4 flex-1 flex flex-col justify-between">
+                  <div>
+                    <h3 className="font-extrabold text-white text-sm group-hover:text-amber-300 transition-colors">
+                      {tmpl.name}
+                    </h3>
+                    <p className="text-xs text-slate-400 mt-1 line-clamp-2 leading-relaxed">
+                      {tmpl.description}
+                    </p>
+
+                    <div className="flex flex-wrap gap-1 mt-2.5">
+                      {tmpl.bestFor.slice(0, 2).map((b, bi) => (
+                        <span
+                          key={bi}
+                          className="text-[10px] bg-slate-900/80 text-slate-300 px-2 py-0.5 rounded-md border border-slate-700"
+                        >
+                          {b}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="pt-3 mt-3 border-t border-slate-700/60 flex items-center gap-2">
+                    <button
+                      onClick={() => setLandingPreviewTemplate(tmpl)}
+                      className="flex-1 inline-flex items-center justify-center gap-1 py-2 px-2.5 rounded-xl text-xs font-semibold text-slate-200 bg-slate-700/60 hover:bg-slate-700 hover:text-white transition-colors"
+                    >
+                      <Eye className="w-3.5 h-3.5" />
+                      <span>Preview</span>
+                    </button>
+                    <Link
+                      href={`/register?template=${tmpl.id}`}
+                      className={`flex-1 inline-flex items-center justify-center gap-1 py-2 px-2.5 rounded-xl text-xs font-bold transition-all ${
+                        tmpl.isPro
+                          ? "bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-slate-950 shadow-md shadow-amber-500/20"
+                          : "bg-blue-600 hover:bg-blue-700 text-white"
+                      }`}
+                    >
+                      {tmpl.isPro ? (
+                        <>
+                          <Crown className="w-3 h-3 fill-current" />
+                          <span>Use (Pro)</span>
+                        </>
+                      ) : (
+                        <span>Use Template</span>
+                      )}
+                    </Link>
                   </div>
                 </div>
               </div>
             ))}
           </div>
-          <div className="text-center mt-10">
-            <Link href="/register" className="inline-flex items-center bg-blue-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-blue-700 transition-colors">
-              View All 15 Templates <ArrowRight className="ml-2 w-4 h-4" />
+
+          {/* Bottom Link to Full Public Directory */}
+          <div className="text-center mt-12">
+            <Link
+              href="/templates"
+              className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-3.5 rounded-2xl font-bold shadow-lg shadow-blue-500/25 transition-all transform hover:scale-[1.02]"
+            >
+              <span>Explore All {ALL_TEMPLATES.length} Templates In Full Directory</span>
+              <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
         </div>
       </div>
+
+      {/* 👑 Landing Page Live Preview Modal */}
+      {landingPreviewTemplate && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in">
+          <div className="bg-slate-900 border border-slate-700 rounded-3xl w-full max-w-4xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
+            {/* Modal Header */}
+            <div className="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-950">
+              <div className="flex items-center gap-3">
+                <div
+                  className={`p-2 rounded-xl text-white ${
+                    landingPreviewTemplate.isPro
+                      ? "bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950"
+                      : "bg-blue-600"
+                  }`}
+                >
+                  {landingPreviewTemplate.isPro ? (
+                    <Crown className="w-5 h-5 fill-current" />
+                  ) : (
+                    <FileText className="w-5 h-5" />
+                  )}
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-bold text-white text-base">
+                      {landingPreviewTemplate.name}
+                    </h3>
+                    {landingPreviewTemplate.isPro && (
+                      <span className="text-[10px] font-extrabold bg-amber-500 text-slate-950 px-2 py-0.5 rounded-full">
+                        PRO EXCLUSIVE
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-xs text-slate-400">
+                    High-resolution ATS Preview • Compatibility:{" "}
+                    <span className="text-emerald-400 font-bold">
+                      {landingPreviewTemplate.atsScore}%
+                    </span>
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <Link
+                  href={`/register?template=${landingPreviewTemplate.id}`}
+                  className="bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-600 hover:to-orange-700 text-slate-950 font-black text-xs px-4 py-2.5 rounded-xl shadow-md transition-all flex items-center gap-1.5"
+                >
+                  <Zap className="w-4 h-4 fill-current" />
+                  <span>Use This Template Now</span>
+                </Link>
+                <button
+                  onClick={() => setLandingPreviewTemplate(null)}
+                  className="p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Modal Body: A4 Paper Preview */}
+            <div className="flex-1 overflow-y-auto p-6 bg-slate-950 flex justify-center">
+              <div
+                className="bg-white shadow-2xl rounded-sm"
+                style={{ width: "210mm", minHeight: "297mm" }}
+              >
+                <ResumeTemplateRenderer
+                  template={landingPreviewTemplate}
+                  data={sampleLandingResumeData}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Testimonials */}
       <div className="py-24 bg-white">
