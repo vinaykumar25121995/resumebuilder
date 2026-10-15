@@ -1,4 +1,4 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import { prisma } from "@/lib/prisma";
 
 export interface SupabaseUser {
@@ -11,27 +11,59 @@ export interface SupabaseUser {
   plan: "free" | "pro" | string;
 }
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
-const supabaseKey =
-  process.env.SUPABASE_SERVICE_ROLE_KEY ||
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
-  "";
+export function getSupabaseUrl(): string {
+  return (
+    process.env.NEXT_PUBLIC_SUPABASE_URL ||
+    process.env.SUPABASE_URL ||
+    ""
+  );
+}
+
+export function getSupabaseKey(): string {
+  return (
+    process.env.SUPABASE_SERVICE_ROLE_KEY ||
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+    process.env.SUPABASE_ANON_KEY ||
+    ""
+  );
+}
 
 export const isSupabaseConfigured = (): boolean => {
+  const url = getSupabaseUrl();
+  const key = getSupabaseKey();
   return Boolean(
-    supabaseUrl &&
-      supabaseKey &&
-      !supabaseUrl.includes("placeholder") &&
-      !supabaseKey.includes("placeholder")
+    url &&
+      key &&
+      !url.includes("placeholder") &&
+      !key.includes("placeholder")
   );
 };
 
-// Singleton admin client (bypasses RLS to manage users and plans)
-export const supabaseAdmin = isSupabaseConfigured()
-  ? createClient(supabaseUrl, supabaseKey, {
-      auth: { persistSession: false, autoRefreshToken: false },
-    })
-  : null;
+let _cachedClient: SupabaseClient | null = null;
+let _cachedUrl = "";
+let _cachedKey = "";
+
+export function getSupabaseAdmin(): SupabaseClient | null {
+  const url = getSupabaseUrl();
+  const key = getSupabaseKey();
+
+  if (!url || !key || url.includes("placeholder") || key.includes("placeholder")) {
+    return null;
+  }
+
+  if (_cachedClient && _cachedUrl === url && _cachedKey === key) {
+    return _cachedClient;
+  }
+
+  _cachedUrl = url;
+  _cachedKey = key;
+  _cachedClient = createClient(url, key, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
+  return _cachedClient;
+}
+
+export const supabaseAdmin = getSupabaseAdmin();
 
 /**
  * Fetch a user from the Supabase `users` table by email.
@@ -39,10 +71,11 @@ export const supabaseAdmin = isSupabaseConfigured()
 export async function getSupabaseUserByEmail(
   email: string
 ): Promise<SupabaseUser | null> {
-  if (!isSupabaseConfigured() || !supabaseAdmin) return null;
+  const admin = getSupabaseAdmin();
+  if (!admin) return null;
 
   try {
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await admin
       .from("users")
       .select("id, email, name, password, created_at, last_login, plan")
       .ilike("email", email.trim())
@@ -65,10 +98,11 @@ export async function getSupabaseUserByEmail(
 export async function getSupabaseUserById(
   id: string
 ): Promise<SupabaseUser | null> {
-  if (!isSupabaseConfigured() || !supabaseAdmin) return null;
+  const admin = getSupabaseAdmin();
+  if (!admin) return null;
 
   try {
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await admin
       .from("users")
       .select("id, email, name, password, created_at, last_login, plan")
       .eq("id", id)
@@ -90,47 +124,56 @@ export async function upsertSupabaseUser(payload: {
   name?: string | null;
   password?: string | null;
   plan?: string;
-}): Promise<SupabaseUser | null> {
-  if (!isSupabaseConfigured() || !supabaseAdmin) return null;
-
-  const now = new Date().toISOString();
-  const existing = await getSupabaseUserByEmail(payload.email);
-
-  if (existing) {
-    // Update existing user's last_login and optional fields
-    const updates: Record<string, any> = {
-      last_login: now,
+}): Promise<{ user: SupabaseUser | null; error?: string }> {
+  const admin = getSupabaseAdmin();
+  if (!admin) {
+    return {
+      user: null,
+      error:
+        "Supabase credentials not configured. Please add NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in Netlify environment variables.",
     };
-    if (payload.name && !existing.name) updates.name = payload.name;
-    if (payload.password) updates.password = payload.password;
-
-    const { data, error } = await supabaseAdmin
-      .from("users")
-      .update(updates)
-      .eq("id", existing.id)
-      .select("id, email, name, created_at, last_login, plan")
-      .single();
-
-    if (error) {
-      console.error("Error updating Supabase user:", error.message);
-      return existing;
-    }
-    return data as SupabaseUser;
   }
 
-  // Create new user in Supabase
-  const insertData: Record<string, any> = {
-    email: payload.email.trim().toLowerCase(),
-    name: payload.name || payload.email.split("@")[0],
-    created_at: now,
-    last_login: now,
-    plan: payload.plan || "free",
-  };
-  if (payload.id) insertData.id = payload.id;
-  if (payload.password) insertData.password = payload.password;
+  const now = new Date().toISOString();
+  const cleanEmail = payload.email.trim().toLowerCase();
 
   try {
-    const { data, error } = await supabaseAdmin
+    const existing = await getSupabaseUserByEmail(cleanEmail);
+
+    if (existing) {
+      // Update existing user's last_login and optional fields
+      const updates: Record<string, any> = {
+        last_login: now,
+      };
+      if (payload.name && !existing.name) updates.name = payload.name;
+      if (payload.password) updates.password = payload.password;
+
+      const { data, error } = await admin
+        .from("users")
+        .update(updates)
+        .eq("id", existing.id)
+        .select("id, email, name, created_at, last_login, plan")
+        .single();
+
+      if (error) {
+        console.error("Error updating Supabase user:", error.message);
+        return { user: existing, error: error.message };
+      }
+      return { user: data as SupabaseUser };
+    }
+
+    // Insert new user in Supabase
+    const insertData: Record<string, any> = {
+      email: cleanEmail,
+      name: payload.name || cleanEmail.split("@")[0],
+      created_at: now,
+      last_login: now,
+      plan: payload.plan || "free",
+    };
+    if (payload.id) insertData.id = payload.id;
+    if (payload.password) insertData.password = payload.password;
+
+    const { data, error } = await admin
       .from("users")
       .insert([insertData])
       .select("id, email, name, created_at, last_login, plan")
@@ -138,12 +181,28 @@ export async function upsertSupabaseUser(payload: {
 
     if (error) {
       console.error("Error inserting Supabase user:", error.message);
-      return null;
+      let userFriendlyMsg = error.message;
+      if (error.message.includes("does not exist") || (error as any).code === "42P01") {
+        userFriendlyMsg =
+          "The Supabase 'users' table does not exist. Please run the provided SQL in your Supabase SQL Editor.";
+      } else if (
+        error.message.includes("JWT") ||
+        (error as any).code === "PGRST301" ||
+        error.message.includes("apikey")
+      ) {
+        userFriendlyMsg =
+          "Invalid Supabase API key. Please check SUPABASE_SERVICE_ROLE_KEY or NEXT_PUBLIC_SUPABASE_ANON_KEY in Netlify.";
+      }
+      return { user: null, error: userFriendlyMsg };
     }
-    return data as SupabaseUser;
-  } catch (err) {
+
+    return { user: data as SupabaseUser };
+  } catch (err: any) {
     console.error("Supabase insert exception:", err);
-    return null;
+    return {
+      user: null,
+      error: err?.message || "Failed to communicate with Supabase",
+    };
   }
 }
 
@@ -153,10 +212,11 @@ export async function upsertSupabaseUser(payload: {
 export async function updateSupabaseUserLastLogin(
   emailOrId: string
 ): Promise<void> {
-  if (!isSupabaseConfigured() || !supabaseAdmin) return;
+  const admin = getSupabaseAdmin();
+  if (!admin) return;
   const now = new Date().toISOString();
   try {
-    await supabaseAdmin
+    await admin
       .from("users")
       .update({ last_login: now })
       .or(`email.ilike.${emailOrId},id.eq.${emailOrId}`);
@@ -170,9 +230,10 @@ export async function updateSupabaseUserLastLogin(
  * Queries Supabase `users` table if configured, otherwise falls back to Prisma.
  */
 export async function getAllUsersForAdmin(): Promise<SupabaseUser[]> {
-  if (isSupabaseConfigured() && supabaseAdmin) {
+  const admin = getSupabaseAdmin();
+  if (admin) {
     try {
-      const { data, error } = await supabaseAdmin
+      const { data, error } = await admin
         .from("users")
         .select("id, email, name, created_at, last_login, plan")
         .order("created_at", { ascending: false });
@@ -210,9 +271,10 @@ export async function updateUserPlan(
   userId: string,
   newPlan: "free" | "pro"
 ): Promise<{ success: boolean; error?: string }> {
-  if (isSupabaseConfigured() && supabaseAdmin) {
+  const admin = getSupabaseAdmin();
+  if (admin) {
     try {
-      const { error } = await supabaseAdmin
+      const { error } = await admin
         .from("users")
         .update({ plan: newPlan })
         .eq("id", userId);

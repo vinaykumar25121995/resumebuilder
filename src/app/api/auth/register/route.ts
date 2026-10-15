@@ -21,18 +21,22 @@ export async function POST(req: Request) {
     const cleanEmail = email.trim().toLowerCase();
     const cleanName = name?.trim() || cleanEmail.split("@")[0];
 
-    // Check if user exists in Supabase
+    // 1. Check if user already exists in Supabase
     if (isSupabaseConfigured()) {
-      const existingSb = await getSupabaseUserByEmail(cleanEmail);
-      if (existingSb) {
-        return NextResponse.json(
-          { error: "An account with this email already exists" },
-          { status: 400 }
-        );
+      try {
+        const existingSb = await getSupabaseUserByEmail(cleanEmail);
+        if (existingSb) {
+          return NextResponse.json(
+            { error: "An account with this email already exists" },
+            { status: 400 }
+          );
+        }
+      } catch (e) {
+        console.warn("Supabase check error:", e);
       }
     }
 
-    // Check if user exists in Prisma
+    // 2. Check if user exists in Prisma (if available)
     try {
       const existingPrisma = await prisma.user.findUnique({
         where: { email: cleanEmail },
@@ -44,27 +48,31 @@ export async function POST(req: Request) {
         );
       }
     } catch (e) {
-      // Prisma error (e.g. SQLite readonly on serverless) shouldn't block registration if Supabase works
       console.warn("Prisma user lookup warning:", e);
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // 1. Store in Supabase `users` table
+    // 3. Store in Supabase `users` table
     let createdUserId: string | null = null;
+    let supabaseError: string | null = null;
+
     if (isSupabaseConfigured()) {
-      const sbUser = await upsertSupabaseUser({
+      const sbResult = await upsertSupabaseUser({
         email: cleanEmail,
         name: cleanName,
         password: hashedPassword,
         plan: "free",
       });
-      if (sbUser) {
-        createdUserId = sbUser.id;
+      if (sbResult.user) {
+        createdUserId = sbResult.user.id;
+      } else if (sbResult.error) {
+        supabaseError = sbResult.error;
       }
     }
 
-    // 2. Store in Prisma database
+    // 4. Also attempt to sync to Prisma in background (never block registration if it fails)
+    let prismaSuccess = false;
     try {
       const user = await prisma.user.create({
         data: {
@@ -74,6 +82,7 @@ export async function POST(req: Request) {
           password: hashedPassword,
         },
       });
+      prismaSuccess = true;
 
       // Automatically create empty profile
       await prisma.profile.create({
@@ -83,13 +92,28 @@ export async function POST(req: Request) {
       });
     } catch (prismaErr) {
       console.warn("Prisma user creation warning:", prismaErr);
-      // If Supabase creation succeeded, registration is still a success
-      if (!createdUserId) {
-        throw prismaErr;
-      }
     }
 
-    return NextResponse.json({ success: true }, { status: 201 });
+    // 5. If user was created in Supabase OR in Prisma, registration succeeded!
+    if (createdUserId || prismaSuccess) {
+      return NextResponse.json({ success: true }, { status: 201 });
+    }
+
+    // 6. If neither succeeded, return an actionable, clear error message
+    if (supabaseError) {
+      return NextResponse.json(
+        { error: supabaseError },
+        { status: 400 }
+      );
+    }
+
+    return NextResponse.json(
+      {
+        error:
+          "Database configuration missing: Please ensure your Supabase credentials (NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY) are configured in Netlify > Site configuration > Environment variables.",
+      },
+      { status: 500 }
+    );
   } catch (error: any) {
     console.error("Registration error:", error);
     return NextResponse.json(

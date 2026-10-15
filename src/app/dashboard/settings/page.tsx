@@ -2,11 +2,14 @@
 
 import { useState } from "react";
 import { useSession } from "next-auth/react";
-import { User, Bell, Lock, Key, Save } from "lucide-react";
+import { User, Bell, Lock, Key, Save, Eye, EyeOff } from "lucide-react";
 
 export default function SettingsPage() {
   const { data: session } = useSession();
   const [activeTab, setActiveTab] = useState("account");
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const tabs = [
     { id: "account", label: "Account Profile", icon: User },
@@ -103,15 +106,60 @@ export default function SettingsPage() {
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Current Password</label>
-                    <input type="password" placeholder="••••••••" className="w-full max-w-md rounded-lg border border-gray-300 p-2.5 text-sm focus:ring-2 focus:ring-blue-500 outline-none" />
+                    <div className="relative max-w-md">
+                      <input
+                        type={showCurrentPassword ? "text" : "password"}
+                        placeholder="••••••••"
+                        className="w-full rounded-lg border border-gray-300 p-2.5 pr-10 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none p-1"
+                        aria-label={showCurrentPassword ? "Hide password" : "Show password"}
+                        tabIndex={-1}
+                      >
+                        {showCurrentPassword ? <EyeOff className="w-4 h-4 text-blue-600" /> : <Eye className="w-4 h-4 text-gray-400" />}
+                      </button>
+                    </div>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">New Password</label>
-                    <input type="password" placeholder="••••••••" className="w-full max-w-md rounded-lg border border-gray-300 p-2.5 text-sm focus:ring-2 focus:ring-blue-500 outline-none" />
+                    <div className="relative max-w-md">
+                      <input
+                        type={showNewPassword ? "text" : "password"}
+                        placeholder="••••••••"
+                        className="w-full rounded-lg border border-gray-300 p-2.5 pr-10 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowNewPassword(!showNewPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none p-1"
+                        aria-label={showNewPassword ? "Hide password" : "Show password"}
+                        tabIndex={-1}
+                      >
+                        {showNewPassword ? <EyeOff className="w-4 h-4 text-blue-600" /> : <Eye className="w-4 h-4 text-gray-400" />}
+                      </button>
+                    </div>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Confirm New Password</label>
-                    <input type="password" placeholder="••••••••" className="w-full max-w-md rounded-lg border border-gray-300 p-2.5 text-sm focus:ring-2 focus:ring-blue-500 outline-none" />
+                    <div className="relative max-w-md">
+                      <input
+                        type={showConfirmPassword ? "text" : "password"}
+                        placeholder="••••••••"
+                        className="w-full rounded-lg border border-gray-300 p-2.5 pr-10 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none p-1"
+                        aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                        tabIndex={-1}
+                      >
+                        {showConfirmPassword ? <EyeOff className="w-4 h-4 text-blue-600" /> : <Eye className="w-4 h-4 text-gray-400" />}
+                      </button>
+                    </div>
                   </div>
                 </div>
                 <div className="pt-4">

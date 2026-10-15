@@ -1,13 +1,27 @@
-import { PrismaClient } from "@prisma/client"
+import { PrismaClient } from "@prisma/client";
+
+// Fallback DATABASE_URL so Prisma never throws "Environment variable not found: DATABASE_URL"
+const defaultDbUrl = process.env.DATABASE_URL || "file:./dev.db";
+if (!process.env.DATABASE_URL) {
+  process.env.DATABASE_URL = defaultDbUrl;
+}
 
 const globalForPrisma = globalThis as unknown as {
-  prisma: PrismaClient | undefined
-}
+  prisma: PrismaClient | undefined;
+};
 
 export const prisma =
   globalForPrisma.prisma ??
   new PrismaClient({
-    log: process.env.NODE_ENV === "development" ? ["query", "error", "warn"] : ["error"],
-  })
+    datasources: {
+      db: {
+        url: defaultDbUrl,
+      },
+    },
+    log:
+      process.env.NODE_ENV === "development"
+        ? ["query", "error", "warn"]
+        : ["error"],
+  });
 
-if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma
+if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;

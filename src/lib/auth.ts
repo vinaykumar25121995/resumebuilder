@@ -154,14 +154,14 @@ export const authOptions: NextAuthOptions = {
         try {
           // Store/update user in Supabase `users` table
           if (isSupabaseConfigured()) {
-            const sbUser = await upsertSupabaseUser({
+            const sbResult = await upsertSupabaseUser({
               email,
               name,
               plan: "free",
             });
-            if (sbUser) {
-              user.id = sbUser.id;
-              (user as any).plan = sbUser.plan;
+            if (sbResult?.user) {
+              user.id = sbResult.user.id;
+              (user as any).plan = sbResult.user.plan;
             }
           }
 
