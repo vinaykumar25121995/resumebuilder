@@ -273,29 +273,365 @@ function LandingMiniPreview({ template }: { template: TemplateConfig }) {
     );
   }
 
-  // Fallback for standard templates
+  const s = template.style;
+  const isTwoColumn = s.layoutType?.includes("two-column");
+  const accentHex = s.accentColor || "#2563eb";
+
   return (
-    <div className="w-full h-48 bg-slate-900 border-b border-slate-800 flex items-center justify-center overflow-hidden select-none">
-      <div className="bg-white shadow-xl rounded overflow-hidden p-3 flex flex-col gap-1.5" style={{ width: "135px", height: "175px", fontSize: "3px" }}>
-        <div style={{ borderBottom: `1px solid ${template.style.accentColor || "#2563eb"}`, paddingBottom: "2px" }}>
-          <div style={{ fontSize: "6px", fontWeight: "900", color: template.style.nameColor || "#0f172a" }}>Alex Johnson</div>
-          <div style={{ fontSize: "3.2px", color: template.style.accentColor || "#2563eb", fontWeight: "600" }}>Lead Software Engineer</div>
-          <div style={{ fontSize: "2.2px", color: "#64748b" }}>San Francisco, CA • alex@example.com • (555) 0192</div>
-        </div>
-        <div>
-          <div style={{ fontSize: "3.4px", fontWeight: "bold", color: template.style.headingColor || "#0f172a", textTransform: "uppercase" }}>Summary</div>
-          <div style={{ fontSize: "2.2px", color: "#475569", lineHeight: "1.2" }}>Experienced professional with a proven track record delivering scalable applications and clean architectures.</div>
-        </div>
-        <div>
-          <div style={{ fontSize: "3.4px", fontWeight: "bold", color: template.style.headingColor || "#0f172a", textTransform: "uppercase" }}>Experience</div>
-          <div style={{ fontSize: "2.8px", fontWeight: "bold", color: "#1e293b" }}>Senior Lead Specialist</div>
-          <div style={{ fontSize: "2.2px", color: "#64748b", fontStyle: "italic" }}>Acme Global Tech | 2021 – Present</div>
-          <div style={{ fontSize: "2.1px", color: "#475569" }}>• Spearheaded enterprise deliverables with 99.9% uptime</div>
-        </div>
-        <div>
-          <div style={{ fontSize: "3.4px", fontWeight: "bold", color: template.style.headingColor || "#0f172a", textTransform: "uppercase" }}>Skills</div>
-          <div style={{ fontSize: "2.2px", color: "#475569" }}>React, Next.js, TypeScript, Node.js, Python, PostgreSQL, AWS</div>
-        </div>
+    <div
+      className="w-full h-48 bg-slate-900 border-b border-slate-800 flex items-center justify-center overflow-hidden select-none"
+      style={{ fontFamily: s.fontFamily }}
+    >
+      <div
+        className="bg-white shadow-xl rounded-sm overflow-hidden flex"
+        style={{
+          width: "135px",
+          height: "175px",
+          fontSize: "3.5px",
+          lineHeight: "1.3",
+          flexDirection:
+            s.layoutType === "two-column-right-sidebar" ? "row-reverse" : "row",
+        }}
+      >
+        {isTwoColumn ? (
+          <>
+            <div
+              style={{
+                width: s.sidebarWidth || "32%",
+                backgroundColor: s.sidebarBgColor || "#f8fafc",
+                color: s.sidebarTextColor || "#000",
+                padding: "8px 5px",
+                display: "flex",
+                flexDirection: "column",
+                gap: "4px",
+              }}
+            >
+              {s.hasPhoto && (
+                <div
+                  style={{
+                    width: "20px",
+                    height: "20px",
+                    borderRadius:
+                      s.photoStyle === "round"
+                        ? "50%"
+                        : s.photoStyle === "rounded"
+                        ? "4px"
+                        : "0",
+                    backgroundColor: "#cbd5e1",
+                    margin: "0 auto 3px auto",
+                    border: `1px solid ${s.accentColor || "#fff"}`,
+                  }}
+                />
+              )}
+              <div>
+                <div
+                  style={{
+                    fontSize: "5.5px",
+                    fontWeight: "bold",
+                    textTransform: "uppercase",
+                    color: s.sidebarTextColor || accentHex,
+                    lineHeight: "1.1",
+                  }}
+                >
+                  John Doe
+                </div>
+                <div style={{ fontSize: "3.2px", opacity: 0.9 }}>
+                  Senior Analyst
+                </div>
+              </div>
+              <div>
+                <div
+                  style={{
+                    fontSize: "3.5px",
+                    fontWeight: "bold",
+                    borderBottom: `0.5px solid ${s.sidebarTextColor || accentHex}`,
+                    marginBottom: "2px",
+                    color: s.sidebarTextColor || accentHex,
+                  }}
+                >
+                  Contact
+                </div>
+                <div
+                  style={{
+                    fontSize: "2.5px",
+                    opacity: 0.8,
+                    lineHeight: "1.3",
+                  }}
+                >
+                  Mumbai, India
+                  <br />
+                  john@example.com
+                </div>
+              </div>
+              <div>
+                <div
+                  style={{
+                    fontSize: "3.5px",
+                    fontWeight: "bold",
+                    borderBottom: `0.5px solid ${s.sidebarTextColor || accentHex}`,
+                    marginBottom: "2px",
+                    color: s.sidebarTextColor || accentHex,
+                  }}
+                >
+                  Skills
+                </div>
+                <div
+                  style={{
+                    fontSize: "2.5px",
+                    opacity: 0.8,
+                    lineHeight: "1.3",
+                  }}
+                >
+                  SQL, Python, Tableau, Excel
+                </div>
+              </div>
+            </div>
+            <div
+              style={{
+                flex: 1,
+                padding: "8px 6px",
+                display: "flex",
+                flexDirection: "column",
+                gap: "4px",
+              }}
+            >
+              <div>
+                <div
+                  style={{
+                    fontSize: "3.8px",
+                    fontWeight: "bold",
+                    textTransform:
+                      s.headingCase === "uppercase" ? "uppercase" : "none",
+                    color: accentHex,
+                    borderBottom: s.showDividers
+                      ? `0.5px solid ${accentHex}`
+                      : "none",
+                    marginBottom: "2px",
+                  }}
+                >
+                  Summary
+                </div>
+                <div
+                  style={{
+                    fontSize: "2.6px",
+                    color: "#555",
+                    lineHeight: "1.2",
+                  }}
+                >
+                  Experienced professional with proven domain track record in
+                  analytics.
+                </div>
+              </div>
+              <div>
+                <div
+                  style={{
+                    fontSize: "3.8px",
+                    fontWeight: "bold",
+                    textTransform:
+                      s.headingCase === "uppercase" ? "uppercase" : "none",
+                    color: accentHex,
+                    borderBottom: s.showDividers
+                      ? `0.5px solid ${accentHex}`
+                      : "none",
+                    marginBottom: "2px",
+                  }}
+                >
+                  Experience
+                </div>
+                <div
+                  style={{
+                    fontSize: "3.2px",
+                    fontWeight: "bold",
+                    color: "#333",
+                  }}
+                >
+                  Senior Analyst
+                </div>
+                <div
+                  style={{
+                    fontSize: "2.6px",
+                    color: "#666",
+                    fontStyle: "italic",
+                  }}
+                >
+                  ABC Tech | 2022–Present
+                </div>
+                <div
+                  style={{
+                    fontSize: "2.4px",
+                    color: "#555",
+                    marginTop: "1px",
+                  }}
+                >
+                  {s.bulletChar} Spearheaded business analytics & reporting
+                </div>
+              </div>
+            </div>
+          </>
+        ) : (
+          <div
+            style={{
+              padding: "8px",
+              width: "100%",
+              display: "flex",
+              flexDirection: "column",
+              gap: "4px",
+            }}
+          >
+            <div
+              style={{
+                textAlign: s.nameAlign,
+                borderBottom: s.showDividers ? `1px solid ${accentHex}` : "none",
+                paddingBottom: "3px",
+                display: s.hasPhoto ? "flex" : "block",
+                alignItems: "center",
+                gap: "6px",
+                flexDirection: s.nameAlign === "right" ? "row-reverse" : "row",
+              }}
+            >
+              {s.hasPhoto && (
+                <div
+                  style={{
+                    width: "18px",
+                    height: "18px",
+                    borderRadius:
+                      s.photoStyle === "round"
+                        ? "50%"
+                        : s.photoStyle === "rounded"
+                        ? "3px"
+                        : "0",
+                    backgroundColor: "#cbd5e1",
+                    flexShrink: 0,
+                  }}
+                />
+              )}
+              <div style={{ flex: 1 }}>
+                <div
+                  style={{
+                    fontSize: "6px",
+                    fontWeight: "bold",
+                    textTransform: "uppercase",
+                    color: accentHex,
+                  }}
+                >
+                  John Doe
+                </div>
+                <div style={{ fontSize: "3.2px", color: "#666" }}>
+                  Data Analyst
+                </div>
+                <div
+                  style={{
+                    fontSize: "2.5px",
+                    color: "#888",
+                    marginTop: "1px",
+                  }}
+                >
+                  Mumbai, India • john@example.com
+                </div>
+              </div>
+            </div>
+            <div>
+              <div
+                style={{
+                  fontSize: "3.8px",
+                  fontWeight: "bold",
+                  textTransform:
+                    s.headingCase === "uppercase" ? "uppercase" : "none",
+                  color: accentHex,
+                  borderBottom: s.showDividers
+                    ? `0.5px solid ${accentHex}`
+                    : "none",
+                  paddingBottom: "1px",
+                  marginBottom: "2px",
+                }}
+              >
+                Summary
+              </div>
+              <div
+                style={{
+                  fontSize: "2.6px",
+                  color: "#555",
+                  lineHeight: "1.2",
+                }}
+              >
+                Experienced data analyst specializing in reporting, dashboards,
+                and business intelligence.
+              </div>
+            </div>
+            <div>
+              <div
+                style={{
+                  fontSize: "3.8px",
+                  fontWeight: "bold",
+                  textTransform:
+                    s.headingCase === "uppercase" ? "uppercase" : "none",
+                  color: accentHex,
+                  borderBottom: s.showDividers
+                    ? `0.5px solid ${accentHex}`
+                    : "none",
+                  paddingBottom: "1px",
+                  marginBottom: "2px",
+                }}
+              >
+                Experience
+              </div>
+              <div
+                style={{
+                  fontSize: "3.2px",
+                  fontWeight: "bold",
+                  color: "#333",
+                }}
+              >
+                Senior Analyst
+              </div>
+              <div
+                style={{
+                  fontSize: "2.6px",
+                  color: "#666",
+                  fontStyle: "italic",
+                }}
+              >
+                Global Tech | 2022–Present
+              </div>
+              <div
+                style={{
+                  fontSize: "2.4px",
+                  color: "#555",
+                  marginTop: "1px",
+                }}
+              >
+                {s.bulletChar} Developed operational data pipelines
+              </div>
+            </div>
+            <div>
+              <div
+                style={{
+                  fontSize: "3.8px",
+                  fontWeight: "bold",
+                  textTransform:
+                    s.headingCase === "uppercase" ? "uppercase" : "none",
+                  color: accentHex,
+                  borderBottom: s.showDividers
+                    ? `0.5px solid ${accentHex}`
+                    : "none",
+                  paddingBottom: "1px",
+                  marginBottom: "2px",
+                }}
+              >
+                Skills
+              </div>
+              <div
+                style={{
+                  fontSize: "2.4px",
+                  color: "#555",
+                  lineHeight: "1.3",
+                }}
+              >
+                SQL, Python, Power BI, Advanced Excel, Statistics
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -311,7 +647,7 @@ export default function Home() {
   const heroRef = useRef<HTMLDivElement>(null);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [billingCycle, setBillingCycle] = useState<"monthly" | "annual">("monthly");
-  const [templateTab, setTemplateTab] = useState<"pro" | "standard" | "all">("pro");
+  const [templateTab, setTemplateTab] = useState<"pro" | "twocolumn" | "standard" | "all">("pro");
   const [landingPreviewTemplate, setLandingPreviewTemplate] = useState<TemplateConfig | null>(null);
   const [contactForm, setContactForm] = useState({
     name: "",
@@ -649,6 +985,16 @@ export default function Home() {
                 <span>👑 Premium Pro Collection (4)</span>
               </button>
               <button
+                onClick={() => setTemplateTab("twocolumn")}
+                className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
+                  templateTab === "twocolumn"
+                    ? "bg-cyan-600 text-white shadow-lg shadow-cyan-500/25 scale-105"
+                    : "bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 border border-slate-700"
+                }`}
+              >
+                <span>📑 2-Column & Photo (5)</span>
+              </button>
+              <button
                 onClick={() => setTemplateTab("standard")}
                 className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
                   templateTab === "standard"
@@ -657,7 +1003,7 @@ export default function Home() {
                 }`}
               >
                 <FileText className="w-3.5 h-3.5" />
-                <span>Standard ATS Templates</span>
+                <span>Standard ATS Templates (40)</span>
               </button>
               <button
                 onClick={() => setTemplateTab("all")}
@@ -676,8 +1022,10 @@ export default function Home() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {(templateTab === "pro"
               ? ALL_TEMPLATES.filter((t) => t.isPro)
+              : templateTab === "twocolumn"
+              ? ALL_TEMPLATES.filter((t) => t.number >= 45 && t.number <= 49)
               : templateTab === "standard"
-              ? ALL_TEMPLATES.filter((t) => !t.isPro).slice(0, 8)
+              ? ALL_TEMPLATES.filter((t) => !t.isPro)
               : ALL_TEMPLATES
             ).map((tmpl) => (
               <div
