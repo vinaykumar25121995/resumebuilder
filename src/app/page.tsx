@@ -142,78 +142,101 @@ export default function Home() {
           </div>
         </motion.div>
 
-        {/* Content Container (z-20 and pointer-events-auto for full interactivity) */}
-        <div className="relative z-20 mx-auto max-w-4xl text-center pointer-events-auto">
-          <motion.div
-            initial={{ opacity: 0, y: -16, scale: 0.96 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ duration: 0.55, ease: "easeOut" }}
-            className="inline-flex items-center bg-blue-950/60 backdrop-blur-md text-cyan-300 text-sm font-medium px-4 py-2 rounded-full mb-6 border border-cyan-500/30 shadow-lg shadow-cyan-950/30"
-          >
-            <Sparkles className="w-4 h-4 mr-2 text-cyan-400 animate-spin" style={{ animationDuration: "8s" }} />
-            AI-Powered ATS Optimization
-          </motion.div>
+        {/* Dynamic High-Contrast Background Card for Hero Texts */}
+        <motion.div
+          initial={{ opacity: 0, y: 25, scale: 0.98 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="relative z-20 mx-auto max-w-4xl text-center pointer-events-auto my-6"
+        >
+          {/* Animated Ambient Color Aura Behind the Card */}
+          <div
+            className="absolute -inset-1.5 bg-gradient-to-r from-cyan-500/30 via-blue-600/30 to-indigo-500/30 rounded-3xl blur-2xl opacity-75 animate-pulse -z-10"
+            style={{ animationDuration: "6s" }}
+          />
 
-          <motion.h1
-            initial={{ opacity: 0, y: 22 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.65, delay: 0.1, ease: "easeOut" }}
-            className="text-5xl lg:text-7xl font-extrabold tracking-tight text-white mb-6 drop-shadow-md"
-          >
-            Build Once.<br />
-            <span className="bg-gradient-to-r from-cyan-300 via-blue-400 to-indigo-300 bg-clip-text text-transparent">
-              Tailor for Every Job.
-            </span>
-          </motion.h1>
+          {/* Dynamic Frosted Glass Container */}
+          <div className="relative rounded-3xl bg-slate-950/70 backdrop-blur-xl md:backdrop-blur-2xl border border-white/20 shadow-[0_0_60px_rgba(0,0,0,0.85)] p-6 sm:p-10 md:p-12 overflow-hidden">
+            {/* Subtle Top-Edge High-Tech Rim Light */}
+            <div className="absolute top-0 inset-x-0 h-[1.5px] bg-gradient-to-r from-transparent via-cyan-400/80 to-transparent shadow-[0_0_15px_#38bdf8]" />
+            <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-96 h-48 bg-blue-500/15 rounded-full blur-3xl pointer-events-none" />
 
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.65, delay: 0.2, ease: "easeOut" }}
-            className="text-xl text-slate-200 max-w-2xl mx-auto mb-10 leading-relaxed font-normal drop-shadow-sm"
-          >
-            Create an ATS-friendly master resume, then automatically optimize it for every job description using AI.
-            <span className="font-semibold text-white"> Stop rewriting manually.</span>
-          </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.65, delay: 0.3, ease: "easeOut" }}
-            className="flex flex-col sm:flex-row items-center justify-center gap-4"
-          >
-            <Link
-              href="/register"
-              className="w-full sm:w-auto inline-flex items-center justify-center bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 text-white px-8 py-4 rounded-xl text-base font-semibold hover:from-blue-500 hover:to-indigo-500 hover:scale-105 active:scale-95 transition-all duration-200 shadow-xl shadow-blue-500/30 border border-blue-400/30 group"
+            {/* AI Optimization Pill Badge */}
+            <motion.div
+              initial={{ opacity: 0, y: -16, scale: 0.96 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ duration: 0.55, ease: "easeOut" }}
+              className="inline-flex items-center bg-gradient-to-r from-blue-950/80 via-slate-900/90 to-blue-950/80 backdrop-blur-md text-cyan-300 text-xs sm:text-sm font-semibold px-4 py-2 rounded-full mb-6 border border-cyan-400/40 shadow-[0_0_20px_rgba(6,182,212,0.25)]"
             >
-              BUILD MY RESUME
-              <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </Link>
-            <a
-              href="#how-it-works"
-              className="w-full sm:w-auto inline-flex items-center justify-center bg-white/10 backdrop-blur-md border border-white/25 text-white px-8 py-4 rounded-xl text-base font-semibold hover:bg-white/20 hover:border-white/40 hover:scale-105 active:scale-95 transition-all duration-200 shadow-md"
-            >
-              See How It Works
-            </a>
-          </motion.div>
+              <Sparkles className="w-4 h-4 mr-2 text-cyan-400 animate-spin" style={{ animationDuration: "8s" }} />
+              AI-Powered ATS Optimization • Global Career Ready
+            </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.45, ease: "easeOut" }}
-            className="mt-12 flex flex-wrap items-center justify-center gap-6 sm:gap-8 text-sm text-slate-300"
-          >
-            <div className="flex items-center gap-2 bg-slate-900/60 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/15 shadow-sm">
-              <CheckCircle className="w-4 h-4 text-emerald-400" /> No credit card required
-            </div>
-            <div className="flex items-center gap-2 bg-slate-900/60 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/15 shadow-sm">
-              <CheckCircle className="w-4 h-4 text-emerald-400" /> Free to start
-            </div>
-            <div className="flex items-center gap-2 bg-slate-900/60 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/15 shadow-sm">
-              <CheckCircle className="w-4 h-4 text-emerald-400" /> ATS-Designed Templates
-            </div>
-          </motion.div>
-        </div>
+            {/* Main Headline */}
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.65, delay: 0.1, ease: "easeOut" }}
+              className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white mb-6 drop-shadow-[0_4px_16px_rgba(0,0,0,0.9)]"
+            >
+              Build Once.<br />
+              <span className="bg-gradient-to-r from-cyan-300 via-blue-400 to-indigo-300 bg-clip-text text-transparent drop-shadow-[0_0_25px_rgba(56,189,248,0.4)]">
+                Tailor for Every Job.
+              </span>
+            </motion.h1>
+
+            {/* Supporting Description */}
+            <motion.p
+              initial={{ opacity: 0, y: 18 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.65, delay: 0.2, ease: "easeOut" }}
+              className="text-lg sm:text-xl text-slate-100 max-w-2xl mx-auto mb-8 sm:mb-10 leading-relaxed font-normal drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]"
+            >
+              Create an ATS-friendly master resume, then automatically optimize it for every job description using AI.
+              <span className="font-semibold text-white"> Stop rewriting manually.</span>
+            </motion.p>
+
+            {/* Call To Action Buttons */}
+            <motion.div
+              initial={{ opacity: 0, y: 18 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.65, delay: 0.3, ease: "easeOut" }}
+              className="flex flex-col sm:flex-row items-center justify-center gap-4"
+            >
+              <Link
+                href="/register"
+                className="w-full sm:w-auto inline-flex items-center justify-center bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 text-white px-8 py-4 rounded-xl text-base font-bold hover:from-blue-500 hover:to-indigo-500 hover:scale-105 active:scale-95 transition-all duration-200 shadow-[0_0_25px_rgba(37,99,235,0.5)] border border-blue-400/40 group"
+              >
+                BUILD MY RESUME
+                <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </Link>
+              <a
+                href="#how-it-works"
+                className="w-full sm:w-auto inline-flex items-center justify-center bg-white/10 backdrop-blur-md border border-white/30 text-white px-8 py-4 rounded-xl text-base font-semibold hover:bg-white/20 hover:border-white/50 hover:scale-105 active:scale-95 transition-all duration-200 shadow-lg"
+              >
+                See How It Works
+              </a>
+            </motion.div>
+
+            {/* Guarantee / Verification Pills */}
+            <motion.div
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.45, ease: "easeOut" }}
+              className="mt-8 sm:mt-10 flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-xs sm:text-sm text-slate-200"
+            >
+              <div className="flex items-center gap-2 bg-slate-900/80 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/20 shadow-md">
+                <CheckCircle className="w-4 h-4 text-emerald-400" /> No credit card required
+              </div>
+              <div className="flex items-center gap-2 bg-slate-900/80 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/20 shadow-md">
+                <CheckCircle className="w-4 h-4 text-emerald-400" /> Free to start
+              </div>
+              <div className="flex items-center gap-2 bg-slate-900/80 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/20 shadow-md">
+                <CheckCircle className="w-4 h-4 text-emerald-400" /> ATS-Designed Templates
+              </div>
+            </motion.div>
+          </div>
+        </motion.div>
       </div>
 
       {/* Stats */}
