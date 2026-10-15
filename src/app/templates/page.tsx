@@ -79,7 +79,7 @@ export default function PublicTemplatesPage() {
               >
                 <span>Templates</span>
                 <span className="text-[10px] bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-extrabold px-1.5 py-0.5 rounded-full leading-none">
-                  5 PRO
+                  10 PRO
                 </span>
               </Link>
               <Link

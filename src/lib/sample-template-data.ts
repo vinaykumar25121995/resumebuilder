@@ -6,6 +6,565 @@ import { ResumeData } from "@/components/ResumeTemplateRenderer";
  * Provides realistic, fully populated demonstration content for every template.
  */
 
+export const SAMPLE_PRO_CLAIRE: ResumeData = {
+  personalInfo: {
+    fullName: "Claire Russel",
+    title: "Computer Science Student",
+    email: "email@clairemurh.south",
+    phone: "023-456-7920",
+    location: "Champaign, IL",
+    linkedin: "linkedin.org/in/clairerussel",
+    github: "github.com/clairerussel",
+    portfolio: "clairelooon.dev",
+    photoUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80",
+  },
+  summary:
+    "Hard working and passionate Computer Science student with an intensive coding background, algorithmic problem solving foundation, and hands-on software development experience. Seeking to leverage strong data structures knowledge and full-stack capabilities to contribute to cutting-edge technical initiatives and software products.",
+  skills: {
+    technical: [
+      "Data Structures & Algorithms",
+      "Software Engineering",
+      "Machine Learning",
+      "Database Management Systems",
+      "Object-Oriented Design",
+      "Python",
+      "Java",
+      "C++",
+    ],
+    tools: ["Git & GitHub", "Linux / Unix", "Docker", "VS Code", "PostgreSQL"],
+    concepts: ["Algorithmic Complexity", "REST APIs", "System Architecture", "Unit Testing"],
+    soft: ["Global Thinking", "Leadership", "Creativity", "Teamwork", "Adaptability"],
+  },
+  experience: [
+    {
+      id: "exp-1",
+      title: "Lead Programming Instructor",
+      company: "CodeWar Youth Initiative",
+      location: "Chicago, IL",
+      date: "2022 – Present",
+      bullets: [
+        "Spearheaded comprehensive programming curriculum and hands-on workshops for underrepresented students across the state.",
+        "Mentored 45+ aspiring junior coders in Python foundations, algorithm design, and collaborative open-source workflows.",
+      ],
+    },
+    {
+      id: "exp-2",
+      title: "Event Coordinator",
+      company: "Community STEM Outreach Program",
+      location: "Springfield, IL",
+      date: "2021 – 2022",
+      bullets: [
+        "Coordinated large-scale logistics for annual STEM hackathons, hosting 250+ student participants and university sponsors.",
+        "Secured competitive grant funding and corporate sponsorships totaling over $15,000 for student computing kits.",
+      ],
+    },
+  ],
+  education: [
+    {
+      id: "edu-1",
+      degree: "Bachelor of Science in Computer Science",
+      school: "Illinois University",
+      date: "Attending – Present",
+      location: "Urbana-Champaign, IL",
+      bullets: [
+        "Data Structures & Algorithms",
+        "Software Engineering Principles",
+        "Statistical Machine Learning",
+        "Database Management Systems",
+        "Object-Oriented Development",
+      ],
+    },
+  ],
+  projects: [
+    {
+      id: "proj-1",
+      name: "Algorithmic Code Visualizer",
+      description: "Interactive browser application rendering pathfinding algorithms and binary search trees in real-time.",
+      tech: "React, TypeScript, Web Canvas",
+    },
+    {
+      id: "proj-2",
+      name: "Autonomous STEM Drone Firmware",
+      description: "Embedded C++ controller for micro quadcopters executing indoor obstacle avoidance routines.",
+      tech: "C++, FreeRTOS, Arduino",
+    },
+  ],
+  achievements: [
+    {
+      id: "ach-1",
+      title: "NextGen Coder Society",
+      description: "Active Chapter Member & Hackathon Team Lead (2021 – Present)",
+    },
+    {
+      id: "ach-2",
+      title: "Be We Tomorrow Initiative",
+      description: "Scholarship Recipient & STEM Ambassador (2019 – Present)",
+    },
+  ],
+  certifications: [
+    {
+      id: "cert-1",
+      name: "Google IT Support Professional Certificate",
+      issuer: "Google / Coursera",
+      date: "2023",
+    },
+    {
+      id: "cert-2",
+      name: "Microsoft Azure Fundamentals Certificate (AZ-900)",
+      issuer: "Microsoft",
+      date: "2023",
+    },
+    {
+      id: "cert-3",
+      name: "Certified Cloud Leader",
+      issuer: "AWS",
+      date: "2022",
+    },
+  ],
+  languages: [
+    { id: "lang-1", name: "English", proficiency: "Native / Bilingual Proficiency" },
+    { id: "lang-2", name: "Spanish", proficiency: "Professional Working Proficiency" },
+    { id: "lang-3", name: "German", proficiency: "Elementary Technical Proficiency" },
+  ],
+};
+
+export const SAMPLE_PRO_JESSICA: ResumeData = {
+  personalInfo: {
+    fullName: "Jessica Blakely",
+    title: "Senior Game Designer",
+    email: "jessica@fectsresums.com",
+    phone: "(04) 336-3200",
+    location: "Phoenix, AZ",
+    portfolio: "jessica.designs.com",
+    linkedin: "linkedin.com/in/jessicablakely",
+    photoUrl: "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=400&q=80",
+  },
+  summary:
+    "Results-driven Game Designer with 8+ years of experience in level design, 3D modeling, and interactive systems. Proven track record leading core design mechanics from concept to multi-platform launch. Proficient in Unreal Engine 5, Blueprints scripting, and procedural level generation with an emphasis on player engagement, intuitive mechanics, and cinematic pacing.",
+  skills: {
+    technical: [
+      "Unreal Engine 5",
+      "Blueprints Scripting",
+      "Game Systems",
+      "Map Drafting",
+      "Level Testing & QA",
+      "Unity 3D",
+      "3D Blocking",
+      "Level Design",
+      "3D Animation",
+      "Behavior Trees",
+    ],
+    tools: ["Unreal Engine 5", "Blender", "Maya", "Jira", "Perforce (P4)", "Figma"],
+    concepts: ["Level Pacing", "Combat Encounters", "Procedural Generation", "Spatial Aesthetics"],
+    soft: ["Teamwork", "Pioneering Vision", "Creative Writing", "Player Psychology", "Deadline Driven"],
+  },
+  experience: [
+    {
+      id: "exp-1",
+      title: "3D Game Designer",
+      company: "Octo-tailboard Studios ↗",
+      location: "Phoenix, AZ",
+      date: "November 2021 – Present",
+      bullets: [
+        "Spearheaded gameplay mechanics and combat balance for an acclaimed action-RPG, earning the Epic Storytelling Award.",
+        "Created interactive encounters and puzzle topologies across 14 diverse biomes, optimizing real-time framerate stability by 30%.",
+        "Coordinated with concept artists and technical animators to prototype 40+ boss fight mechanics and physics interactions.",
+      ],
+    },
+    {
+      id: "exp-2",
+      title: "3D Level & Environment Designer",
+      company: "TriQuiet Interactive ↗",
+      location: "Tempe, AZ",
+      date: "August 2018 – November 2021",
+      bullets: [
+        "Collaborated with narrative directors to design environmental storytelling beats across 25 expansive game zones.",
+        "Constructed high-density 3D level whiteboxes, lighting passes, and collision meshes in Unreal Engine.",
+        "Gathered qualitative telemetry feedback from focus playtests to tune platforming navigation and player retention curves.",
+      ],
+    },
+  ],
+  education: [
+    {
+      id: "edu-1",
+      degree: "BA in Computer Science, Minor in Game Design",
+      school: "Arizona State University ↗",
+      date: "June 2021",
+      location: "Tempe, AZ",
+    },
+  ],
+  achievements: [
+    {
+      id: "ach-1",
+      title: "Epic Storytelling Award (2021)",
+      description: "Awarded by Game Dev Guild for standout narrative integration into environmental level geometry.",
+    },
+    {
+      id: "ach-2",
+      title: "Top Design Award — 'Chaotic Realms' (2022)",
+      description: "Recognized as Best Emerging Indie Design at United States Independent Game Showcase.",
+    },
+    {
+      id: "ach-3",
+      title: "Breakthrough Gameplay Innovation — IndieCade (2019)",
+      description: "Honored for pioneering dynamic gravity puzzle mechanics in student capstone game.",
+    },
+  ],
+  certifications: [
+    {
+      id: "cert-1",
+      name: "Unreal Engine 5 Design Specialist (2022) ↗",
+      issuer: "Epic Games Academy",
+      date: "2022",
+    },
+    {
+      id: "cert-2",
+      name: "Comprehensive Level Design Certification ↗",
+      issuer: "CG Master Academy",
+      date: "2021",
+    },
+    {
+      id: "cert-3",
+      name: "Game Architecture & Player Experience ↗",
+      issuer: "Frankenment Masterclass",
+      date: "2020",
+    },
+  ],
+  languages: [
+    { id: "lang-1", name: "English", proficiency: "Native / Bilingual" },
+    { id: "lang-2", name: "French", proficiency: "Full Professional" },
+    { id: "lang-3", name: "Spanish", proficiency: "Professional Working" },
+  ],
+};
+
+export const SAMPLE_PRO_ADAM: ResumeData = {
+  personalInfo: {
+    fullName: "Adam Stotch",
+    title: "Licensed Realtor & Property Specialist",
+    email: "adam@moresumes.com",
+    phone: "(122) 234-7890",
+    location: "Orlando, FL",
+    linkedin: "adam.development.com",
+    portfolio: "linkedin.com/in/adamstotch",
+    photoUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80",
+  },
+  summary:
+    "Dedicated Realtor with 8+ years of high-volume residential and commercial property management experience. Closed over $45M in successful real estate transactions as buyer and seller representative. Recognized as a Certified Property Manager (CPM) committed to maximizing asset value, mitigating closing risks, and delivering five-star client experiences.",
+  skills: {
+    technical: [
+      "Market & Price Analysis",
+      "Property Management",
+      "Property Manager Software",
+      "MLS Database & CMA",
+      "Contract Negotiation",
+      "Written & Oral Communication",
+      "Client Relationship Management",
+      "Strategic Networking",
+    ],
+    tools: ["MLS Matrix", "Dotloop", "Zillow Premier Agent", "AppFolio", "DocuSign"],
+    concepts: ["Comparative Market Analysis", "Escrow Logistics", "1031 Exchange", "Title Verification"],
+    soft: ["Client Advisory", "High-Stakes Negotiation", "Active Listening", "Integrity & Discretion"],
+  },
+  experience: [
+    {
+      id: "exp-1",
+      title: "Senior Realtor",
+      company: "American Realty & Associates ↗",
+      location: "Orlando, FL",
+      date: "2018 – Present",
+      bullets: [
+        "Promoted client listings via targeted digital marketing and MLS syndication, boosting inquiry velocity by 65%.",
+        "Closed 85+ residential and commercial transactions totaling $32M in career gross volume with 98% client retention.",
+        "Accompanied buyer delegations to evaluate properties, inspect structural foundations, and estimate renovation margins.",
+        "Drafted and negotiated compliant purchase agreements, addendums, title insurance, and lender escrow contracts.",
+      ],
+    },
+    {
+      id: "exp-2",
+      title: "Real Estate Agent",
+      company: "Penny Realty Inc. ↗",
+      location: "Winter Park, FL",
+      date: "2014 – 2018",
+      bullets: [
+        "Managed end-to-end listing lifecycle for 40+ single-family residences, conducting weekly open houses and private showings.",
+        "Assisted first-time homebuyers with loan pre-approvals, FHA financing programs, and title deed transfers.",
+      ],
+    },
+  ],
+  education: [
+    {
+      id: "edu-1",
+      degree: "Bachelor of Arts in Business Administration",
+      school: "University of Florida",
+      date: "2010 – 2014",
+      location: "Gainesville, FL",
+    },
+  ],
+  certifications: [
+    {
+      id: "cert-1",
+      name: "Certified Real Estate Broker (CRB) ↗",
+      issuer: "Real Estate Business Institute",
+      date: "2020",
+    },
+    {
+      id: "cert-2",
+      name: "Certified Property Manager (CPM) ↗",
+      issuer: "Institute of Real Estate Management (IREM)",
+      date: "2019",
+    },
+    {
+      id: "cert-3",
+      name: "Certified Real Estate Specialist (CRS) ↗",
+      issuer: "Residential Real Estate Council",
+      date: "2018",
+    },
+    {
+      id: "cert-4",
+      name: "Accredited Buyer's Representative (ABR) ↗",
+      issuer: "National Association of Realtors",
+      date: "2016",
+    },
+  ],
+  achievements: [
+    {
+      id: "ach-1",
+      title: "National Association of Realtors (NAR) ↗",
+      description: "Active Member & Certified Florida Board Representative",
+    },
+    {
+      id: "ach-2",
+      title: "Institute of Real Estate Management (IREM) ↗",
+      description: "Orlando Chapter Committee Member",
+    },
+  ],
+  languages: [
+    { id: "lang-1", name: "English", proficiency: "● ● ● ● ●" },
+    { id: "lang-2", name: "Spanish", proficiency: "● ● ● ● ●" },
+    { id: "lang-3", name: "French", proficiency: "● ● ● ● ○" },
+    { id: "lang-4", name: "German", proficiency: "● ● ○ ○ ○" },
+  ],
+};
+
+export const SAMPLE_PRO_NICK: ResumeData = {
+  personalInfo: {
+    fullName: "Nick Koe",
+    title: "Professional Event Photographer",
+    email: "nick@koephotography.com",
+    phone: "+1 (123) 444-2222",
+    location: "San Francisco, CA",
+    portfolio: "nick-koe.com",
+    linkedin: "linkedin.com/in/nickkoe",
+    photoUrl: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=400&q=80",
+  },
+  summary:
+    "Creative and detail-oriented Event Photographer with 6+ years of professional experience capturing high-profile weddings, corporate summits, and intimate private events. Highly proficient in multi-point strobe lighting, documentary photojournalism, and post-production color grading. Renowned for curated editorial albums delivering a 25% subscriber growth for lifestyle magazines. Expert in Adobe Lightroom and Capture One Pro.",
+  skills: {
+    technical: [
+      "Composition & Framing",
+      "Studio & Ambient Lighting",
+      "Editorial Photo Editing",
+      "Color Grading & LUTs",
+      "Candid Documentary Photography",
+      "Event & Gala Coverage",
+      "Adobe Photoshop CC",
+      "Adobe Lightroom Classic",
+      "Capture One Pro",
+    ],
+    tools: ["Sony A7R V", "Profoto Strobe Systems", "Adobe Lightroom", "Capture One", "Photoshop"],
+    concepts: ["Documentary Storytelling", "High-Dynamic-Range Lighting", "Color Science", "Fast Ingestion Workflows"],
+    soft: ["Creativity", "Attention to Detail", "Adaptability Under Pressure", "Client Rapport", "Fast Turnaround"],
+  },
+  experience: [
+    {
+      id: "exp-1",
+      title: "Wedding & Editorial Photographer",
+      company: "Elegant Bride Magazine ↗",
+      location: "San Francisco, CA",
+      date: "08/2021 – Present",
+      bullets: [
+        "Produced over 250 high-fashion bridal editorials, showcasing diverse venue lighting conditions and wedding couture.",
+        "Collaborated closely with creative directors and editors to curate cover imagery and 12-page centerfold feature spreads.",
+        "Engineered a digital raw ingestion pipeline in Capture One Pro, reducing client gallery turnaround from 14 days to 4 days.",
+      ],
+    },
+    {
+      id: "exp-2",
+      title: "Lead Event Photographer",
+      company: "Freelance Visual Media ↗",
+      location: "San Francisco, CA",
+      date: "12/2018 – 08/2021",
+      bullets: [
+        "Captured bespoke photo sets for 45+ premier corporate galas, tech conferences, and celebrity private receptions.",
+        "Achieved unanimous 5-star reviews on freelance vendor platforms, resulting in an 80% repeat booking client base.",
+        "Operated multi-camera setups with synchronized speedlights to photograph low-light evening celebrations without disruption.",
+      ],
+    },
+  ],
+  education: [
+    {
+      id: "edu-1",
+      degree: "Bachelor of Fine Arts (B.F.A.) in Photography",
+      school: "Columbus State University",
+      date: "2014 – 2018",
+      location: "Columbus, GA",
+    },
+  ],
+  projects: [
+    {
+      id: "proj-1",
+      name: "Wedding Photography Portfolio ↗",
+      description: "Captured both candid and editorial images using natural and artificial lighting setups for over 40+ high-budget weddings.",
+      url: "https://www.koephotography.com/weddings",
+    },
+    {
+      id: "proj-2",
+      name: "Corporate Photography Portfolio ↗",
+      description: "Documented 30+ corporate summits, tech product launches, and charity galas with same-day press deliverables.",
+      url: "https://www.koephotography.com/corporate",
+    },
+    {
+      id: "proj-3",
+      name: "Fine Art Event Collection ↗",
+      description: "Vast archival collection of candid portraits capturing authentic emotions and cinematic compositions.",
+      url: "https://www.koephotography.com/fine-art",
+    },
+  ],
+  certifications: [
+    {
+      id: "cert-1",
+      name: "Adobe Lightroom: Advanced Techniques (2022) ↗",
+      issuer: "Philanthropy & Arts Guild",
+      date: "2022",
+    },
+    {
+      id: "cert-2",
+      name: "Adobe Photoshop: Advanced Techniques (2020) ↗",
+      issuer: "Creative University",
+      date: "2020",
+    },
+    {
+      id: "cert-3",
+      name: "Capture One Pro: Mastering Workflow and Editing (2020) ↗",
+      issuer: "Udemy / Phase One",
+      date: "2020",
+    },
+  ],
+  languages: [
+    { id: "lang-1", name: "English", proficiency: "Native / Bilingual" },
+    { id: "lang-2", name: "French", proficiency: "Professional Working" },
+    { id: "lang-3", name: "Spanish", proficiency: "Professional Working" },
+  ],
+};
+
+export const SAMPLE_PRO_LISA: ResumeData = {
+  personalInfo: {
+    fullName: "Lisa Neumann",
+    title: "Senior Mechanical Engineer",
+    email: "lisa.neumann@resumesite.com",
+    phone: "(123) 456-0233",
+    location: "Philadelphia, PA",
+    linkedin: "linkedin.com/in/lisa.neumann",
+    portfolio: "neumann-engineering.com",
+  },
+  summary:
+    "Methodical, results-oriented Mechanical Engineering professional with 8+ years of expertise designing industrial HVAC, thermodynamics, and high-efficiency mechanical systems for commercial facilities. Proven track record managing $15M+ engineering capital budgets, delivering compliant engineering blueprints, and spearheading Six Sigma process optimizations that boosted industrial manufacturing output by 8%.",
+  skills: {
+    technical: [
+      "Autodesk Revit",
+      "Building Information Modeling (BIM)",
+      "Energy Modeling Programs",
+      "AutoCAD Mechanical",
+      "MS Office Advanced",
+      "Intermediate Python & MATLAB",
+      "City of Philadelphia Building Codes",
+      "Scrum & Agile Methodology",
+      "Master Tech & Trello",
+    ],
+    tools: ["Revit BIM", "AutoCAD", "Carrier HAP", "Trane TRACE 700", "SolidWorks", "Python"],
+    concepts: ["HVAC Psychrometrics", "Hydronic Piping", "ASHRAE 90.1 Compliance", "Thermal Load Calculations"],
+    soft: [
+      "Time Management",
+      "Analytical Mathematics",
+      "Technical Documentation",
+      "Cross-Functional Leadership",
+      "Engineering Communication",
+      "Project Management",
+    ],
+  },
+  experience: [
+    {
+      id: "exp-1",
+      title: "Mechanical / HVAC Project Engineer",
+      company: "TechWise Systems",
+      location: "Philadelphia, PA",
+      date: "11/2021 – Present",
+      bullets: [
+        "Spearheaded multiple complex projects designing mechanical and HVAC systems for high-profile commercial facilities.",
+        "Managed 5 concurrent projects with an individual capital budget of over $4 million each, ensuring on-schedule completion.",
+        "Developed and fully implemented technical drawings and innovative schematics, resulting in an 8% increase in industrial output.",
+        "Led and collaborated with a team of 20+ junior mechanical engineers to design, establish, and validate cooling tower preservation statistics.",
+      ],
+    },
+    {
+      id: "exp-2",
+      title: "Mechanical Application Engineer",
+      company: "Systematic Engineering Co.",
+      location: "Philadelphia, PA",
+      date: "03/2016 – 10/2021",
+      bullets: [
+        "Revamped and streamlined project management methodologies to ensure all equipment specifications, budgets, and schedules were strictly tracked.",
+        "Extensively optimized hand/AO and navigation tools to identify structural stresses and implement critical engineering improvements.",
+      ],
+    },
+    {
+      id: "exp-3",
+      title: "Junior Mechanical Engineer",
+      company: "Flextronics Corporation",
+      location: "Philadelphia, PA",
+      date: "08/2014 – 01/2016",
+      bullets: [
+        "Demonstrated strong attention to detail, focus, and expert inspection to analyze assembly line throughput and elevate quality standards by 7%.",
+        "Assisted in planning for efficient workforce allocation and assisted teams to optimize business workflow, resulting in more than 15% annual production capacity growth.",
+      ],
+    },
+  ],
+  education: [
+    {
+      id: "edu-1",
+      degree: "Bachelor of Science in Mechanical Engineering",
+      school: "Western Michigan University",
+      date: "09/2010 – 06/2014",
+      location: "Kalamazoo, MI",
+    },
+  ],
+  certifications: [
+    {
+      id: "cert-1",
+      name: "Six Sigma Green Belt Certified (2014)",
+      issuer: "American Society for Quality (ASQ)",
+      date: "2014",
+    },
+    {
+      id: "cert-2",
+      name: "Pennsylvania Professional Engineer (PE #88491) (2012)",
+      issuer: "Commonwealth of Pennsylvania",
+      date: "2012",
+    },
+    {
+      id: "cert-3",
+      name: "EPA 608 Universal Certification for HVAC Systems",
+      issuer: "Environmental Protection Agency",
+      date: "2015",
+    },
+  ],
+  languages: [
+    { id: "lang-1", name: "English", proficiency: "Native or Bilingual Proficiency" },
+    { id: "lang-2", name: "Spanish", proficiency: "Full Professional Proficiency" },
+    { id: "lang-3", name: "French", proficiency: "Full Professional Proficiency" },
+  ],
+};
+
 export const SAMPLE_PRO_MICHELLE: ResumeData = {
   personalInfo: {
     fullName: "Michelle Dhamar",
@@ -2109,10 +2668,15 @@ export const SAMPLE_ATS_PHOTO_SIDEBAR: ResumeData = {
 };
 
 /**
- * Mapping of all 14 active templates to their dedicated, fully populated sample data.
+ * Mapping of all 19 active templates to their dedicated, fully populated sample data.
  */
 export const TEMPLATE_SAMPLE_MAP: Record<string, ResumeData> = {
   "pro-michelle": SAMPLE_PRO_MICHELLE,
+  "pro-claire": SAMPLE_PRO_CLAIRE,
+  "pro-jessica": SAMPLE_PRO_JESSICA,
+  "pro-adam": SAMPLE_PRO_ADAM,
+  "pro-nick": SAMPLE_PRO_NICK,
+  "pro-lisa": SAMPLE_PRO_LISA,
   "pro-catherine": SAMPLE_PRO_CATHERINE,
   "pro-chris-flims": SAMPLE_PRO_CHRIS_FLIMS,
   "pro-will-tribian": SAMPLE_PRO_WILL_TRIBIAN,

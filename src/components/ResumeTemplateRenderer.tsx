@@ -289,6 +289,7 @@ export interface ResumeData {
     date?: string;
     location?: string;
     score?: string;
+    bullets?: string[];
     degreeFontSize?: number;
     schoolFontSize?: number;
     dateFontSize?: number;
@@ -2584,6 +2585,1380 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
       );
     };
 
+
+    // 6. Claire Russel — Computer Science Student
+    const renderProClaire = () => {
+      const email = data.personalInfo?.email;
+      const phone = data.personalInfo?.phone;
+      const location = data.personalInfo?.location;
+      const portfolio = data.personalInfo?.portfolio;
+      const linkedin = data.personalInfo?.linkedin;
+      const github = data.personalInfo?.github;
+      const photoUrl =
+        data.personalInfo?.photoUrl ||
+        "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80";
+
+      const softSkills = data.skills?.soft?.length
+        ? data.skills.soft
+        : ["Global Thinking", "Leadership", "Creativity", "Teamwork", "Adaptability"];
+
+      const renderHeaderLine = (title: string) => (
+        <div style={{ marginTop: "14px", marginBottom: "8px" }}>
+          <div
+            style={{
+              fontSize: "10pt",
+              fontWeight: "800",
+              textTransform: "uppercase",
+              letterSpacing: "0.8px",
+              color: "#1e1b4b",
+              borderBottom: "1.5px solid #4c1d95",
+              paddingBottom: "2px",
+            }}
+          >
+            {title}
+          </div>
+        </div>
+      );
+
+      return (
+        <div
+          ref={ref}
+          style={{
+            fontFamily: cs.fontFamily || "'Inter', Arial, sans-serif",
+            width: pageDim.width,
+            minHeight: pageDim.height,
+            backgroundColor: "#ffffff",
+            padding: "14mm 16mm",
+            boxSizing: "border-box",
+            color: "#1e293b",
+          }}
+        >
+          <style
+            dangerouslySetInnerHTML={{
+              __html: `@page { size: ${pageDim.width} ${pageDim.height}; margin: 0; }`,
+            }}
+          />
+
+          {/* Top Banner: Round photo + Purple Capsule */}
+          <div style={{ display: "flex", alignItems: "stretch", gap: "16px", marginBottom: "14px" }}>
+            <div style={{ flex: "0 0 100px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <img
+                src={photoUrl}
+                alt={data.personalInfo?.fullName || "Claire Russel"}
+                style={{
+                  width: "92px",
+                  height: "92px",
+                  borderRadius: "50%",
+                  objectFit: "cover",
+                  border: "2.5px solid #e2e8f0",
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+                }}
+              />
+            </div>
+            <div
+              style={{
+                flex: 1,
+                backgroundColor: "#4c1d95",
+                borderRadius: "4px",
+                padding: "14px 20px",
+                color: "#ffffff",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+              }}
+            >
+              <h1 style={{ fontSize: nameFontSize || "24pt", fontWeight: "800", margin: "0 0 2px 0", letterSpacing: "-0.5px" }}>
+                {data.personalInfo?.fullName || "Claire Russel"}
+              </h1>
+              <p style={{ fontSize: "10.5pt", color: "#ddd6fe", fontWeight: "600", margin: "0 0 6px 0" }}>
+                {data.personalInfo?.title || "Computer Science Student"}
+              </p>
+              {data.summary && (
+                <p style={{ fontSize: "8.5pt", color: "#f3e8ff", lineHeight: 1.4, margin: 0 }}>
+                  {renderFormattedText(data.summary)}
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Body: 2-Column (Left 28%, Right 72%) */}
+          <div style={{ display: "flex", gap: "20px" }}>
+            {/* Left Sidebar */}
+            <div style={{ flex: "0 0 28%", borderRight: "1px solid #e2e8f0", paddingRight: "16px" }}>
+              {/* Contact with Square Icons */}
+              <div style={{ display: "flex", flexDirection: "column", gap: "6px", fontSize: "8pt", color: "#334155" }}>
+                {email && (
+                  <div style={{ display: "flex", alignItems: "center", gap: "6px", wordBreak: "break-all" }}>
+                    <div style={{ width: 16, height: 16, backgroundColor: "#4c1d95", borderRadius: 2, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                      <Mail style={{ width: 10, height: 10, color: "#ffffff" }} />
+                    </div>
+                    <span>{email}</span>
+                  </div>
+                )}
+                {phone && (
+                  <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                    <div style={{ width: 16, height: 16, backgroundColor: "#4c1d95", borderRadius: 2, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                      <Phone style={{ width: 10, height: 10, color: "#ffffff" }} />
+                    </div>
+                    <span>{phone}</span>
+                  </div>
+                )}
+                {location && (
+                  <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                    <div style={{ width: 16, height: 16, backgroundColor: "#4c1d95", borderRadius: 2, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                      <MapPin style={{ width: 10, height: 10, color: "#ffffff" }} />
+                    </div>
+                    <span>{location}</span>
+                  </div>
+                )}
+                {linkedin && (
+                  <div style={{ display: "flex", alignItems: "center", gap: "6px", wordBreak: "break-all" }}>
+                    <div style={{ width: 16, height: 16, backgroundColor: "#4c1d95", borderRadius: 2, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                      <LinkedinIcon style={{ width: 10, height: 10, color: "#ffffff" }} />
+                    </div>
+                    <span>{linkedin.replace(/^https?:\/\//, "")}</span>
+                  </div>
+                )}
+                {github && (
+                  <div style={{ display: "flex", alignItems: "center", gap: "6px", wordBreak: "break-all" }}>
+                    <div style={{ width: 16, height: 16, backgroundColor: "#4c1d95", borderRadius: 2, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                      <Globe style={{ width: 10, height: 10, color: "#ffffff" }} />
+                    </div>
+                    <span>{github.replace(/^https?:\/\//, "")}</span>
+                  </div>
+                )}
+                {portfolio && (
+                  <div style={{ display: "flex", alignItems: "center", gap: "6px", wordBreak: "break-all" }}>
+                    <div style={{ width: 16, height: 16, backgroundColor: "#4c1d95", borderRadius: 2, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                      <Sparkles style={{ width: 10, height: 10, color: "#ffffff" }} />
+                    </div>
+                    <span>{portfolio.replace(/^https?:\/\//, "")}</span>
+                  </div>
+                )}
+              </div>
+
+              {/* SOFT SKILLS */}
+              <div style={{ marginTop: "14px" }}>
+                <div style={{ fontSize: "9.5pt", fontWeight: "800", textTransform: "uppercase", color: "#1e1b4b", borderBottom: "1.5px solid #4c1d95", paddingBottom: "2px", marginBottom: "6px" }}>
+                  SOFT SKILLS
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: "4px", fontSize: "8.5pt", color: "#334155" }}>
+                  {softSkills.map((s, idx) => (
+                    <div key={idx}>{s}</div>
+                  ))}
+                </div>
+              </div>
+
+              {/* LANGUAGES */}
+              {data.languages && data.languages.length > 0 && (
+                <div style={{ marginTop: "14px" }}>
+                  <div style={{ fontSize: "9.5pt", fontWeight: "800", textTransform: "uppercase", color: "#1e1b4b", borderBottom: "1.5px solid #4c1d95", paddingBottom: "2px", marginBottom: "6px" }}>
+                    LANGUAGES
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                    {data.languages.map((l, idx) => (
+                      <div key={idx}>
+                        <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{l.name}</div>
+                        <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{l.proficiency}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* INTERESTS */}
+              <div style={{ marginTop: "14px" }}>
+                <div style={{ fontSize: "9.5pt", fontWeight: "800", textTransform: "uppercase", color: "#1e1b4b", borderBottom: "1.5px solid #4c1d95", paddingBottom: "2px", marginBottom: "6px" }}>
+                  INTERESTS
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
+                  {["Emerging Technologies", "Algorithms and Competitive Programming", "Outdoor Activities and Photography"].map((item, idx) => (
+                    <div
+                      key={idx}
+                      style={{
+                        border: "1px solid #94a3b8",
+                        borderRadius: "4px",
+                        padding: "3px 6px",
+                        fontSize: "7.5pt",
+                        color: "#334155",
+                        lineHeight: 1.25,
+                      }}
+                    >
+                      {item}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Right Main Column */}
+            <div style={{ flex: 1 }}>
+              {/* EDUCATION */}
+              {data.education && data.education.length > 0 && (
+                <div>
+                  {renderHeaderLine("EDUCATION")}
+                  <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                    {data.education.map((edu, idx) => (
+                      <div key={idx}>
+                        <div style={{ fontSize: "9.5pt", fontWeight: "700", color: "#0f172a" }}>{edu.degree}</div>
+                        <div style={{ fontSize: "8.5pt", color: "#334155" }}>{edu.school}</div>
+                        {edu.date && <div style={{ fontSize: "8pt", color: "#64748b" }}>{edu.date}</div>}
+                        {edu.bullets && edu.bullets.length > 0 && (
+                          <div style={{ marginTop: "4px" }}>
+                            <div style={{ fontSize: "8pt", fontWeight: "600", color: "#475569" }}>Advised Coursework & Core Focus:</div>
+                            <ul style={{ margin: "2px 0 0 0", paddingLeft: "14px", fontSize: "8pt", color: "#334155" }}>
+                              {edu.bullets.map((b, bIdx) => (
+                                <li key={bIdx}>{b}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* VOLUNTEER / WORK EXPERIENCE */}
+              {data.experience && data.experience.length > 0 && (
+                <div>
+                  {renderHeaderLine("VOLUNTEER & TECHNICAL EXPERIENCE")}
+                  <div style={{ display: "flex", flexDirection: "column", gap: "9px" }}>
+                    {data.experience.map((exp, idx) => (
+                      <div key={idx}>
+                        <div style={{ fontSize: "9.5pt", fontWeight: "700", color: "#0f172a" }}>{exp.title}</div>
+                        <div style={{ fontSize: "8.5pt", color: "#4c1d95", fontWeight: "600" }}>{exp.company}</div>
+                        {exp.date && <div style={{ fontSize: "8pt", color: "#64748b", margin: "1px 0" }}>{exp.date}</div>}
+                        {exp.bullets && exp.bullets.length > 0 && (
+                          <ul style={{ margin: "2px 0 0 0", paddingLeft: "14px" }}>
+                            {exp.bullets.map((b, bIdx) => (
+                              <li key={bIdx} style={{ fontSize: "8.5pt", color: "#334155", lineHeight: 1.4, marginBottom: "2px" }}>
+                                {renderFormattedText(b)}
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* ORGANIZATIONS */}
+              {data.achievements && data.achievements.length > 0 && (
+                <div>
+                  {renderHeaderLine("ORGANIZATIONS")}
+                  <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                    {data.achievements.map((ach, idx) => (
+                      <div key={idx}>
+                        <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{ach.title}</div>
+                        {ach.description && <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{ach.description}</div>}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* CERTIFICATES */}
+              {data.certifications && data.certifications.length > 0 && (
+                <div>
+                  {renderHeaderLine("CERTIFICATES")}
+                  <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                    {data.certifications.map((c, idx) => (
+                      <div key={idx}>
+                        <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{c.name}</div>
+                        {c.issuer && <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{c.issuer}</div>}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // 7. Jessica Blakely — Game Designer
+    const renderProJessica = () => {
+      const email = data.personalInfo?.email;
+      const phone = data.personalInfo?.phone;
+      const location = data.personalInfo?.location;
+      const portfolio = data.personalInfo?.portfolio;
+      const linkedin = data.personalInfo?.linkedin;
+      const photoUrl =
+        data.personalInfo?.photoUrl ||
+        "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=400&q=80";
+
+      const hardSkills = [
+        ...(data.skills?.technical || []),
+        ...(data.skills?.tools || []),
+      ];
+      const softSkills = data.skills?.soft?.length
+        ? data.skills.soft
+        : ["Teamwork", "Pioneering", "Creative Writing", "Player Psychology", "Deadline Driven"];
+
+      const renderGoldHeader = (title: string) => (
+        <div style={{ marginTop: "14px", marginBottom: "7px" }}>
+          <div
+            style={{
+              fontSize: "10pt",
+              fontWeight: "800",
+              textTransform: "uppercase",
+              letterSpacing: "1.2px",
+              color: "#b8860b",
+            }}
+          >
+            {title}
+          </div>
+        </div>
+      );
+
+      return (
+        <div
+          ref={ref}
+          style={{
+            fontFamily: cs.fontFamily || "'Inter', Arial, sans-serif",
+            width: pageDim.width,
+            minHeight: pageDim.height,
+            backgroundColor: "#ffffff",
+            padding: "0",
+            boxSizing: "border-box",
+            color: "#1e293b",
+          }}
+        >
+          <style
+            dangerouslySetInnerHTML={{
+              __html: `@page { size: ${pageDim.width} ${pageDim.height}; margin: 0; }`,
+            }}
+          />
+
+          {/* Dark Navy Header with Gold Ring Photo */}
+          <div
+            style={{
+              backgroundColor: "#1e293b",
+              color: "#ffffff",
+              padding: "16mm 16mm 10mm 16mm",
+              borderTopLeftRadius: "12px",
+              borderTopRightRadius: "12px",
+            }}
+          >
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "20px" }}>
+              <div style={{ flex: 1 }}>
+                <h1 style={{ fontSize: nameFontSize || "24pt", fontWeight: "800", margin: "0 0 2px 0", letterSpacing: "-0.5px" }}>
+                  {data.personalInfo?.fullName || "Jessica Blakely"}
+                </h1>
+                <p style={{ fontSize: "11pt", color: "#d4af37", fontWeight: "600", margin: "0 0 8px 0" }}>
+                  {data.personalInfo?.title || "Game Designer"}
+                </p>
+                {data.summary && (
+                  <p style={{ fontSize: "8.5pt", color: "#cbd5e1", lineHeight: 1.45, margin: 0 }}>
+                    {renderFormattedText(data.summary)}
+                  </p>
+                )}
+              </div>
+              <div style={{ flex: "0 0 100px", display: "flex", justifyContent: "center" }}>
+                <img
+                  src={photoUrl}
+                  alt={data.personalInfo?.fullName || "Jessica Blakely"}
+                  style={{
+                    width: "95px",
+                    height: "95px",
+                    borderRadius: "50%",
+                    objectFit: "cover",
+                    border: "3.5px solid #d4af37",
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.25)",
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* Contact Ribbon Inside Banner */}
+            <div
+              style={{
+                borderTop: "1px solid #334155",
+                marginTop: "12px",
+                paddingTop: "10px",
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: "6px 20px",
+                fontSize: "8pt",
+                color: "#e2e8f0",
+              }}
+            >
+              {email && (
+                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                  <Mail style={{ width: 12, height: 12, color: "#d4af37" }} />
+                  <span>{email}</span>
+                </div>
+              )}
+              {phone && (
+                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                  <Phone style={{ width: 12, height: 12, color: "#d4af37" }} />
+                  <span>{phone}</span>
+                </div>
+              )}
+              {location && (
+                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                  <MapPin style={{ width: 12, height: 12, color: "#d4af37" }} />
+                  <span>{location}</span>
+                </div>
+              )}
+              {portfolio && (
+                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                  <Globe style={{ width: 12, height: 12, color: "#d4af37" }} />
+                  <span>{portfolio.replace(/^https?:\/\//, "")}</span>
+                </div>
+              )}
+              {linkedin && (
+                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                  <LinkedinIcon style={{ width: 12, height: 12, color: "#d4af37" }} />
+                  <span>{linkedin.replace(/^https?:\/\//, "")}</span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Body: 2 Columns */}
+          <div style={{ padding: "8mm 16mm 14mm 16mm", display: "flex", gap: "24px" }}>
+            {/* Left Column (55%): Experience & Certificates */}
+            <div style={{ flex: "1 1 55%" }}>
+              {data.experience && data.experience.length > 0 && (
+                <div>
+                  {renderGoldHeader("WORK EXPERIENCE")}
+                  <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                    {data.experience.map((exp, idx) => (
+                      <div key={idx}>
+                        <div style={{ fontSize: "9.5pt", fontWeight: "700", color: "#0f172a" }}>{exp.title}</div>
+                        <div style={{ fontSize: "8.5pt", color: "#334155", fontWeight: "600" }}>{exp.company}</div>
+                        {exp.date && <div style={{ fontSize: "8pt", color: "#b8860b", margin: "1px 0" }}>{exp.date}</div>}
+                        {exp.bullets && exp.bullets.length > 0 && (
+                          <ul style={{ margin: "2px 0 0 0", paddingLeft: "14px" }}>
+                            {exp.bullets.map((b, bIdx) => (
+                              <li key={bIdx} style={{ fontSize: "8.5pt", color: "#334155", lineHeight: 1.4, marginBottom: "2px" }}>
+                                {renderFormattedText(b)}
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {data.certifications && data.certifications.length > 0 && (
+                <div>
+                  {renderGoldHeader("CERTIFICATES")}
+                  <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                    {data.certifications.map((c, idx) => (
+                      <div key={idx}>
+                        <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{c.name}</div>
+                        {c.issuer && <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{c.issuer}</div>}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Right Column (45%): Skills, Education, Awards, Languages */}
+            <div style={{ flex: "1 1 45%" }}>
+              {/* HARD SKILLS */}
+              <div>
+                {renderGoldHeader("HARD SKILLS")}
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
+                  {(hardSkills.length > 0
+                    ? hardSkills.slice(0, 10)
+                    : ["Unreal Engine", "Blueprints", "Game Systems", "Map Drafting", "Level Testing", "3D Blocking", "Level Design"]
+                  ).map((s, idx) => (
+                    <span
+                      key={idx}
+                      style={{
+                        backgroundColor: "#1e293b",
+                        color: "#ffffff",
+                        padding: "3px 8px",
+                        borderRadius: "4px",
+                        fontSize: "7.5pt",
+                        fontWeight: "600",
+                      }}
+                    >
+                      {s}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {/* SOFT SKILLS */}
+              <div>
+                {renderGoldHeader("SOFT SKILLS")}
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
+                  {softSkills.map((s, idx) => (
+                    <span
+                      key={idx}
+                      style={{
+                        backgroundColor: "#1e293b",
+                        color: "#ffffff",
+                        padding: "3px 8px",
+                        borderRadius: "4px",
+                        fontSize: "7.5pt",
+                        fontWeight: "600",
+                      }}
+                    >
+                      {s}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {/* EDUCATION */}
+              {data.education && data.education.length > 0 && (
+                <div>
+                  {renderGoldHeader("EDUCATION")}
+                  {data.education.map((edu, idx) => (
+                    <div key={idx}>
+                      <div style={{ fontSize: "9pt", fontWeight: "700", color: "#0f172a" }}>{edu.degree}</div>
+                      <div style={{ fontSize: "8.5pt", color: "#334155" }}>{edu.school}</div>
+                      {edu.date && <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{edu.date}</div>}
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* AWARDS */}
+              {data.achievements && data.achievements.length > 0 && (
+                <div>
+                  {renderGoldHeader("AWARDS")}
+                  <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
+                    {data.achievements.map((ach, idx) => (
+                      <div key={idx}>
+                        <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{ach.title}</div>
+                        {ach.description && <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{ach.description}</div>}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* LANGUAGES */}
+              {data.languages && data.languages.length > 0 && (
+                <div>
+                  {renderGoldHeader("LANGUAGES")}
+                  <div style={{ display: "flex", gap: "16px", marginTop: "4px" }}>
+                    {data.languages.map((l, idx) => (
+                      <div key={idx} style={{ textAlign: "center" }}>
+                        <div
+                          style={{
+                            width: "36px",
+                            height: "26px",
+                            backgroundColor: "#1e293b",
+                            borderRadius: "4px",
+                            borderTop: "4px solid #d4af37",
+                            margin: "0 auto 3px auto",
+                          }}
+                        />
+                        <div style={{ fontSize: "7.5pt", fontWeight: "700", color: "#0f172a" }}>{l.name}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // 8. Adam Stotch — Realtor
+    const renderProAdam = () => {
+      const email = data.personalInfo?.email;
+      const phone = data.personalInfo?.phone;
+      const location = data.personalInfo?.location;
+      const portfolio = data.personalInfo?.portfolio;
+      const linkedin = data.personalInfo?.linkedin;
+      const photoUrl =
+        data.personalInfo?.photoUrl ||
+        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80";
+
+      const renderSimpleHeader = (title: string) => (
+        <div style={{ marginTop: "14px", marginBottom: "8px" }}>
+          <div
+            style={{
+              fontSize: "10pt",
+              fontWeight: "800",
+              textTransform: "uppercase",
+              letterSpacing: "0.8px",
+              color: "#0f172a",
+              borderBottom: "1.5px solid #0f172a",
+              paddingBottom: "2px",
+            }}
+          >
+            {title}
+          </div>
+        </div>
+      );
+
+      return (
+        <div
+          ref={ref}
+          style={{
+            fontFamily: cs.fontFamily || "'Inter', Arial, sans-serif",
+            width: pageDim.width,
+            minHeight: pageDim.height,
+            backgroundColor: "#ffffff",
+            padding: "15mm 16mm",
+            boxSizing: "border-box",
+            color: "#0f172a",
+          }}
+        >
+          <style
+            dangerouslySetInnerHTML={{
+              __html: `@page { size: ${pageDim.width} ${pageDim.height}; margin: 0; }`,
+            }}
+          />
+
+          {/* Top Row: Photo + Name/Title + Contact */}
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "16px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+              <img
+                src={photoUrl}
+                alt={data.personalInfo?.fullName || "Adam Stotch"}
+                style={{
+                  width: "82px",
+                  height: "82px",
+                  borderRadius: "12px",
+                  objectFit: "cover",
+                  border: "1.5px solid #cbd5e1",
+                }}
+              />
+              <div>
+                <h1 style={{ fontSize: nameFontSize || "24pt", fontWeight: "800", margin: "0 0 2px 0", color: "#0f172a" }}>
+                  {data.personalInfo?.fullName || "Adam Stotch"}
+                </h1>
+                <p style={{ fontSize: "11pt", color: "#475569", fontWeight: "500", margin: 0 }}>
+                  {data.personalInfo?.title || "Realtor"}
+                </p>
+              </div>
+            </div>
+
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "4px", fontSize: "8.5pt", color: "#334155" }}>
+              {email && (
+                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                  <span>{email}</span>
+                  <Mail style={{ width: 12, height: 12, color: "#0f172a" }} />
+                </div>
+              )}
+              {phone && (
+                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                  <span>{phone}</span>
+                  <Phone style={{ width: 12, height: 12, color: "#0f172a" }} />
+                </div>
+              )}
+              {location && (
+                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                  <span>{location}</span>
+                  <MapPin style={{ width: 12, height: 12, color: "#0f172a" }} />
+                </div>
+              )}
+              {linkedin && (
+                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                  <span>{linkedin.replace(/^https?:\/\//, "")}</span>
+                  <LinkedinIcon style={{ width: 12, height: 12, color: "#0f172a" }} />
+                </div>
+              )}
+              {portfolio && (
+                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                  <span>{portfolio.replace(/^https?:\/\//, "")}</span>
+                  <Globe style={{ width: 12, height: 12, color: "#0f172a" }} />
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Full-width Summary */}
+          {data.summary && (
+            <p style={{ fontSize: "8.5pt", color: "#334155", lineHeight: 1.45, margin: "12px 0 8px 0" }}>
+              {renderFormattedText(data.summary)}
+            </p>
+          )}
+
+          {/* 2 Columns */}
+          <div style={{ display: "flex", gap: "24px", marginTop: "8px" }}>
+            {/* Left Column (55%): Experience with Timeline Node Glyphs & Inset Brackets */}
+            <div style={{ flex: "1 1 55%" }}>
+              {data.experience && data.experience.length > 0 && (
+                <div>
+                  {renderSimpleHeader("WORK EXPERIENCE")}
+                  <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                    {data.experience.map((exp, idx) => (
+                      <div key={idx} style={{ position: "relative", paddingLeft: "18px" }}>
+                        {/* Circle node & vertical line */}
+                        <div
+                          style={{
+                            position: "absolute",
+                            left: 0,
+                            top: "3px",
+                            width: "9px",
+                            height: "9px",
+                            borderRadius: "50%",
+                            border: "2px solid #0f172a",
+                            backgroundColor: "#ffffff",
+                          }}
+                        />
+                        <div
+                          style={{
+                            position: "absolute",
+                            left: "4px",
+                            top: "14px",
+                            bottom: "-8px",
+                            width: "1.5px",
+                            backgroundColor: "#cbd5e1",
+                          }}
+                        />
+
+                        <div style={{ fontSize: "9.5pt", fontWeight: "700", color: "#0f172a" }}>{exp.title}</div>
+                        <div style={{ fontSize: "8.5pt", color: "#334155", fontWeight: "600" }}>{exp.company}</div>
+                        {exp.date && <div style={{ fontSize: "7.5pt", color: "#64748b", margin: "1px 0" }}>{exp.date}</div>}
+
+                        {/* Inset bracket container */}
+                        {exp.bullets && exp.bullets.length > 0 && (
+                          <div
+                            style={{
+                              borderLeft: "2px solid #94a3b8",
+                              paddingLeft: "8px",
+                              marginTop: "4px",
+                            }}
+                          >
+                            <ul style={{ margin: 0, paddingLeft: "12px" }}>
+                              {exp.bullets.map((b, bIdx) => (
+                                <li key={bIdx} style={{ fontSize: "8.5pt", color: "#334155", lineHeight: 1.4, marginBottom: "2px" }}>
+                                  {renderFormattedText(b)}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* EDUCATION */}
+              {data.education && data.education.length > 0 && (
+                <div style={{ marginTop: "12px" }}>
+                  {renderSimpleHeader("EDUCATION")}
+                  {data.education.map((edu, idx) => (
+                    <div key={idx} style={{ position: "relative", paddingLeft: "18px" }}>
+                      <div
+                        style={{
+                          position: "absolute",
+                          left: 0,
+                          top: "3px",
+                          width: "9px",
+                          height: "9px",
+                          borderRadius: "50%",
+                          border: "2px solid #0f172a",
+                          backgroundColor: "#ffffff",
+                        }}
+                      />
+                      <div style={{ fontSize: "9.5pt", fontWeight: "700", color: "#0f172a" }}>{edu.degree}</div>
+                      <div style={{ fontSize: "8.5pt", color: "#334155" }}>{edu.school}</div>
+                      {edu.date && <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{edu.date}</div>}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Right Column (45%): Skills Grid, Certifications, Memberships, Languages (Dots), Interests */}
+            <div style={{ flex: "1 1 45%" }}>
+              {/* SKILLS */}
+              <div>
+                {renderSimpleHeader("SKILLS")}
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px", fontSize: "8pt", color: "#334155" }}>
+                  {[
+                    "Market & Price Analysis", "Property Management",
+                    "Property Manager Software", "MLS Database",
+                    "Negotiation", "Written & Oral Comm.",
+                    "Organization", "Networking"
+                  ].map((s, idx) => (
+                    <div key={idx} style={{ padding: "2px 0" }}>{s}</div>
+                  ))}
+                </div>
+              </div>
+
+              {/* CERTIFICATES */}
+              {data.certifications && data.certifications.length > 0 && (
+                <div>
+                  {renderSimpleHeader("CERTIFICATES")}
+                  <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
+                    {data.certifications.map((c, idx) => (
+                      <div key={idx}>
+                        <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{c.name}</div>
+                        {c.issuer && <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{c.issuer}</div>}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* MEMBERSHIPS */}
+              {data.achievements && data.achievements.length > 0 && (
+                <div>
+                  {renderSimpleHeader("MEMBERSHIPS")}
+                  <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                    {data.achievements.map((ach, idx) => (
+                      <div key={idx}>
+                        <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{ach.title}</div>
+                        {ach.description && <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{ach.description}</div>}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* LANGUAGES: Dot Rating Matrix */}
+              {data.languages && data.languages.length > 0 && (
+                <div>
+                  {renderSimpleHeader("LANGUAGES")}
+                  <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
+                    {data.languages.map((l, idx) => (
+                      <div key={idx} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <span style={{ fontSize: "8.5pt", color: "#0f172a", fontWeight: "600" }}>{l.name}</span>
+                        <div style={{ display: "flex", gap: "4px" }}>
+                          {[1, 2, 3, 4, 5].map((dot) => {
+                            const isFilled = dot <= (l.name === "English" || l.name === "Spanish" ? 5 : l.name === "French" ? 4 : 3);
+                            return (
+                              <div
+                                key={dot}
+                                style={{
+                                  width: "7px",
+                                  height: "7px",
+                                  borderRadius: "50%",
+                                  backgroundColor: isFilled ? "#475569" : "#cbd5e1",
+                                }}
+                              />
+                            );
+                          })}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* INTERESTS & HOBBIES */}
+              <div style={{ marginTop: "12px" }}>
+                {renderSimpleHeader("INTERESTS & HOBBIES")}
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
+                  {["Photography", "Community Involvement", "Learning Languages", "Blogging"].map((item, idx) => (
+                    <span
+                      key={idx}
+                      style={{
+                        border: "1px solid #94a3b8",
+                        borderRadius: "12px",
+                        padding: "3px 8px",
+                        fontSize: "7.5pt",
+                        color: "#334155",
+                      }}
+                    >
+                      {item}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // 9. Nick Koe — Event Photographer
+    const renderProNick = () => {
+      const email = data.personalInfo?.email;
+      const phone = data.personalInfo?.phone;
+      const location = data.personalInfo?.location;
+      const portfolio = data.personalInfo?.portfolio;
+      const linkedin = data.personalInfo?.linkedin;
+      const photoUrl =
+        data.personalInfo?.photoUrl ||
+        "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=400&q=80";
+
+      const hardSkills = [
+        ...(data.skills?.technical || []),
+        ...(data.skills?.tools || []),
+      ];
+      const softSkills = data.skills?.soft?.length
+        ? data.skills.soft
+        : ["Creativity", "Attention to Detail", "Adaptability"];
+
+      const renderNickHeader = (title: string) => (
+        <div style={{ marginTop: "14px", marginBottom: "8px" }}>
+          <div
+            style={{
+              fontSize: "10pt",
+              fontWeight: "800",
+              textTransform: "uppercase",
+              letterSpacing: "0.8px",
+              color: "#0f172a",
+            }}
+          >
+            {title}
+          </div>
+        </div>
+      );
+
+      return (
+        <div
+          ref={ref}
+          style={{
+            fontFamily: cs.fontFamily || "'Inter', Arial, sans-serif",
+            width: pageDim.width,
+            minHeight: pageDim.height,
+            backgroundColor: "#ffffff",
+            padding: "14mm 16mm 14mm 12mm",
+            boxSizing: "border-box",
+            color: "#0f172a",
+            position: "relative",
+          }}
+        >
+          <style
+            dangerouslySetInnerHTML={{
+              __html: `@page { size: ${pageDim.width} ${pageDim.height}; margin: 0; }`,
+            }}
+          />
+
+          {/* Left Margin Accent Bars */}
+          <div style={{ position: "absolute", left: 0, top: "14mm", width: "8px", height: "35px", backgroundColor: "#4a6b82" }} />
+          <div style={{ position: "absolute", left: 0, top: "68mm", width: "8px", height: "35px", backgroundColor: "#e06d53" }} />
+          <div style={{ position: "absolute", left: 0, top: "140mm", width: "8px", height: "35px", backgroundColor: "#4a6b82" }} />
+          <div style={{ position: "absolute", left: 0, top: "210mm", width: "8px", height: "35px", backgroundColor: "#e06d53" }} />
+
+          {/* Top Header: Name/Title/Bio + Squircle Framed Photo + Contact */}
+          <div style={{ display: "flex", alignItems: "flex-start", gap: "16px", paddingLeft: "8px" }}>
+            <div style={{ flex: "1 1 42%" }}>
+              <h1 style={{ fontSize: nameFontSize || "24pt", fontWeight: "800", margin: "0 0 2px 0", color: "#4a6b82" }}>
+                {data.personalInfo?.fullName || "Nick Koe"}
+              </h1>
+              <p style={{ fontSize: "11pt", color: "#e06d53", fontWeight: "600", margin: "0 0 8px 0" }}>
+                {data.personalInfo?.title || "Event Photographer"}
+              </p>
+              {data.summary && (
+                <p style={{ fontSize: "8.5pt", color: "#334155", lineHeight: 1.45, margin: 0 }}>
+                  {renderFormattedText(data.summary)}
+                </p>
+              )}
+            </div>
+
+            <div style={{ flex: "0 0 100px", display: "flex", justifyContent: "center" }}>
+              <img
+                src={photoUrl}
+                alt={data.personalInfo?.fullName || "Nick Koe"}
+                style={{
+                  width: "92px",
+                  height: "105px",
+                  borderRadius: "24px",
+                  objectFit: "cover",
+                  border: "3px solid #e06d53",
+                  boxShadow: "0 3px 8px rgba(0,0,0,0.1)",
+                }}
+              />
+            </div>
+
+            <div style={{ flex: "1 1 38%", display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "4px", fontSize: "8.5pt", color: "#334155" }}>
+              {email && (
+                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                  <span>{email}</span>
+                  <Mail style={{ width: 12, height: 12, color: "#4a6b82" }} />
+                </div>
+              )}
+              {phone && (
+                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                  <span>{phone}</span>
+                  <Phone style={{ width: 12, height: 12, color: "#4a6b82" }} />
+                </div>
+              )}
+              {location && (
+                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                  <span>{location}</span>
+                  <MapPin style={{ width: 12, height: 12, color: "#4a6b82" }} />
+                </div>
+              )}
+              {portfolio && (
+                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                  <span>{portfolio.replace(/^https?:\/\//, "")}</span>
+                  <Globe style={{ width: 12, height: 12, color: "#4a6b82" }} />
+                </div>
+              )}
+              {linkedin && (
+                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                  <span>{linkedin.replace(/^https?:\/\//, "")}</span>
+                  <LinkedinIcon style={{ width: 12, height: 12, color: "#4a6b82" }} />
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div style={{ borderBottom: "1px solid #cbd5e1", margin: "12px 0 10px 8px" }} />
+
+          {/* 2-Column Body */}
+          <div style={{ display: "flex", gap: "24px", paddingLeft: "8px" }}>
+            {/* Left Column (55%) */}
+            <div style={{ flex: "1 1 55%" }}>
+              {data.experience && data.experience.length > 0 && (
+                <div>
+                  {renderNickHeader("WORK EXPERIENCE")}
+                  <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                    {data.experience.map((exp, idx) => (
+                      <div key={idx}>
+                        <div style={{ fontSize: "9.5pt", fontWeight: "700", color: "#0f172a" }}>{exp.title}</div>
+                        <div style={{ fontSize: "8.5pt", color: "#334155", fontWeight: "600" }}>{exp.company}</div>
+                        <div style={{ fontSize: "8pt", color: "#e06d53", fontWeight: "600", margin: "1px 0" }}>
+                          {exp.date} {exp.location ? `• ${exp.location}` : ""}
+                        </div>
+                        {exp.bullets && exp.bullets.length > 0 && (
+                          <ul style={{ margin: "2px 0 0 0", paddingLeft: "14px" }}>
+                            {exp.bullets.map((b, bIdx) => (
+                              <li key={bIdx} style={{ fontSize: "8.5pt", color: "#334155", lineHeight: 1.4, marginBottom: "2px" }}>
+                                {renderFormattedText(b)}
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {data.education && data.education.length > 0 && (
+                <div style={{ marginTop: "12px" }}>
+                  {renderNickHeader("EDUCATION")}
+                  {data.education.map((edu, idx) => (
+                    <div key={idx}>
+                      <div style={{ fontSize: "9.5pt", fontWeight: "700", color: "#0f172a" }}>{edu.degree}</div>
+                      <div style={{ fontSize: "8.5pt", color: "#334155" }}>{edu.school}</div>
+                      {edu.date && <div style={{ fontSize: "8pt", color: "#e06d53" }}>{edu.date}</div>}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Right Column (45%) */}
+            <div style={{ flex: "1 1 45%" }}>
+              {/* HARD SKILLS */}
+              <div>
+                {renderNickHeader("HARD SKILLS")}
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
+                  {(hardSkills.length > 0
+                    ? hardSkills.slice(0, 9)
+                    : ["Composition", "Lighting", "Photo Editing", "Color Correction", "Candid Photography", "Adobe Photoshop", "Adobe Lightroom", "Capture One Pro"]
+                  ).map((s, idx) => (
+                    <span
+                      key={idx}
+                      style={{
+                        backgroundColor: "#8da9c4",
+                        color: "#ffffff",
+                        padding: "3px 8px",
+                        borderRadius: "4px",
+                        fontSize: "7.5pt",
+                        fontWeight: "600",
+                      }}
+                    >
+                      {s}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {/* SOFT SKILLS */}
+              <div>
+                {renderNickHeader("SOFT SKILLS")}
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
+                  {softSkills.map((s, idx) => (
+                    <span
+                      key={idx}
+                      style={{
+                        backgroundColor: "#8da9c4",
+                        color: "#ffffff",
+                        padding: "3px 8px",
+                        borderRadius: "4px",
+                        fontSize: "7.5pt",
+                        fontWeight: "600",
+                      }}
+                    >
+                      {s}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {/* PORTFOLIO / PROJECTS */}
+              {data.projects && data.projects.length > 0 && (
+                <div>
+                  {renderNickHeader("PORTFOLIO")}
+                  <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                    {data.projects.map((p, idx) => (
+                      <div key={idx}>
+                        <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{p.name}</div>
+                        <ul style={{ margin: "2px 0 0 0", paddingLeft: "14px" }}>
+                          <li style={{ fontSize: "8pt", color: "#334155", lineHeight: 1.35 }}>{p.description}</li>
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* CERTIFICATES */}
+              {data.certifications && data.certifications.length > 0 && (
+                <div>
+                  {renderNickHeader("CERTIFICATES")}
+                  <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
+                    {data.certifications.map((c, idx) => (
+                      <div key={idx}>
+                        <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{c.name}</div>
+                        {c.issuer && <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{c.issuer}</div>}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // 10. Lisa Neumann — Mechanical Engineer
+    const renderProLisa = () => {
+      const email = data.personalInfo?.email;
+      const phone = data.personalInfo?.phone;
+      const location = data.personalInfo?.location;
+      const linkedin = data.personalInfo?.linkedin;
+
+      const softSkills = data.skills?.soft?.length
+        ? data.skills.soft
+        : ["Time Management", "Mathematics", "Technical Documentation", "Leadership", "Communication", "Project Management"];
+
+      const renderBlueHeader = (title: string) => (
+        <div style={{ marginTop: "14px", marginBottom: "7px" }}>
+          <div
+            style={{
+              fontSize: "10.5pt",
+              fontWeight: "800",
+              textTransform: "uppercase",
+              letterSpacing: "0.8px",
+              color: "#1e3a5f",
+              borderBottom: "1.5px solid #1e3a5f",
+              paddingBottom: "2px",
+            }}
+          >
+            {title}
+          </div>
+        </div>
+      );
+
+      return (
+        <div
+          ref={ref}
+          style={{
+            fontFamily: cs.fontFamily || "'Inter', Arial, sans-serif",
+            width: pageDim.width,
+            minHeight: pageDim.height,
+            backgroundColor: "#ffffff",
+            padding: "14mm 16mm",
+            boxSizing: "border-box",
+            color: "#1e293b",
+          }}
+        >
+          <style
+            dangerouslySetInnerHTML={{
+              __html: `@page { size: ${pageDim.width} ${pageDim.height}; margin: 0; }`,
+            }}
+          />
+
+          {/* Top Header */}
+          <div>
+            <h1 style={{ fontSize: nameFontSize || "26pt", fontWeight: "700", color: "#1e293b", margin: "0 0 2px 0", letterSpacing: "-0.5px" }}>
+              {data.personalInfo?.fullName || "Lisa Neumann"}
+            </h1>
+            <p style={{ fontSize: "12pt", color: "#0284c7", fontWeight: "600", margin: "0 0 8px 0" }}>
+              {data.personalInfo?.title || "Mechanical Engineer"}
+            </p>
+            {data.summary && (
+              <p style={{ fontSize: "8.5pt", color: "#334155", lineHeight: 1.45, margin: "0 0 10px 0" }}>
+                {renderFormattedText(data.summary)}
+              </p>
+            )}
+          </div>
+
+          {/* Solid Steel-Blue Contact Ribbon */}
+          <div
+            style={{
+              backgroundColor: "#1e3a5f",
+              color: "#ffffff",
+              padding: "7px 16px",
+              borderRadius: "2px",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              fontSize: "8pt",
+              marginBottom: "12px",
+            }}
+          >
+            {email && (
+              <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                <Mail style={{ width: 12, height: 12, color: "#93c5fd" }} />
+                <span>{email}</span>
+              </div>
+            )}
+            {phone && (
+              <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                <Phone style={{ width: 12, height: 12, color: "#93c5fd" }} />
+                <span>{phone}</span>
+              </div>
+            )}
+            {location && (
+              <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                <MapPin style={{ width: 12, height: 12, color: "#93c5fd" }} />
+                <span>{location}</span>
+              </div>
+            )}
+            {linkedin && (
+              <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                <LinkedinIcon style={{ width: 12, height: 12, color: "#93c5fd" }} />
+                <span>{linkedin.replace(/^https?:\/\//, "")}</span>
+              </div>
+            )}
+          </div>
+
+          {/* 2-Column Body */}
+          <div style={{ display: "flex", gap: "24px" }}>
+            {/* Left Column (55%): Experience & Education */}
+            <div style={{ flex: "1 1 55%" }}>
+              {data.experience && data.experience.length > 0 && (
+                <div>
+                  {renderBlueHeader("WORK EXPERIENCE")}
+                  <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                    {data.experience.map((exp, idx) => (
+                      <div key={idx}>
+                        <div style={{ fontSize: "9.5pt", fontWeight: "700", color: "#0f172a" }}>{exp.title}</div>
+                        <div style={{ fontSize: "8.5pt", color: "#1e3a5f", fontWeight: "600" }}>{exp.company}</div>
+                        {exp.date && <div style={{ fontSize: "8pt", color: "#64748b", margin: "1px 0" }}>{exp.date}</div>}
+                        {exp.bullets && exp.bullets.length > 0 && (
+                          <ul style={{ margin: "2px 0 0 0", paddingLeft: "14px" }}>
+                            {exp.bullets.map((b, bIdx) => (
+                              <li key={bIdx} style={{ fontSize: "8.5pt", color: "#334155", lineHeight: 1.4, marginBottom: "2px" }}>
+                                {renderFormattedText(b)}
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {data.education && data.education.length > 0 && (
+                <div style={{ marginTop: "12px" }}>
+                  {renderBlueHeader("EDUCATION")}
+                  {data.education.map((edu, idx) => (
+                    <div key={idx}>
+                      <div style={{ fontSize: "9.5pt", fontWeight: "700", color: "#0f172a" }}>{edu.degree}</div>
+                      <div style={{ fontSize: "8.5pt", color: "#334155" }}>{edu.school}</div>
+                      {edu.date && <div style={{ fontSize: "8pt", color: "#64748b" }}>{edu.date}</div>}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Right Column (45%): Technical Skills, General Skills, Certifications, Languages */}
+            <div style={{ flex: "1 1 45%" }}>
+              {/* TECHNICAL SKILLS */}
+              <div>
+                {renderBlueHeader("TECHNICAL SKILLS")}
+                <div style={{ display: "flex", flexDirection: "column", gap: "6px", fontSize: "8pt" }}>
+                  <div>
+                    <div style={{ fontWeight: "700", color: "#0f172a" }}>Computer-aided Design</div>
+                    <div style={{ color: "#475569" }}>Autodesk Revit, BIM, Energy Modeling Programs, AutoCAD</div>
+                  </div>
+                  <div>
+                    <div style={{ fontWeight: "700", color: "#0f172a" }}>Computing</div>
+                    <div style={{ color: "#475569" }}>MS Office Advanced, Intermediate Python & MATLAB</div>
+                  </div>
+                  <div>
+                    <div style={{ fontWeight: "700", color: "#0f172a" }}>Legal & Codes</div>
+                    <div style={{ color: "#475569" }}>City of Philadelphia Building Codes, ASHRAE Standards</div>
+                  </div>
+                  <div>
+                    <div style={{ fontWeight: "700", color: "#0f172a" }}>Project Management</div>
+                    <div style={{ color: "#475569" }}>Scrum, Agile Methodology, Master Tech, Trello</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* GENERAL SKILLS */}
+              <div style={{ marginTop: "12px" }}>
+                {renderBlueHeader("GENERAL SKILLS")}
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
+                  {softSkills.map((s, idx) => (
+                    <span
+                      key={idx}
+                      style={{
+                        backgroundColor: "#7f9db9",
+                        color: "#ffffff",
+                        padding: "3px 8px",
+                        borderRadius: "4px",
+                        fontSize: "7.5pt",
+                        fontWeight: "600",
+                      }}
+                    >
+                      {s}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {/* CERTIFICATES */}
+              {data.certifications && data.certifications.length > 0 && (
+                <div style={{ marginTop: "12px" }}>
+                  {renderBlueHeader("CERTIFICATES")}
+                  <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
+                    {data.certifications.map((c, idx) => (
+                      <div key={idx}>
+                        <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{c.name}</div>
+                        {c.issuer && <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{c.issuer}</div>}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* LANGUAGES */}
+              {data.languages && data.languages.length > 0 && (
+                <div style={{ marginTop: "12px" }}>
+                  {renderBlueHeader("LANGUAGES")}
+                  <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                    {data.languages.map((l, idx) => (
+                      <div key={idx}>
+                        <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{l.name}</div>
+                        <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{l.proficiency}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      );
+    };
+
     // 4. Amanda Smith — Chief Information Officer (CIO)
     const renderProAmandaSmith = () => {
       const email = data.personalInfo?.email;
@@ -2872,6 +4247,21 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
     }
     if (template.id === "pro-amanda-smith") {
       return renderProAmandaSmith();
+    }
+    if (template.id === "pro-claire") {
+      return renderProClaire();
+    }
+    if (template.id === "pro-jessica") {
+      return renderProJessica();
+    }
+    if (template.id === "pro-adam") {
+      return renderProAdam();
+    }
+    if (template.id === "pro-nick") {
+      return renderProNick();
+    }
+    if (template.id === "pro-lisa") {
+      return renderProLisa();
     }
 
     if (isTwoColumn) {
