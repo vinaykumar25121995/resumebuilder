@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/Providers";
-import BuckminsterCursor from "@/components/BuckminsterCursor";
+import FullereneCursorModel from "@/components/FullereneCursorModel";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,7 +20,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <Providers>
-          <BuckminsterCursor />
+          <FullereneCursorModel />
           {children}
         </Providers>
       </body>
