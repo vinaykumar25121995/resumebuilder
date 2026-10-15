@@ -13,6 +13,8 @@ export interface TemplateConfig {
   bestFor: string[];
   atsScore: number; // 95-100, all templates are ATS-safe
   pageSupport: "one" | "two" | "both";
+  isPro?: boolean; // Reserved for Pro subscription members
+  previewImage?: string;
   style: {
     fontFamily: string;
     nameFontSize: string;
@@ -40,6 +42,126 @@ export interface TemplateConfig {
 }
 
 export const ALL_TEMPLATES: TemplateConfig[] = [
+  // ─── PREMIUM PRO TEMPLATES (PRO SUBSCRIPTION EXCLUSIVE) ────────────────────
+  {
+    id: "pro-catherine",
+    name: "Catherine Barnett — 3D Animator",
+    category: ["Premium", "Pro", "Creative", "Modern"],
+    description: "High-contrast creative dual-column layout with a deep slate sidebar, pill-style contact indicators, and custom circular section badges.",
+    bestFor: ["3D Animator", "VFX Artist", "Game Developer", "Creative Roles", "Designers"],
+    atsScore: 97,
+    pageSupport: "both",
+    isPro: true,
+    style: {
+      fontFamily: "'Inter', Arial, sans-serif",
+      nameFontSize: "24pt",
+      sectionFontSize: "10.5pt",
+      bodyFontSize: "9.5pt",
+      nameColor: "#0f172a",
+      headingColor: "#0f172a",
+      accentColor: "#0284c7",
+      borderStyle: "1px solid #e2e8f0",
+      spacing: "16px",
+      nameAlign: "left",
+      showDividers: false,
+      bulletChar: "•",
+      headingCase: "uppercase",
+      headingWeight: "bold",
+      sectionOrder: ["summary", "experience", "certifications", "education"],
+      layoutType: "two-column-left-sidebar",
+      sidebarWidth: "32%",
+      sidebarBgColor: "#1e293b",
+      sidebarTextColor: "#f8fafc",
+      hasPhoto: false,
+    },
+  },
+  {
+    id: "pro-chris-flims",
+    name: "Chris Flims — Project Manager",
+    category: ["Premium", "Pro", "Management", "Modern"],
+    description: "High-impact executive single-column layout featuring coral branding, diamond-rule section headers, and an Areas of Expertise matrix.",
+    bestFor: ["Project Manager", "Scrum Master", "Operations Director", "Remote Leaders", "Management"],
+    atsScore: 99,
+    pageSupport: "both",
+    isPro: true,
+    style: {
+      fontFamily: "'Inter', Arial, sans-serif",
+      nameFontSize: "26pt",
+      sectionFontSize: "11pt",
+      bodyFontSize: "9.5pt",
+      nameColor: "#c84b31",
+      headingColor: "#1f2937",
+      accentColor: "#c84b31",
+      borderStyle: "1.5px solid #cbd5e1",
+      spacing: "15px",
+      nameAlign: "left",
+      showDividers: true,
+      bulletChar: "•",
+      headingCase: "uppercase",
+      headingWeight: "bold",
+      sectionOrder: ["summary", "skills", "experience", "education", "certifications"],
+      layoutType: "single-column",
+    },
+  },
+  {
+    id: "pro-will-tribian",
+    name: "Will Tribian — Theater & Creative",
+    category: ["Premium", "Pro", "Creative", "Popular"],
+    description: "Creative profile layout featuring a portrait headshot, dark bio capsule, vibrant cyan-teal contact banner, and split-column credentials.",
+    bestFor: ["Actor", "Performer", "Creative Director", "Media Professional", "Entertainer"],
+    atsScore: 96,
+    pageSupport: "both",
+    isPro: true,
+    style: {
+      fontFamily: "'Inter', Arial, sans-serif",
+      nameFontSize: "22pt",
+      sectionFontSize: "10.5pt",
+      bodyFontSize: "9.5pt",
+      nameColor: "#0f172a",
+      headingColor: "#0891b2",
+      accentColor: "#0891b2",
+      borderStyle: "1.5px solid #0891b2",
+      spacing: "14px",
+      nameAlign: "left",
+      showDividers: true,
+      bulletChar: "•",
+      headingCase: "uppercase",
+      headingWeight: "bold",
+      sectionOrder: ["experience", "projects", "skills", "education", "languages"],
+      hasPhoto: true,
+      photoStyle: "round",
+    },
+  },
+  {
+    id: "pro-amanda-smith",
+    name: "Amanda Smith — CIO Executive",
+    category: ["Premium", "Pro", "Tech", "Executive"],
+    description: "High-level CIO executive format featuring a rounded-square portrait, solid charcoal contact bar, dual-column layout, and specialized credentials matrix.",
+    bestFor: ["CIO", "CTO", "VP of Engineering", "IT Director", "Executive Leadership"],
+    atsScore: 98,
+    pageSupport: "both",
+    isPro: true,
+    style: {
+      fontFamily: "'Inter', Arial, sans-serif",
+      nameFontSize: "24pt",
+      sectionFontSize: "11pt",
+      bodyFontSize: "9.5pt",
+      nameColor: "#0f172a",
+      headingColor: "#18181b",
+      accentColor: "#18181b",
+      borderStyle: "1px solid #d1d5db",
+      spacing: "15px",
+      nameAlign: "left",
+      showDividers: true,
+      bulletChar: "•",
+      headingCase: "uppercase",
+      headingWeight: "bold",
+      sectionOrder: ["experience", "education", "skills", "certifications", "languages", "achievements"],
+      hasPhoto: true,
+      photoStyle: "rounded",
+    },
+  },
+
   // ─── CLASSIC / STANDARD ──────────────────────────────────────────────────
   {
     id: "ats-classic",
@@ -1244,6 +1366,7 @@ export const ALL_TEMPLATES: TemplateConfig[] = [
 // ─── Category definitions ─────────────────────────────────────────────────────
 export const TEMPLATE_CATEGORIES = [
   { id: "All", label: "All Templates", emoji: "📄" },
+  { id: "Premium", label: "👑 Premium Pro", emoji: "👑" },
   { id: "Popular", label: "Popular", emoji: "⭐" },
   { id: "Classic", label: "Classic", emoji: "🏛️" },
   { id: "Modern", label: "Modern", emoji: "✨" },

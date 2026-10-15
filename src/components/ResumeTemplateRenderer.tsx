@@ -3,6 +3,44 @@
 import React from "react";
 import { TemplateConfig } from "@/lib/templates";
 import { renderFormattedText } from "@/lib/text-formatter";
+import {
+  Mail,
+  Phone,
+  MapPin,
+  Globe,
+  Award,
+  GraduationCap,
+  Layers,
+  Sparkles,
+  Briefcase,
+  Shield,
+  BarChart3,
+  Flag,
+  FileText,
+  Compass,
+  Cpu,
+  Bookmark,
+  CheckCircle2,
+} from "lucide-react";
+
+function LinkedinIcon({ style, className }: { style?: React.CSSProperties; className?: string }) {
+  return (
+    <svg
+      style={style}
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
+      <rect width="4" height="12" x="2" y="9" />
+      <circle cx="4" cy="4" r="2" />
+    </svg>
+  );
+}
 
 export interface SectionFontSizes {
   name?: number;           // in pt e.g. 24
@@ -1210,6 +1248,1252 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
           return null;
       }
     };
+
+    // ─── DEDICATED PREMIUM PRO TEMPLATE RENDERERS ─────────────────────────────
+
+    // 1. Catherine Barnett — 3D Character Animator
+    const renderProCatherine = () => {
+      const email = data.personalInfo?.email;
+      const phone = data.personalInfo?.phone;
+      const location = data.personalInfo?.location;
+      const portfolio = data.personalInfo?.portfolio;
+      const linkedin = data.personalInfo?.linkedin;
+
+      const techSkills = [
+        ...(data.skills?.technical || []),
+        ...(data.skills?.tools || []),
+        ...(data.skills?.concepts || []),
+      ];
+      const softSkills = data.skills?.soft?.length
+        ? data.skills.soft
+        : [
+            "Attention to Detail",
+            "Collaboration",
+            "Time Management",
+            "Leadership",
+            "Problem Solving",
+          ];
+
+      return (
+        <div
+          ref={ref}
+          style={{
+            fontFamily: cs.fontFamily || "'Inter', Arial, sans-serif",
+            width: pageDim.width,
+            minHeight: pageDim.height,
+            backgroundColor: "#ffffff",
+            display: "flex",
+            boxSizing: "border-box",
+            color: "#0f172a",
+          }}
+        >
+          <style
+            dangerouslySetInnerHTML={{
+              __html: `@page { size: ${pageDim.width} ${pageDim.height}; margin: 0; }`,
+            }}
+          />
+
+          {/* Left Dark Slate Sidebar */}
+          <div
+            style={{
+              width: "32%",
+              backgroundColor: "#1e293b",
+              color: "#ffffff",
+              padding: "14mm 6mm",
+              boxSizing: "border-box",
+              display: "flex",
+              flexDirection: "column",
+              gap: "16px",
+            }}
+          >
+            {/* Contact Pills */}
+            <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+              {email && (
+                <div
+                  style={{
+                    backgroundColor: "rgba(255, 255, 255, 0.08)",
+                    border: "1px solid rgba(255, 255, 255, 0.12)",
+                    borderRadius: "6px",
+                    padding: "6px 8px",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    fontSize: "8pt",
+                    color: "#f1f5f9",
+                    wordBreak: "break-all",
+                  }}
+                >
+                  <Mail style={{ width: "12px", height: "12px", color: "#38bdf8", flexShrink: 0 }} />
+                  <span>{email}</span>
+                </div>
+              )}
+              {phone && (
+                <div
+                  style={{
+                    backgroundColor: "rgba(255, 255, 255, 0.08)",
+                    border: "1px solid rgba(255, 255, 255, 0.12)",
+                    borderRadius: "6px",
+                    padding: "6px 8px",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    fontSize: "8pt",
+                    color: "#f1f5f9",
+                  }}
+                >
+                  <Phone style={{ width: "12px", height: "12px", color: "#38bdf8", flexShrink: 0 }} />
+                  <span>{phone}</span>
+                </div>
+              )}
+              {location && (
+                <div
+                  style={{
+                    backgroundColor: "rgba(255, 255, 255, 0.08)",
+                    border: "1px solid rgba(255, 255, 255, 0.12)",
+                    borderRadius: "6px",
+                    padding: "6px 8px",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    fontSize: "8pt",
+                    color: "#f1f5f9",
+                  }}
+                >
+                  <MapPin style={{ width: "12px", height: "12px", color: "#38bdf8", flexShrink: 0 }} />
+                  <span>{location}</span>
+                </div>
+              )}
+              {portfolio && (
+                <div
+                  style={{
+                    backgroundColor: "rgba(255, 255, 255, 0.08)",
+                    border: "1px solid rgba(255, 255, 255, 0.12)",
+                    borderRadius: "6px",
+                    padding: "6px 8px",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    fontSize: "8pt",
+                    color: "#f1f5f9",
+                    wordBreak: "break-all",
+                  }}
+                >
+                  <Globe style={{ width: "12px", height: "12px", color: "#38bdf8", flexShrink: 0 }} />
+                  <span>{portfolio}</span>
+                </div>
+              )}
+              {linkedin && (
+                <div
+                  style={{
+                    backgroundColor: "rgba(255, 255, 255, 0.08)",
+                    border: "1px solid rgba(255, 255, 255, 0.12)",
+                    borderRadius: "6px",
+                    padding: "6px 8px",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    fontSize: "8pt",
+                    color: "#f1f5f9",
+                    wordBreak: "break-all",
+                  }}
+                >
+                  <LinkedinIcon style={{ width: "12px", height: "12px", color: "#38bdf8", flexShrink: 0 }} />
+                  <span>{linkedin}</span>
+                </div>
+              )}
+            </div>
+
+            {/* HARD SKILLS */}
+            {techSkills.length > 0 && (
+              <div>
+                <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "4px" }}>
+                  <div
+                    style={{
+                      width: "18px",
+                      height: "18px",
+                      borderRadius: "50%",
+                      backgroundColor: "rgba(255, 255, 255, 0.15)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Layers style={{ width: "10px", height: "10px", color: "#38bdf8" }} />
+                  </div>
+                  <span style={{ fontSize: "9.5pt", fontWeight: "bold", textTransform: "uppercase", letterSpacing: "1px" }}>
+                    Hard Skills
+                  </span>
+                </div>
+                <div style={{ height: "1px", backgroundColor: "rgba(255, 255, 255, 0.15)", marginBottom: "8px" }} />
+                <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                  {techSkills.map((sk, i) => (
+                    <div key={i} style={{ fontSize: "8.5pt", color: "#cbd5e1", lineHeight: "1.3" }}>
+                      {sk}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* SOFT SKILLS */}
+            {softSkills.length > 0 && (
+              <div>
+                <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "4px" }}>
+                  <div
+                    style={{
+                      width: "18px",
+                      height: "18px",
+                      borderRadius: "50%",
+                      backgroundColor: "rgba(255, 255, 255, 0.15)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Sparkles style={{ width: "10px", height: "10px", color: "#38bdf8" }} />
+                  </div>
+                  <span style={{ fontSize: "9.5pt", fontWeight: "bold", textTransform: "uppercase", letterSpacing: "1px" }}>
+                    Soft Skills
+                  </span>
+                </div>
+                <div style={{ height: "1px", backgroundColor: "rgba(255, 255, 255, 0.15)", marginBottom: "8px" }} />
+                <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
+                  {softSkills.map((sk, i) => (
+                    <div
+                      key={i}
+                      style={{
+                        backgroundColor: "rgba(255, 255, 255, 0.12)",
+                        border: "1px solid rgba(255, 255, 255, 0.2)",
+                        borderRadius: "5px",
+                        padding: "4px 8px",
+                        fontSize: "8pt",
+                        color: "#ffffff",
+                        textAlign: "center",
+                        fontWeight: 500,
+                      }}
+                    >
+                      {sk}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* LANGUAGES */}
+            {data.languages && data.languages.length > 0 && (
+              <div>
+                <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "4px" }}>
+                  <div
+                    style={{
+                      width: "18px",
+                      height: "18px",
+                      borderRadius: "50%",
+                      backgroundColor: "rgba(255, 255, 255, 0.15)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Globe style={{ width: "10px", height: "10px", color: "#38bdf8" }} />
+                  </div>
+                  <span style={{ fontSize: "9.5pt", fontWeight: "bold", textTransform: "uppercase", letterSpacing: "1px" }}>
+                    Languages
+                  </span>
+                </div>
+                <div style={{ height: "1px", backgroundColor: "rgba(255, 255, 255, 0.15)", marginBottom: "8px" }} />
+                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                  {data.languages.map((lang, i) => (
+                    <div key={i}>
+                      <div style={{ fontSize: "8.5pt", fontWeight: "bold", color: "#ffffff" }}>{lang.name}</div>
+                      {lang.proficiency && (
+                        <div style={{ fontSize: "7.5pt", color: "#94a3b8" }}>{lang.proficiency}</div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Right White Column */}
+          <div
+            style={{
+              flex: 1,
+              padding: "14mm 12mm 14mm 10mm",
+              boxSizing: "border-box",
+              display: "flex",
+              flexDirection: "column",
+              gap: "14px",
+            }}
+          >
+            {/* Header */}
+            <div>
+              <h1
+                style={{
+                  fontSize: nameFontSize || "24pt",
+                  fontWeight: "800",
+                  color: "#0f172a",
+                  lineHeight: "1.1",
+                  margin: "0 0 4px 0",
+                  letterSpacing: "-0.5px",
+                }}
+              >
+                {data.personalInfo?.fullName || "Catherine Barnett"}
+              </h1>
+              {data.personalInfo?.title && (
+                <div
+                  style={{
+                    fontSize: "12pt",
+                    fontWeight: 600,
+                    color: "#0284c7",
+                    marginBottom: "10px",
+                  }}
+                >
+                  {data.personalInfo.title}
+                </div>
+              )}
+              {data.summary && (
+                <div style={{ marginTop: "4px" }}>
+                  <div
+                    style={{
+                      fontSize: "8.5pt",
+                      fontWeight: "bold",
+                      textTransform: "uppercase",
+                      letterSpacing: "0.5px",
+                      color: "#0f172a",
+                      marginBottom: "3px",
+                    }}
+                  >
+                    Professional Summary
+                  </div>
+                  <p style={{ fontSize: "8.5pt", lineHeight: "1.45", color: "#334155", margin: 0 }}>
+                    {renderFormattedText(data.summary)}
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Work Experience */}
+            {data.experience && data.experience.length > 0 && (
+              <div>
+                <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "6px" }}>
+                  <div
+                    style={{
+                      width: "16px",
+                      height: "16px",
+                      borderRadius: "50%",
+                      border: "2px solid #0f172a",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <div style={{ width: "6px", height: "6px", borderRadius: "50%", backgroundColor: "#0f172a" }} />
+                  </div>
+                  <span style={{ fontSize: "10.5pt", fontWeight: "bold", textTransform: "uppercase", letterSpacing: "1px", color: "#0f172a" }}>
+                    Work Experience
+                  </span>
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                  {data.experience.map((exp, i) => (
+                    <div key={i}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+                        <span style={{ fontSize: "10pt", fontWeight: "bold", color: "#0f172a" }}>
+                          {renderFormattedText(exp.title || "")}
+                        </span>
+                        <span style={{ fontSize: "8pt", color: "#64748b", fontWeight: 500 }}>
+                          {exp.date}
+                        </span>
+                      </div>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+                        <span style={{ fontSize: "9pt", fontWeight: 600, color: "#0284c7" }}>
+                          {renderFormattedText(exp.company || "")}
+                        </span>
+                        {exp.location && (
+                          <span style={{ fontSize: "8pt", color: "#94a3b8" }}>{exp.location}</span>
+                        )}
+                      </div>
+                      {renderBulletList(exp.bullets, false, "•", "8.5pt")}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Certificates */}
+            {data.certifications && data.certifications.length > 0 && (
+              <div>
+                <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "6px" }}>
+                  <div
+                    style={{
+                      width: "16px",
+                      height: "16px",
+                      borderRadius: "50%",
+                      border: "2px solid #0f172a",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Award style={{ width: "9px", height: "9px", color: "#0f172a" }} />
+                  </div>
+                  <span style={{ fontSize: "10.5pt", fontWeight: "bold", textTransform: "uppercase", letterSpacing: "1px", color: "#0f172a" }}>
+                    Certificates
+                  </span>
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                  {data.certifications.map((cert, i) => (
+                    <div key={i}>
+                      <div style={{ fontSize: "9pt", fontWeight: "bold", color: "#0f172a" }}>
+                        {cert.name}
+                      </div>
+                      <div style={{ fontSize: "8pt", color: "#64748b" }}>
+                        {cert.issuer} {cert.date ? `• ${cert.date}` : ""}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Education */}
+            {data.education && data.education.length > 0 && (
+              <div>
+                <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "6px" }}>
+                  <div
+                    style={{
+                      width: "16px",
+                      height: "16px",
+                      borderRadius: "50%",
+                      border: "2px solid #0f172a",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <GraduationCap style={{ width: "9px", height: "9px", color: "#0f172a" }} />
+                  </div>
+                  <span style={{ fontSize: "10.5pt", fontWeight: "bold", textTransform: "uppercase", letterSpacing: "1px", color: "#0f172a" }}>
+                    Education
+                  </span>
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                  {data.education.map((edu, i) => (
+                    <div key={i}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+                        <span style={{ fontSize: "9.5pt", fontWeight: "bold", color: "#0f172a" }}>
+                          {edu.degree} {edu.field ? `in ${edu.field}` : ""}
+                        </span>
+                        <span style={{ fontSize: "8pt", color: "#64748b" }}>{edu.date}</span>
+                      </div>
+                      <div style={{ fontSize: "8.5pt", color: "#475569" }}>{edu.school}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    };
+
+    // 2. Chris Flims — Project Manager Remote
+    const renderProChrisFlims = () => {
+      const email = data.personalInfo?.email;
+      const phone = data.personalInfo?.phone;
+      const location = data.personalInfo?.location;
+      const portfolio = data.personalInfo?.portfolio;
+      const linkedin = data.personalInfo?.linkedin;
+
+      const allSkills = [
+        ...(data.skills?.technical || []),
+        ...(data.skills?.tools || []),
+        ...(data.skills?.concepts || []),
+        ...(data.skills?.soft || []),
+      ];
+
+      const renderDiamondHeader = (title: string) => (
+        <div style={{ display: "flex", alignItems: "center", margin: "14px 0 8px 0" }}>
+          <span style={{ fontSize: "12pt", color: "#c84b31", marginRight: "6px", lineHeight: 1 }}>◈</span>
+          <span style={{ fontSize: "10.5pt", fontWeight: "800", textTransform: "uppercase", letterSpacing: "1px", color: "#1f2937", whiteSpace: "nowrap" }}>
+            {title}
+          </span>
+          <div style={{ flex: 1, height: "1.5px", backgroundColor: "#cbd5e1", margin: "0 8px 0 10px" }} />
+          <div style={{ width: "5px", height: "5px", borderRadius: "50%", backgroundColor: "#cbd5e1", flexShrink: 0 }} />
+        </div>
+      );
+
+      return (
+        <div
+          ref={ref}
+          style={{
+            fontFamily: cs.fontFamily || "'Inter', Arial, sans-serif",
+            width: pageDim.width,
+            minHeight: pageDim.height,
+            backgroundColor: "#ffffff",
+            padding: "16mm 18mm",
+            boxSizing: "border-box",
+            color: "#1f2937",
+          }}
+        >
+          <style
+            dangerouslySetInnerHTML={{
+              __html: `@page { size: ${pageDim.width} ${pageDim.height}; margin: 0; }`,
+            }}
+          />
+
+          {/* Header */}
+          <div>
+            <h1
+              style={{
+                fontSize: nameFontSize || "26pt",
+                fontWeight: "800",
+                color: "#c84b31",
+                lineHeight: "1.1",
+                margin: "0 0 3px 0",
+                letterSpacing: "-0.5px",
+              }}
+            >
+              {data.personalInfo?.fullName || "Chris Flims"}
+            </h1>
+            <div
+              style={{
+                fontSize: "12pt",
+                fontWeight: "600",
+                color: "#1f2937",
+                marginBottom: "8px",
+              }}
+            >
+              {data.personalInfo?.title || "Project Manager - Remote"}
+            </div>
+            {data.summary && (
+              <p style={{ fontSize: "8.5pt", lineHeight: "1.5", color: "#4b5563", margin: "0 0 12px 0" }}>
+                {renderFormattedText(data.summary)}
+              </p>
+            )}
+
+            {/* Contact Grid with Coral Icons */}
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: "5px 20px",
+                padding: "8px 0",
+                borderBottom: "1px solid #e2e8f0",
+                marginBottom: "8px",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "8pt", color: "#374151" }}>
+                <Flag style={{ width: "12px", height: "12px", color: "#c84b31", flexShrink: 0 }} />
+                <span>Project Management</span>
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "8pt", color: "#374151" }}>
+                <BarChart3 style={{ width: "12px", height: "12px", color: "#c84b31", flexShrink: 0 }} />
+                <span>Risk Analysis & Reporting</span>
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "8pt", color: "#374151" }}>
+                <Shield style={{ width: "12px", height: "12px", color: "#c84b31", flexShrink: 0 }} />
+                <span>Cross-functional Governance</span>
+              </div>
+              {email && (
+                <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "8pt", color: "#374151" }}>
+                  <Mail style={{ width: "12px", height: "12px", color: "#c84b31", flexShrink: 0 }} />
+                  <span>{email}</span>
+                </div>
+              )}
+              {phone && (
+                <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "8pt", color: "#374151" }}>
+                  <Phone style={{ width: "12px", height: "12px", color: "#c84b31", flexShrink: 0 }} />
+                  <span>{phone}</span>
+                </div>
+              )}
+              {portfolio && (
+                <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "8pt", color: "#374151" }}>
+                  <Globe style={{ width: "12px", height: "12px", color: "#c84b31", flexShrink: 0 }} />
+                  <span>{portfolio}</span>
+                </div>
+              )}
+              {location && (
+                <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "8pt", color: "#374151" }}>
+                  <MapPin style={{ width: "12px", height: "12px", color: "#c84b31", flexShrink: 0 }} />
+                  <span>{location}</span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* AREAS OF EXPERTISE */}
+          {allSkills.length > 0 && (
+            <div>
+              {renderDiamondHeader("Areas of Expertise")}
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", margin: "6px 0 10px 0" }}>
+                {allSkills.map((sk, i) => (
+                  <span
+                    key={i}
+                    style={{
+                      backgroundColor: "#e2e8f0",
+                      border: "1px solid #94a3b8",
+                      borderRadius: "3px",
+                      padding: "3px 8px",
+                      fontSize: "8pt",
+                      fontWeight: 600,
+                      color: "#1e293b",
+                    }}
+                  >
+                    {sk}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* WORK EXPERIENCE */}
+          {data.experience && data.experience.length > 0 && (
+            <div>
+              {renderDiamondHeader("Work Experience")}
+              <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                {data.experience.map((exp, i) => (
+                  <div key={i}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+                      <span style={{ fontSize: "10.5pt", fontWeight: "700", color: "#0f172a" }}>
+                        {renderFormattedText(exp.title || "")}
+                      </span>
+                      <span style={{ fontSize: "9pt", fontWeight: "700", color: "#1f2937" }}>
+                        {exp.date}
+                      </span>
+                    </div>
+                    <div style={{ fontSize: "8.5pt", fontStyle: "italic", color: "#c84b31", marginBottom: "3px" }}>
+                      {renderFormattedText(exp.company || "")}
+                      {exp.location ? ` - ${exp.location}` : ""}
+                    </div>
+                    {renderBulletList(exp.bullets, false, "•", "8.5pt")}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* EDUCATION */}
+          {data.education && data.education.length > 0 && (
+            <div>
+              {renderDiamondHeader("Education")}
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                {data.education.map((edu, i) => (
+                  <div key={i}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+                      <span style={{ fontSize: "10pt", fontWeight: "700", color: "#0f172a" }}>
+                        {edu.degree} {edu.field ? `in ${edu.field}` : ""}
+                      </span>
+                      <span style={{ fontSize: "8.5pt", fontWeight: "700", color: "#1f2937" }}>
+                        {edu.date}
+                      </span>
+                    </div>
+                    <div style={{ fontSize: "8.5pt", fontStyle: "italic", color: "#c84b31" }}>
+                      {edu.school} {edu.location ? `• ${edu.location}` : ""}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    };
+
+    // 3. Will Tribian — Theater & Creative Portfolio
+    const renderProWillTribian = () => {
+      const email = data.personalInfo?.email;
+      const phone = data.personalInfo?.phone;
+      const location = data.personalInfo?.location;
+      const portfolio = data.personalInfo?.portfolio;
+      const photoUrl =
+        data.personalInfo?.photoUrl ||
+        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=256&auto=format&fit=crop&q=80";
+
+      const techSkills = [
+        ...(data.skills?.technical || []),
+        ...(data.skills?.tools || []),
+        ...(data.skills?.concepts || []),
+      ];
+      const softSkills = data.skills?.soft?.length
+        ? data.skills.soft
+        : ["Improvisation", "Vocal Expression", "Physicality", "Stage Presence", "Dialects"];
+
+      return (
+        <div
+          ref={ref}
+          style={{
+            fontFamily: cs.fontFamily || "'Inter', Arial, sans-serif",
+            width: pageDim.width,
+            minHeight: pageDim.height,
+            backgroundColor: "#ffffff",
+            padding: "12mm 14mm",
+            boxSizing: "border-box",
+            color: "#0f172a",
+          }}
+        >
+          <style
+            dangerouslySetInnerHTML={{
+              __html: `@page { size: ${pageDim.width} ${pageDim.height}; margin: 0; }`,
+            }}
+          />
+
+          {/* Top Header Card */}
+          <div style={{ display: "flex", gap: "16px", alignItems: "center", marginBottom: "8px" }}>
+            <div
+              style={{
+                width: "82px",
+                height: "82px",
+                borderRadius: "50%",
+                overflow: "hidden",
+                border: "2.5px solid #0891b2",
+                flexShrink: 0,
+                backgroundColor: "#e2e8f0",
+              }}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={photoUrl}
+                alt="Profile"
+                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+              />
+            </div>
+            <div style={{ flex: 1 }}>
+              <h1
+                style={{
+                  fontSize: nameFontSize || "24pt",
+                  fontWeight: "800",
+                  color: "#0f172a",
+                  lineHeight: "1.1",
+                  margin: "0 0 2px 0",
+                }}
+              >
+                {data.personalInfo?.fullName || "Will Tribian"}
+              </h1>
+              <div
+                style={{
+                  fontSize: "11pt",
+                  fontWeight: "600",
+                  color: "#0f766e",
+                  marginBottom: "6px",
+                }}
+              >
+                {data.personalInfo?.title || "Theater Actor"}
+              </div>
+              {data.summary && (
+                <div
+                  style={{
+                    backgroundColor: "#1e293b",
+                    color: "#f1f5f9",
+                    borderRadius: "6px",
+                    padding: "7px 10px",
+                    fontSize: "8pt",
+                    lineHeight: "1.4",
+                  }}
+                >
+                  {renderFormattedText(data.summary)}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Full-Width Teal Banner */}
+          <div
+            style={{
+              backgroundColor: "#0891b2",
+              color: "#ffffff",
+              borderRadius: "4px",
+              padding: "6px 12px",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              flexWrap: "wrap",
+              gap: "8px",
+              margin: "8px 0 14px 0",
+              fontSize: "8pt",
+            }}
+          >
+            {email && (
+              <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                <Mail style={{ width: "11px", height: "11px", color: "#ffffff" }} />
+                <span>{email}</span>
+              </div>
+            )}
+            {phone && (
+              <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                <Phone style={{ width: "11px", height: "11px", color: "#ffffff" }} />
+                <span>{phone}</span>
+              </div>
+            )}
+            {location && (
+              <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                <MapPin style={{ width: "11px", height: "11px", color: "#ffffff" }} />
+                <span>{location}</span>
+              </div>
+            )}
+            {portfolio && (
+              <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                <Globe style={{ width: "11px", height: "11px", color: "#ffffff" }} />
+                <span>{portfolio}</span>
+              </div>
+            )}
+          </div>
+
+          {/* 2-Column Lower Body */}
+          <div style={{ display: "flex", gap: "18px" }}>
+            {/* Left Column (~58%) */}
+            <div style={{ flex: "1 1 58%", display: "flex", flexDirection: "column", gap: "12px" }}>
+              {/* WORK EXPERIENCE */}
+              {data.experience && data.experience.length > 0 && (
+                <div>
+                  <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "6px" }}>
+                    <div style={{ width: "14px", height: "14px", borderRadius: "50%", backgroundColor: "#0891b2", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <Briefcase style={{ width: "8px", height: "8px", color: "#ffffff" }} />
+                    </div>
+                    <span style={{ fontSize: "10.5pt", fontWeight: "800", textTransform: "uppercase", letterSpacing: "1px", color: "#0f172a" }}>
+                      Work Experience
+                    </span>
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                    {data.experience.map((exp, i) => (
+                      <div key={i}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+                          <span style={{ fontSize: "9.5pt", fontWeight: "bold", color: "#0f172a" }}>
+                            {renderFormattedText(exp.title || "")}
+                          </span>
+                          <span style={{ fontSize: "8pt", color: "#64748b" }}>{exp.date}</span>
+                        </div>
+                        <div style={{ fontSize: "8.5pt", fontWeight: "600", color: "#0891b2", marginBottom: "3px" }}>
+                          {renderFormattedText(exp.company || "")}
+                          {exp.location ? ` • ${exp.location}` : ""}
+                        </div>
+                        {renderBulletList(exp.bullets, false, "•", "8.5pt")}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* WORKSHOPS & TRAINING CAMPS / PROJECTS */}
+              {data.projects && data.projects.length > 0 && (
+                <div>
+                  <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "6px" }}>
+                    <div style={{ width: "14px", height: "14px", borderRadius: "50%", backgroundColor: "#0891b2", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <Award style={{ width: "8px", height: "8px", color: "#ffffff" }} />
+                    </div>
+                    <span style={{ fontSize: "10.5pt", fontWeight: "800", textTransform: "uppercase", letterSpacing: "1px", color: "#0f172a" }}>
+                      Workshops & Projects
+                    </span>
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                    {data.projects.map((proj, i) => (
+                      <div key={i}>
+                        <div style={{ fontSize: "9pt", fontWeight: "bold", color: "#0f172a" }}>{proj.name}</div>
+                        {proj.description && (
+                          <div style={{ fontSize: "8pt", color: "#475569", lineHeight: "1.4" }}>{proj.description}</div>
+                        )}
+                        {proj.tech && (
+                          <div style={{ fontSize: "7.5pt", color: "#0891b2", fontStyle: "italic" }}>{proj.tech}</div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Right Column (~42%) */}
+            <div style={{ flex: "1 1 42%", display: "flex", flexDirection: "column", gap: "12px" }}>
+              {/* HARD SKILLS */}
+              {techSkills.length > 0 && (
+                <div>
+                  <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "6px" }}>
+                    <div style={{ width: "14px", height: "14px", borderRadius: "50%", backgroundColor: "#0891b2", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <Layers style={{ width: "8px", height: "8px", color: "#ffffff" }} />
+                    </div>
+                    <span style={{ fontSize: "10.5pt", fontWeight: "800", textTransform: "uppercase", letterSpacing: "1px", color: "#0f172a" }}>
+                      Hard Skills
+                    </span>
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                    {techSkills.map((sk, i) => (
+                      <div key={i} style={{ fontSize: "8.5pt", color: "#334155" }}>
+                        {sk}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* SOFT SKILLS */}
+              {softSkills.length > 0 && (
+                <div>
+                  <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "6px" }}>
+                    <div style={{ width: "14px", height: "14px", borderRadius: "50%", backgroundColor: "#0891b2", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <Sparkles style={{ width: "8px", height: "8px", color: "#ffffff" }} />
+                    </div>
+                    <span style={{ fontSize: "10.5pt", fontWeight: "800", textTransform: "uppercase", letterSpacing: "1px", color: "#0f172a" }}>
+                      Soft Skills
+                    </span>
+                  </div>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
+                    {softSkills.map((sk, i) => (
+                      <span
+                        key={i}
+                        style={{
+                          backgroundColor: "#e2e8f0",
+                          color: "#334155",
+                          borderRadius: "4px",
+                          padding: "3px 8px",
+                          fontSize: "8pt",
+                          fontWeight: 500,
+                        }}
+                      >
+                        {sk}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* EDUCATION */}
+              {data.education && data.education.length > 0 && (
+                <div>
+                  <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "6px" }}>
+                    <div style={{ width: "14px", height: "14px", borderRadius: "50%", backgroundColor: "#0891b2", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <GraduationCap style={{ width: "8px", height: "8px", color: "#ffffff" }} />
+                    </div>
+                    <span style={{ fontSize: "10.5pt", fontWeight: "800", textTransform: "uppercase", letterSpacing: "1px", color: "#0f172a" }}>
+                      Education
+                    </span>
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                    {data.education.map((edu, i) => (
+                      <div key={i}>
+                        <div style={{ fontSize: "9pt", fontWeight: "bold", color: "#0f172a" }}>
+                          {edu.degree} {edu.field ? `in ${edu.field}` : ""}
+                        </div>
+                        <div style={{ fontSize: "8pt", color: "#64748b" }}>
+                          {edu.school} {edu.date ? `• ${edu.date}` : ""}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* LANGUAGES */}
+              {data.languages && data.languages.length > 0 && (
+                <div>
+                  <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "6px" }}>
+                    <div style={{ width: "14px", height: "14px", borderRadius: "50%", backgroundColor: "#0891b2", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <Globe style={{ width: "8px", height: "8px", color: "#ffffff" }} />
+                    </div>
+                    <span style={{ fontSize: "10.5pt", fontWeight: "800", textTransform: "uppercase", letterSpacing: "1px", color: "#0f172a" }}>
+                      Languages
+                    </span>
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                    {data.languages.map((l, i) => (
+                      <div key={i} style={{ fontSize: "8.5pt", color: "#334155" }}>
+                        <strong>{l.name}</strong> {l.proficiency ? `(${l.proficiency})` : ""}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // 4. Amanda Smith — Chief Information Officer (CIO)
+    const renderProAmandaSmith = () => {
+      const email = data.personalInfo?.email;
+      const phone = data.personalInfo?.phone;
+      const location = data.personalInfo?.location;
+      const portfolio = data.personalInfo?.portfolio;
+      const photoUrl =
+        data.personalInfo?.photoUrl ||
+        "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=256&auto=format&fit=crop&q=80";
+
+      const allSkills = [
+        ...(data.skills?.technical || []),
+        ...(data.skills?.tools || []),
+        ...(data.skills?.concepts || []),
+        ...(data.skills?.soft || []),
+      ];
+
+      const renderSquareHeader = (title: string) => (
+        <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "6px" }}>
+          <div
+            style={{
+              width: "15px",
+              height: "15px",
+              border: "1.5px solid #18181b",
+              borderRadius: "2px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <FileText style={{ width: "9px", height: "9px", color: "#18181b" }} />
+          </div>
+          <span style={{ fontSize: "10.5pt", fontWeight: "800", textTransform: "uppercase", letterSpacing: "1px", color: "#18181b" }}>
+            {title}
+          </span>
+        </div>
+      );
+
+      return (
+        <div
+          ref={ref}
+          style={{
+            fontFamily: cs.fontFamily || "'Inter', Arial, sans-serif",
+            width: pageDim.width,
+            minHeight: pageDim.height,
+            backgroundColor: "#ffffff",
+            padding: "12mm 14mm",
+            boxSizing: "border-box",
+            color: "#18181b",
+          }}
+        >
+          <style
+            dangerouslySetInnerHTML={{
+              __html: `@page { size: ${pageDim.width} ${pageDim.height}; margin: 0; }`,
+            }}
+          />
+
+          {/* Top Header Card with Rounded Square Photo */}
+          <div style={{ display: "flex", gap: "16px", alignItems: "center", marginBottom: "8px" }}>
+            <div
+              style={{
+                width: "80px",
+                height: "92px",
+                borderRadius: "6px",
+                overflow: "hidden",
+                border: "1px solid #cbd5e1",
+                flexShrink: 0,
+                backgroundColor: "#f1f5f9",
+              }}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={photoUrl}
+                alt="Profile"
+                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+              />
+            </div>
+            <div style={{ flex: 1 }}>
+              <h1
+                style={{
+                  fontSize: nameFontSize || "24pt",
+                  fontWeight: "800",
+                  color: "#18181b",
+                  lineHeight: "1.1",
+                  margin: "0 0 2px 0",
+                }}
+              >
+                {data.personalInfo?.fullName || "Amanda Smith"}
+              </h1>
+              <div
+                style={{
+                  fontSize: "12pt",
+                  fontWeight: "600",
+                  color: "#3f3f46",
+                  marginBottom: "6px",
+                }}
+              >
+                {data.personalInfo?.title || "Chief Information Officer (CIO)"}
+              </div>
+              {data.summary && (
+                <p style={{ fontSize: "8.5pt", lineHeight: "1.45", color: "#52525b", margin: 0 }}>
+                  {renderFormattedText(data.summary)}
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Full-Width Solid Dark Charcoal Contact Bar */}
+          <div
+            style={{
+              backgroundColor: "#18181b",
+              color: "#ffffff",
+              borderRadius: "5px",
+              padding: "7px 14px",
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              gap: "4px 20px",
+              margin: "8px 0 14px 0",
+              fontSize: "8pt",
+            }}
+          >
+            {email && (
+              <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                <Mail style={{ width: "11px", height: "11px", color: "#a1a1aa" }} />
+                <span>{email}</span>
+              </div>
+            )}
+            {phone && (
+              <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                <Phone style={{ width: "11px", height: "11px", color: "#a1a1aa" }} />
+                <span>{phone}</span>
+              </div>
+            )}
+            {location && (
+              <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                <MapPin style={{ width: "11px", height: "11px", color: "#a1a1aa" }} />
+                <span>{location}</span>
+              </div>
+            )}
+            {portfolio && (
+              <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                <Globe style={{ width: "11px", height: "11px", color: "#a1a1aa" }} />
+                <span>{portfolio}</span>
+              </div>
+            )}
+          </div>
+
+          {/* 2-Column Body */}
+          <div style={{ display: "flex", gap: "18px" }}>
+            {/* Left Column (~55%) */}
+            <div style={{ flex: "1 1 55%", display: "flex", flexDirection: "column", gap: "12px" }}>
+              {/* WORK EXPERIENCE */}
+              {data.experience && data.experience.length > 0 && (
+                <div>
+                  {renderSquareHeader("Work Experience")}
+                  <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                    {data.experience.map((exp, i) => (
+                      <div key={i}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+                          <span style={{ fontSize: "10pt", fontWeight: "bold", color: "#18181b" }}>
+                            {renderFormattedText(exp.title || "")}
+                          </span>
+                          <span style={{ fontSize: "8pt", color: "#71717a" }}>{exp.date}</span>
+                        </div>
+                        <div style={{ fontSize: "8.5pt", fontStyle: "italic", color: "#52525b", marginBottom: "3px" }}>
+                          {renderFormattedText(exp.company || "")}
+                          {exp.location ? ` - ${exp.location}` : ""}
+                        </div>
+                        {renderBulletList(exp.bullets, false, "•", "8.5pt")}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* EDUCATION */}
+              {data.education && data.education.length > 0 && (
+                <div>
+                  {renderSquareHeader("Education")}
+                  <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                    {data.education.map((edu, i) => (
+                      <div key={i}>
+                        <div style={{ fontSize: "9.5pt", fontWeight: "bold", color: "#18181b" }}>
+                          {edu.degree} {edu.field ? `in ${edu.field}` : ""}
+                        </div>
+                        <div style={{ fontSize: "8pt", color: "#71717a" }}>
+                          {edu.school} {edu.date ? `• ${edu.date}` : ""}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Right Column (~45%) */}
+            <div style={{ flex: "1 1 45%", display: "flex", flexDirection: "column", gap: "12px" }}>
+              {/* GENERAL SKILLS in 2-Columns */}
+              {allSkills.length > 0 && (
+                <div>
+                  {renderSquareHeader("General Skills")}
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4px 8px" }}>
+                    {allSkills.map((sk, i) => (
+                      <div key={i} style={{ fontSize: "8pt", color: "#3f3f46", fontWeight: 500 }}>
+                        {sk}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* CERTIFICATIONS AND MEMBERSHIPS */}
+              {data.certifications && data.certifications.length > 0 && (
+                <div>
+                  {renderSquareHeader("Certifications and Memberships")}
+                  <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                    {data.certifications.map((c, i) => (
+                      <div key={i}>
+                        <div style={{ fontSize: "8.5pt", fontWeight: "bold", color: "#18181b" }}>{c.name}</div>
+                        <div style={{ fontSize: "7.5pt", color: "#71717a" }}>
+                          {c.issuer} {c.date ? `(${c.date})` : ""}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* LANGUAGES */}
+              {data.languages && data.languages.length > 0 && (
+                <div>
+                  {renderSquareHeader("Languages")}
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4px 8px" }}>
+                    {data.languages.map((l, i) => (
+                      <div key={i}>
+                        <div style={{ fontSize: "8.5pt", fontWeight: "bold", color: "#18181b" }}>{l.name}</div>
+                        {l.proficiency && (
+                          <div style={{ fontSize: "7.5pt", color: "#71717a" }}>{l.proficiency}</div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* INTERESTS */}
+              <div>
+                {renderSquareHeader("Interests")}
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px", fontSize: "8pt", color: "#3f3f46" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                    <Cpu style={{ width: "11px", height: "11px", color: "#18181b" }} />
+                    <span>AI / Deep Tech</span>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                    <Compass style={{ width: "11px", height: "11px", color: "#18181b" }} />
+                    <span>Chess & Strategy</span>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                    <Sparkles style={{ width: "11px", height: "11px", color: "#18181b" }} />
+                    <span>Hiking & Outdoors</span>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                    <Layers style={{ width: "11px", height: "11px", color: "#18181b" }} />
+                    <span>Renewable Energy</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // Route to dedicated Pro template renderers if matched
+    if (template.id === "pro-catherine") {
+      return renderProCatherine();
+    }
+    if (template.id === "pro-chris-flims") {
+      return renderProChrisFlims();
+    }
+    if (template.id === "pro-will-tribian") {
+      return renderProWillTribian();
+    }
+    if (template.id === "pro-amanda-smith") {
+      return renderProAmandaSmith();
+    }
 
     if (isTwoColumn) {
       // Sidebar sections can be configured by user or defaulted

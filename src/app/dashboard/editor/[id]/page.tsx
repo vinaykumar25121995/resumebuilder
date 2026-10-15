@@ -2316,11 +2316,20 @@ export default function ResumeEditorPage({
                 value={templateId}
                 onChange={(e) => setTemplateId(e.target.value)}
               >
-                {ALL_TEMPLATES.map((tmpl) => (
-                  <option key={tmpl.id} value={tmpl.id}>
-                    {tmpl.name} (ATS {tmpl.atsScore}%)
-                  </option>
-                ))}
+                <optgroup label="👑 Premium Pro Templates (Members Only)">
+                  {ALL_TEMPLATES.filter((t) => t.isPro).map((tmpl) => (
+                    <option key={tmpl.id} value={tmpl.id}>
+                      👑 {tmpl.name} (ATS {tmpl.atsScore}%)
+                    </option>
+                  ))}
+                </optgroup>
+                <optgroup label="Standard ATS Templates">
+                  {ALL_TEMPLATES.filter((t) => !t.isPro).map((tmpl) => (
+                    <option key={tmpl.id} value={tmpl.id}>
+                      {tmpl.name} (ATS {tmpl.atsScore}%)
+                    </option>
+                  ))}
+                </optgroup>
               </select>
             </div>
 
