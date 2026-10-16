@@ -18,7 +18,7 @@ import { repairFormattingTags, TEXT_COLORS } from "@/lib/text-formatter";
 
 export const TEMPLATE_DEFAULT_SIDEBARS: Record<string, string[]> = {
   "pro-michelle": ["skills", "projects", "achievements", "certifications", "languages"],
-  "pro-catherine": ["skills", "projects", "certifications", "languages"],
+  "pro-catherine": ["skills", "projects"],
   "pro-will-tribian": ["skills", "education", "languages", "certifications", "achievements"],
   "pro-amanda-smith": ["skills", "certifications", "languages", "achievements"],
   "pro-claire": ["skills", "languages", "certifications", "achievements"],
@@ -235,7 +235,7 @@ export async function generateResumeDocxBlob(
 
     return new Paragraph({
       heading: HeadingLevel.HEADING_2,
-      spacing: { before: isSidebar ? 160 : 200, after: 80 },
+      spacing: { before: isSidebar ? 140 : 180, after: 60 },
       border: borderBottom ? { bottom: borderBottom } : undefined,
       children: [
         new TextRun({
@@ -374,13 +374,24 @@ export async function generateResumeDocxBlob(
     contactHalfPt
   );
 
-  // Load photo if available
+  // Load photo ONLY if template explicitly supports photos and photoUrl exists
+  const templateHasPhoto =
+    (tStyle.hasPhoto === true || template?.hasPhoto === true) &&
+    templateId !== "pro-catherine" &&
+    templateId !== "pro-lisa" &&
+    templateId !== "pro-ivana" &&
+    templateId !== "pro-veronica" &&
+    templateId !== "pro-chris-flims";
+
   const photoUrl =
-    data.personalInfo?.photoUrl ||
-    ((isMichelle || tStyle.hasPhoto) && !data.personalInfo?.photoUrl
-      ? "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&w=400&q=80"
-      : undefined);
-  const photoBytes = await resolveImageBytes(photoUrl);
+    templateHasPhoto
+      ? data.personalInfo?.photoUrl ||
+        (isMichelle && !data.personalInfo?.photoUrl
+          ? "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&w=400&q=80"
+          : undefined)
+      : undefined;
+
+  const photoBytes = templateHasPhoto ? await resolveImageBytes(photoUrl) : null;
 
   // ─── Contact Items Helper ──────────────────────────────────────────────────
   const getContactList = (): { label: string; text: string; icon: string }[] => {
@@ -405,7 +416,7 @@ export async function generateResumeDocxBlob(
     const result: Paragraph[] = [createSectionHeading("Professional Summary", isSidebar)];
     result.push(
       new Paragraph({
-        spacing: { before: 40, after: 100 },
+        spacing: { before: 30, after: 80 },
         children: createFormattedRuns(data.summary, {
           size: secHalfPt,
           font: fontName,
@@ -455,7 +466,6 @@ export async function generateResumeDocxBlob(
       });
     } else {
       allSkills.forEach((skill) => {
-        // Check if skill has category format "Category: item1, item2"
         const cleanS = cleanBulletText(skill);
         const colonIdx = cleanS.indexOf(":");
         if (colonIdx > 0 && colonIdx < 35) {
@@ -463,8 +473,8 @@ export async function generateResumeDocxBlob(
           const rest = cleanS.slice(colonIdx + 1).trim();
           result.push(
             new Paragraph({
-              spacing: { before: 30, after: 20 },
-              indent: isSidebar ? { left: 40 } : { left: 160, hanging: 120 },
+              spacing: { before: 25, after: 15 },
+              indent: isSidebar ? { left: 30 } : { left: 160, hanging: 120 },
               children: [
                 new TextRun({
                   text: cat,
@@ -486,7 +496,7 @@ export async function generateResumeDocxBlob(
           result.push(
             new Paragraph({
               indent: { left: 160, hanging: 120 },
-              spacing: { before: 20, after: 25 },
+              spacing: { before: 15, after: 20 },
               children: [
                 new TextRun({
                   text: `${bulletChar} `,
@@ -523,7 +533,7 @@ export async function generateResumeDocxBlob(
 
       result.push(
         new Paragraph({
-          spacing: { before: 80, after: 15 },
+          spacing: { before: 70, after: 15 },
           children: [
             new TextRun({
               text: cleanBulletText(exp.title || ""),
@@ -579,7 +589,7 @@ export async function generateResumeDocxBlob(
           result.push(
             new Paragraph({
               indent: { left: 160, hanging: 120 },
-              spacing: { before: 15, after: 25 },
+              spacing: { before: 12, after: 20 },
               children: [
                 new TextRun({
                   text: `${bulletChar} `,
@@ -620,7 +630,7 @@ export async function generateResumeDocxBlob(
 
       result.push(
         new Paragraph({
-          spacing: { before: 70, after: 15 },
+          spacing: { before: 60, after: 12 },
           children: [
             new TextRun({
               text: rawName,
@@ -658,7 +668,7 @@ export async function generateResumeDocxBlob(
         result.push(
           new Paragraph({
             indent: { left: 160, hanging: 120 },
-            spacing: { before: 15, after: 20 },
+            spacing: { before: 10, after: 18 },
             children: [
               new TextRun({
                 text: `${bulletChar} `,
@@ -691,10 +701,13 @@ export async function generateResumeDocxBlob(
       const dateHalfPt = getLineHalfPt("dates", edu.dateFontSize, secHalfPt - 1);
       const scoreHalfPt = getLineHalfPt("scores", edu.scoreFontSize, secHalfPt - 1);
 
+      const degreeText = cleanBulletText(edu.degree || "Degree");
+      const fullDegree = edu.field ? `${degreeText} in ${cleanBulletText(edu.field)}` : degreeText;
+
       result.push(
         new Paragraph({
-          spacing: { before: 70, after: 15 },
-          children: createFormattedRuns(cleanBulletText(edu.degree || "Degree"), {
+          spacing: { before: 60, after: 12 },
+          children: createFormattedRuns(fullDegree, {
             bold: true,
             size: degHalfPt,
             font: fontName,
@@ -702,7 +715,7 @@ export async function generateResumeDocxBlob(
           }),
         }),
         new Paragraph({
-          spacing: { before: 0, after: 35 },
+          spacing: { before: 0, after: 30 },
           children: [
             ...createFormattedRuns(edu.school || "", {
               size: schHalfPt,
@@ -750,7 +763,7 @@ export async function generateResumeDocxBlob(
       result.push(
         new Paragraph({
           indent: { left: 160, hanging: 120 },
-          spacing: { before: 20, after: 25 },
+          spacing: { before: 15, after: 20 },
           children: [
             new TextRun({
               text: `${bulletChar} `,
@@ -801,7 +814,7 @@ export async function generateResumeDocxBlob(
       result.push(
         new Paragraph({
           indent: { left: 160, hanging: 120 },
-          spacing: { before: 20, after: 25 },
+          spacing: { before: 15, after: 20 },
           children: [
             new TextRun({
               text: `${bulletChar} `,
@@ -844,7 +857,7 @@ export async function generateResumeDocxBlob(
       const cleanName = cleanBulletText(lang.name);
       result.push(
         new Paragraph({
-          spacing: { before: 20, after: 15 },
+          spacing: { before: 15, after: 12 },
           indent: { left: 140, hanging: 100 },
           children: [
             new TextRun({
@@ -919,9 +932,6 @@ export async function generateResumeDocxBlob(
   const defaultSidebar = TEMPLATE_DEFAULT_SIDEBARS[templateId] || [
     "skills",
     "projects",
-    "certifications",
-    "languages",
-    "achievements",
   ];
 
   const userSidebar =
@@ -931,8 +941,12 @@ export async function generateResumeDocxBlob(
 
   const sidebarSet = new Set(userSidebar);
 
-  // Ordered sections, starting with user or template order, ensuring all existing sections are represented
-  const baseOrder: string[] = cs.sectionOrder || tStyle.sectionOrder || defaultSections;
+  // Standard ATS order: summary -> experience -> education -> skills -> projects -> certifications -> achievements -> languages
+  const baseOrder: string[] =
+    cs.sectionOrder && cs.sectionOrder.length > 0
+      ? cs.sectionOrder
+      : defaultSections;
+
   const orderedSet = new Set<string>();
   const ordered: string[] = [];
 
@@ -966,8 +980,8 @@ export async function generateResumeDocxBlob(
     // Build Left Sidebar Cell Content
     const leftCellChildren: Paragraph[] = [];
 
-    // Optional photo at top of sidebar
-    if (photoBytes) {
+    // Optional photo at top of sidebar ONLY if template supports it
+    if (templateHasPhoto && photoBytes) {
       leftCellChildren.push(
         new Paragraph({
           alignment: AlignmentType.CENTER,
@@ -988,7 +1002,7 @@ export async function generateResumeDocxBlob(
     contactList.forEach((ci) => {
       leftCellChildren.push(
         new Paragraph({
-          spacing: { before: 25, after: 25 },
+          spacing: { before: 20, after: 20 },
           shading: isDarkSidebar ? { fill: "283548" } : { fill: "F1F5F9" },
           indent: { left: 80, right: 80 },
           children: [
@@ -1021,7 +1035,7 @@ export async function generateResumeDocxBlob(
     // Top Header inside Right Cell: Name & Title
     rightCellChildren.push(
       new Paragraph({
-        spacing: { before: 0, after: 20 },
+        spacing: { before: 0, after: 15 },
         children: [
           new TextRun({
             text: fullName,
@@ -1181,7 +1195,7 @@ export async function generateResumeDocxBlob(
     });
 
     const headerCells: TableCell[] = [];
-    if (photoBytes) {
+    if (templateHasPhoto && photoBytes) {
       headerCells.push(
         new TableCell({
           width: { size: 48, type: WidthType.PERCENTAGE },
@@ -1389,7 +1403,7 @@ export async function generateResumeDocxBlob(
         ? AlignmentType.RIGHT
         : AlignmentType.LEFT;
 
-    if (photoBytes) {
+    if (templateHasPhoto && photoBytes) {
       children.push(
         new Table({
           width: { size: 100, type: WidthType.PERCENTAGE },
