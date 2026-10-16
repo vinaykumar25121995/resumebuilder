@@ -5764,11 +5764,12 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
         "languages",
         "achievements",
       ];
-      const sidebarSections = configuredSidebar.filter((id) =>
-        sectionOrder.includes(id)
+      const sidebarSet = new Set(configuredSidebar);
+      const sidebarSections = sectionOrder.filter((id) =>
+        sidebarSet.has(id)
       );
       const mainSections = sectionOrder.filter(
-        (id) => !sidebarSections.includes(id)
+        (id) => !sidebarSet.has(id)
       );
 
       return (

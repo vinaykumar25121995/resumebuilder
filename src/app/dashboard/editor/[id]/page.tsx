@@ -2104,6 +2104,42 @@ const SECTION_METADATA: Record<string, { label: string; icon: any; desc: string 
     return acc;
   }, {} as Record<string, { label: string; icon: any; desc: string }>);
 
+export const TWO_COLUMN_TEMPLATE_IDS = new Set([
+  "pro-michelle",
+  "pro-catherine",
+  "pro-will-tribian",
+  "pro-amanda-smith",
+  "pro-claire",
+  "pro-jessica",
+  "pro-adam",
+  "pro-nick",
+  "pro-lisa",
+  "pro-ivana",
+  "pro-melissa",
+  "ats-two-column-blue",
+  "ats-two-column-dark",
+  "ats-two-column-cream",
+  "ats-photo-sidebar",
+]);
+
+export const TEMPLATE_DEFAULT_SIDEBARS: Record<string, string[]> = {
+  "pro-michelle": ["skills", "projects", "achievements", "certifications", "languages"],
+  "pro-catherine": ["skills", "languages", "certifications"],
+  "pro-will-tribian": ["skills", "education", "languages", "certifications", "achievements"],
+  "pro-amanda-smith": ["skills", "certifications", "languages", "achievements"],
+  "pro-claire": ["skills", "languages", "certifications", "achievements"],
+  "pro-jessica": ["skills", "education", "languages", "achievements"],
+  "pro-adam": ["skills", "certifications", "languages", "achievements"],
+  "pro-nick": ["skills", "certifications", "languages", "achievements"],
+  "pro-lisa": ["skills", "certifications", "languages", "achievements"],
+  "pro-ivana": ["skills", "certifications", "education", "languages", "achievements"],
+  "pro-melissa": ["skills", "projects", "certifications", "languages", "achievements"],
+  "ats-two-column-blue": ["skills", "certifications", "languages", "achievements"],
+  "ats-two-column-dark": ["skills", "certifications", "languages", "achievements"],
+  "ats-two-column-cream": ["skills", "certifications", "languages", "achievements"],
+  "ats-photo-sidebar": ["skills", "certifications", "languages", "achievements"],
+};
+
 export default function ResumeEditorPage({
   params,
 }: {
@@ -2332,13 +2368,17 @@ export default function ResumeEditorPage({
     defaultSectionOrder;
 
   const hiddenSections = new Set(data?.customStyles?.hiddenSections || []);
-  const sidebarSections = new Set(
-    data?.customStyles?.sidebarSections || [
+  const defaultSidebarForTemplate =
+    TEMPLATE_DEFAULT_SIDEBARS[currentTemplate.id] || [
       "skills",
       "certifications",
       "languages",
       "achievements",
-    ]
+    ];
+  const sidebarSections = new Set(
+    data?.customStyles?.sidebarSections && data.customStyles.sidebarSections.length > 0
+      ? data.customStyles.sidebarSections
+      : defaultSidebarForTemplate
   );
 
   const moveSection = (index: number, direction: "up" | "down") => {
@@ -2805,6 +2845,10 @@ export default function ResumeEditorPage({
   }
 
   const cs = data.customStyles || {};
+  const isTwoCol =
+    cs.layoutType?.includes("two-column") ||
+    currentTemplate.style.layoutType?.includes("two-column") ||
+    TWO_COLUMN_TEMPLATE_IDS.has(currentTemplate.id);
 
   return (
     <div className="flex h-screen bg-gray-100 overflow-hidden -m-8">
@@ -2934,6 +2978,20 @@ export default function ResumeEditorPage({
               </p>
             </div>
 
+            {/* Two-Column Placement Guidance Banner */}
+            {isTwoCol && (
+              <div className="bg-purple-50/80 border border-purple-200 rounded-xl p-3 text-xs text-purple-900 flex items-center justify-between gap-2 shadow-2xs">
+                <div className="flex items-center gap-2">
+                  <span className="w-6 h-6 rounded-md bg-purple-100 text-purple-700 flex items-center justify-center flex-shrink-0">
+                    <Columns className="w-3.5 h-3.5" />
+                  </span>
+                  <p className="text-[11px] leading-tight text-purple-800">
+                    <strong>Dual-Column Layout Active:</strong> Use the <span className="px-1.5 py-0.5 rounded bg-blue-100 text-blue-700 font-bold text-[10px]">Main</span> / <span className="px-1.5 py-0.5 rounded bg-purple-100 text-purple-700 font-bold text-[10px]">Sidebar</span> buttons below to shift any section between columns in real-time.
+                  </p>
+                </div>
+              </div>
+            )}
+
             {/* Filter Pills & Actions */}
             <div className="flex items-center justify-between gap-2 border-b border-gray-100 pb-2.5">
               <div className="flex items-center bg-gray-100 p-0.5 rounded-lg text-[11px] font-bold text-gray-600">
@@ -3024,7 +3082,8 @@ export default function ResumeEditorPage({
                       const isSidebar = sidebarSections.has(sectionId);
                       const isTwoCol =
                         cs.layoutType?.includes("two-column") ||
-                        currentTemplate.style.layoutType?.includes("two-column");
+                        currentTemplate.style.layoutType?.includes("two-column") ||
+                        TWO_COLUMN_TEMPLATE_IDS.has(currentTemplate.id);
                       const status = getSectionContentStatus(sectionId);
 
                       return (
@@ -3085,14 +3144,15 @@ export default function ResumeEditorPage({
                               <button
                                 type="button"
                                 onClick={() => toggleSidebarPlacement(sectionId)}
-                                className={`text-[10px] px-2 py-0.5 rounded font-semibold transition-colors ${
+                                className={`inline-flex items-center gap-1 text-[10.5px] px-2.5 py-1 rounded-md font-semibold transition-all border ${
                                   isSidebar
-                                    ? "bg-purple-100 text-purple-700 hover:bg-purple-200"
-                                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                                    ? "bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100 shadow-2xs"
+                                    : "bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100 shadow-2xs"
                                 }`}
-                                title="Toggle between Main Column and Sidebar"
+                                title={`Currently placed in ${isSidebar ? "Sidebar" : "Main Column"}. Click to move to ${isSidebar ? "Main Column" : "Sidebar"}.`}
                               >
-                                {isSidebar ? "Sidebar" : "Main"}
+                                <Columns className="w-3 h-3" />
+                                <span>{isSidebar ? "Sidebar" : "Main"}</span>
                               </button>
                             )}
 
