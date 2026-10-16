@@ -131,6 +131,11 @@ export function convertProfileToResumeData(profile: any, user?: any): ResumeData
       github: profile.githubUrl || "",
       portfolio: profile.portfolioUrl || "",
       photoUrl: profile.photoUrl || user?.image || "",
+      customLinks: (() => {
+        if (!profile.customLinks) return [];
+        if (Array.isArray(profile.customLinks)) return profile.customLinks;
+        try { return JSON.parse(profile.customLinks); } catch { return []; }
+      })(),
     },
     summary: profile.summary || "",
     skills: {

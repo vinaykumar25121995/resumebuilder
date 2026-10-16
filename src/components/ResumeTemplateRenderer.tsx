@@ -5,6 +5,7 @@ import { TemplateConfig } from "@/lib/templates";
 import { renderFormattedText } from "@/lib/text-formatter";
 import {
   Mail,
+  FolderGit2,
   Phone,
   MapPin,
   Globe,
@@ -240,6 +241,7 @@ export interface ResumeData {
     github?: string;
     portfolio?: string;
     photoUrl?: string;
+    customLinks?: Array<{ label: string; url: string }>;
     nameFontSize?: number;
     titleFontSize?: number;
     contactFontSize?: number;
@@ -478,6 +480,8 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
       marginTop: spacing,
     });
 
+    const customLinksList =
+      data.personalInfo?.customLinks?.map((cl) => `${cl.label}: ${cl.url}`) || [];
     const contactLine = [
       data.personalInfo?.location,
       data.personalInfo?.phone,
@@ -485,6 +489,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
       data.personalInfo?.linkedin,
       data.personalInfo?.github,
       data.personalInfo?.portfolio,
+      ...customLinksList,
     ]
       .filter(Boolean)
       .join(isTwoColumn ? "\n" : " | ");
@@ -1778,6 +1783,12 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                   <span>{linkedin}</span>
                 </div>
               )}
+              {data.personalInfo?.customLinks && data.personalInfo.customLinks.map((cl, i) => (
+                <div key={i} style={{ backgroundColor: "rgba(255, 255, 255, 0.08)", border: "1px solid rgba(255, 255, 255, 0.12)", borderRadius: "6px", padding: "6px 8px", display: "flex", alignItems: "center", gap: "8px", fontSize: "8pt", color: "#f1f5f9", wordBreak: "break-all" }}>
+                  <Globe style={{ width: "12px", height: "12px", color: "#38bdf8", flexShrink: 0 }} />
+                  <span><strong>{cl.label}:</strong> {cl.url}</span>
+                </div>
+              ))}
             </div>
 
             {/* HARD SKILLS */}
@@ -2069,6 +2080,52 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                 </div>
               </div>
             )}
+
+            {/* Projects */}
+            {data.projects && data.projects.length > 0 && (
+              <div>
+                <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "6px" }}>
+                  <div style={{ width: "16px", height: "16px", borderRadius: "50%", border: "2px solid #0f172a", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <FolderGit2 style={{ width: "9px", height: "9px", color: "#0f172a" }} />
+                  </div>
+                  <span style={{ fontSize: "10.5pt", fontWeight: "bold", textTransform: "uppercase", letterSpacing: "1px", color: "#0f172a" }}>
+                    Key Projects
+                  </span>
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                  {data.projects.map((proj, i) => (
+                    <div key={i}>
+                      <div style={{ fontSize: "9.5pt", fontWeight: "bold", color: "#0f172a" }}>
+                        {proj.name} {proj.tech ? <span style={{ fontSize: "8pt", color: "#0284c7" }}>({proj.tech})</span> : null}
+                      </div>
+                      {proj.description && <div style={{ fontSize: "8.5pt", color: "#334155" }}>{proj.description}</div>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Achievements */}
+            {data.achievements && data.achievements.length > 0 && (
+              <div>
+                <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "6px" }}>
+                  <div style={{ width: "16px", height: "16px", borderRadius: "50%", border: "2px solid #0f172a", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <Sparkles style={{ width: "9px", height: "9px", color: "#0f172a" }} />
+                  </div>
+                  <span style={{ fontSize: "10.5pt", fontWeight: "bold", textTransform: "uppercase", letterSpacing: "1px", color: "#0f172a" }}>
+                    Achievements & Honors
+                  </span>
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                  {data.achievements.map((ach, i) => (
+                    <div key={i}>
+                      <div style={{ fontSize: "9pt", fontWeight: "bold", color: "#0f172a" }}>{ach.title}</div>
+                      {ach.description && <div style={{ fontSize: "8pt", color: "#64748b" }}>{ach.description}</div>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       );
@@ -2196,6 +2253,12 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                   <span>{location}</span>
                 </div>
               )}
+              {data.personalInfo?.customLinks && data.personalInfo.customLinks.map((cl, i) => (
+                <div key={i} style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "8pt", color: "#374151" }}>
+                  <Globe style={{ width: "12px", height: "12px", color: "#c84b31", flexShrink: 0 }} />
+                  <span><strong>{cl.label}:</strong> {cl.url}</span>
+                </div>
+              ))}
             </div>
           </div>
 
@@ -2268,6 +2331,67 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                     <div style={{ fontSize: "8.5pt", fontStyle: "italic", color: "#c84b31" }}>
                       {edu.school} {edu.location ? `• ${edu.location}` : ""}
                     </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* KEY PROJECTS */}
+          {data.projects && data.projects.length > 0 && (
+            <div>
+              {renderDiamondHeader("Key Projects")}
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                {data.projects.map((proj, i) => (
+                  <div key={i}>
+                    <div style={{ fontSize: "9.5pt", fontWeight: "700", color: "#0f172a" }}>
+                      {proj.name} {proj.tech ? <span style={{ fontSize: "8pt", fontStyle: "italic", color: "#c84b31" }}> | {proj.tech}</span> : null}
+                    </div>
+                    {proj.description && <div style={{ fontSize: "8.5pt", color: "#4b5563", lineHeight: 1.4 }}>{proj.description}</div>}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* CERTIFICATIONS */}
+          {data.certifications && data.certifications.length > 0 && (
+            <div>
+              {renderDiamondHeader("Certifications")}
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
+                {data.certifications.map((c, i) => (
+                  <div key={i}>
+                    <div style={{ fontSize: "9pt", fontWeight: "700", color: "#0f172a" }}>{c.name}</div>
+                    <div style={{ fontSize: "8pt", color: "#64748b" }}>{c.issuer} {c.date ? `(${c.date})` : ""}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* ACHIEVEMENTS */}
+          {data.achievements && data.achievements.length > 0 && (
+            <div>
+              {renderDiamondHeader("Achievements & Honors")}
+              <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                {data.achievements.map((ach, i) => (
+                  <div key={i}>
+                    <div style={{ fontSize: "9pt", fontWeight: "700", color: "#0f172a" }}>{ach.title}</div>
+                    {ach.description && <div style={{ fontSize: "8pt", color: "#4b5563" }}>{ach.description}</div>}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* LANGUAGES */}
+          {data.languages && data.languages.length > 0 && (
+            <div>
+              {renderDiamondHeader("Languages")}
+              <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
+                {data.languages.map((l, i) => (
+                  <div key={i} style={{ fontSize: "8.5pt" }}>
+                    <strong style={{ color: "#0f172a" }}>{l.name}</strong> {l.proficiency ? <span style={{ color: "#64748b" }}>({l.proficiency})</span> : null}
                   </div>
                 ))}
               </div>
@@ -2414,6 +2538,12 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                 <span>{portfolio}</span>
               </div>
             )}
+            {data.personalInfo?.customLinks && data.personalInfo.customLinks.map((cl, i) => (
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                <Globe style={{ width: "11px", height: "11px", color: "#ffffff" }} />
+                <span><strong>{cl.label}:</strong> {cl.url}</span>
+              </div>
+            ))}
           </div>
 
           {/* 2-Column Lower Body */}
@@ -2579,6 +2709,48 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                   </div>
                 </div>
               )}
+
+              {/* CERTIFICATIONS */}
+              {data.certifications && data.certifications.length > 0 && (
+                <div>
+                  <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "6px" }}>
+                    <div style={{ width: "14px", height: "14px", borderRadius: "50%", backgroundColor: "#0891b2", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <Award style={{ width: "8px", height: "8px", color: "#ffffff" }} />
+                    </div>
+                    <span style={{ fontSize: "10.5pt", fontWeight: "800", textTransform: "uppercase", letterSpacing: "1px", color: "#0f172a" }}>
+                      Certifications
+                    </span>
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                    {data.certifications.map((c, i) => (
+                      <div key={i} style={{ fontSize: "8.5pt", color: "#334155" }}>
+                        <strong>{c.name}</strong> {c.issuer ? `• ${c.issuer}` : ""}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* ACHIEVEMENTS */}
+              {data.achievements && data.achievements.length > 0 && (
+                <div>
+                  <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "6px" }}>
+                    <div style={{ width: "14px", height: "14px", borderRadius: "50%", backgroundColor: "#0891b2", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <Sparkles style={{ width: "8px", height: "8px", color: "#ffffff" }} />
+                    </div>
+                    <span style={{ fontSize: "10.5pt", fontWeight: "800", textTransform: "uppercase", letterSpacing: "1px", color: "#0f172a" }}>
+                      Achievements
+                    </span>
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                    {data.achievements.map((ach, i) => (
+                      <div key={i} style={{ fontSize: "8.5pt", color: "#334155" }}>
+                        <strong>{ach.title}</strong> {ach.description ? `: ${ach.description}` : ""}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -2735,6 +2907,14 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                     <span>{portfolio.replace(/^https?:\/\//, "")}</span>
                   </div>
                 )}
+                {data.personalInfo?.customLinks && data.personalInfo.customLinks.map((cl, idx) => (
+                  <div key={idx} style={{ display: "flex", alignItems: "center", gap: "6px", wordBreak: "break-all" }}>
+                    <div style={{ width: 16, height: 16, backgroundColor: "#4c1d95", borderRadius: 2, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                      <Globe style={{ width: 10, height: 10, color: "#ffffff" }} />
+                    </div>
+                    <span><strong>{cl.label}:</strong> {cl.url.replace(/^https?:\/\//, "")}</span>
+                  </div>
+                ))}
               </div>
 
               {/* SOFT SKILLS */}
@@ -2844,6 +3024,23 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                 </div>
               )}
 
+              {/* KEY PROJECTS */}
+              {data.projects && data.projects.length > 0 && (
+                <div>
+                  {renderHeaderLine("KEY PROJECTS")}
+                  <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                    {data.projects.map((proj, idx) => (
+                      <div key={idx}>
+                        <div style={{ fontSize: "9pt", fontWeight: "700", color: "#0f172a" }}>
+                          {proj.name} {proj.tech ? <span style={{ fontSize: "8pt", color: "#8da9c4" }}>({proj.tech})</span> : null}
+                        </div>
+                        {proj.description && <div style={{ fontSize: "8pt", color: "#334155" }}>{proj.description}</div>}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* ORGANIZATIONS */}
               {data.achievements && data.achievements.length > 0 && (
                 <div>
@@ -2868,6 +3065,23 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                       <div key={idx}>
                         <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{c.name}</div>
                         {c.issuer && <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{c.issuer}</div>}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* PROJECTS */}
+              {data.projects && data.projects.length > 0 && (
+                <div>
+                  {renderHeaderLine("PROJECTS")}
+                  <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                    {data.projects.map((proj, idx) => (
+                      <div key={idx}>
+                        <div style={{ fontSize: "9pt", fontWeight: "700", color: "#0f172a" }}>
+                          {proj.name} {proj.tech ? <span style={{ fontSize: "8pt", color: "#4c1d95" }}>({proj.tech})</span> : null}
+                        </div>
+                        {proj.description && <div style={{ fontSize: "8pt", color: "#334155" }}>{proj.description}</div>}
                       </div>
                     ))}
                   </div>
@@ -3726,6 +3940,35 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                   </div>
                 </div>
               )}
+
+              {/* ACHIEVEMENTS */}
+              {data.achievements && data.achievements.length > 0 && (
+                <div>
+                  {renderNickHeader("ACHIEVEMENTS")}
+                  <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                    {data.achievements.map((ach, idx) => (
+                      <div key={idx}>
+                        <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{ach.title}</div>
+                        {ach.description && <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{ach.description}</div>}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* LANGUAGES */}
+              {data.languages && data.languages.length > 0 && (
+                <div>
+                  {renderNickHeader("LANGUAGES")}
+                  <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", fontSize: "8pt" }}>
+                    {data.languages.map((l, idx) => (
+                      <div key={idx}>
+                        <strong style={{ color: "#0f172a" }}>{l.name}</strong> {l.proficiency ? <span style={{ color: "#64748b" }}>({l.proficiency})</span> : null}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -3939,6 +4182,21 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                 </div>
               )}
 
+              {/* ACHIEVEMENTS */}
+              {data.achievements && data.achievements.length > 0 && (
+                <div style={{ marginTop: "12px" }}>
+                  {renderBlueHeader("ACHIEVEMENTS")}
+                  <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                    {data.achievements.map((ach, idx) => (
+                      <div key={idx}>
+                        <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{ach.title}</div>
+                        {ach.description && <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{ach.description}</div>}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* LANGUAGES */}
               {data.languages && data.languages.length > 0 && (
                 <div style={{ marginTop: "12px" }}>
@@ -4121,7 +4379,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
             <div style={{ flex: "1 1 45%" }}>
               {/* SKILLS & COMPETENCIES */}
               <div>
-                {renderIvanaHeader("SKILLS & COMPETENCIES", <Cpu style={{ width: 12, height: 12, color: "#ffffff" }} />)}
+                {renderIvanaHeader("SKILLS & COMPETENCIES", <Sparkles style={{ width: 12, height: 12, color: "#ffffff" }} />)}
                 <div style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
                   {(hardSkills.length > 0
                     ? hardSkills.slice(0, 10)
@@ -4482,6 +4740,36 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                 </div>
               )}
 
+              {/* CERTIFICATES */}
+              {data.certifications && data.certifications.length > 0 && (
+                <div style={{ marginTop: "12px" }}>
+                  {renderMelissaHeader("CERTIFICATES")}
+                  <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                    {data.certifications.map((c, idx) => (
+                      <div key={idx}>
+                        <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{c.name}</div>
+                        {c.issuer && <div style={{ fontSize: "7pt", color: "#64748b" }}>{c.issuer}</div>}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* ACHIEVEMENTS */}
+              {data.achievements && data.achievements.length > 0 && (
+                <div style={{ marginTop: "12px" }}>
+                  {renderMelissaHeader("ACHIEVEMENTS")}
+                  <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                    {data.achievements.map((ach, idx) => (
+                      <div key={idx}>
+                        <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{ach.title}</div>
+                        {ach.description && <div style={{ fontSize: "7pt", color: "#64748b" }}>{ach.description}</div>}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* LANGUAGES: Radial Circular Gauge Meters */}
               {data.languages && data.languages.length > 0 && (
                 <div>
@@ -4692,6 +4980,14 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                   <span>{portfolio.replace(/^https?:\/\//, "")}</span>
                 </div>
               )}
+              {data.personalInfo?.customLinks && data.personalInfo.customLinks.map((cl, idx) => (
+                <div key={idx} style={{ display: "flex", alignItems: "center", gap: "8px", wordBreak: "break-all" }}>
+                  <div style={{ width: 16, height: 16, backgroundColor: "rgba(255,255,255,0.15)", borderRadius: 3, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    <Globe style={{ width: 10, height: 10, color: "#ffffff" }} />
+                  </div>
+                  <span><strong>{cl.label}:</strong> {cl.url.replace(/^https?:\/\//, "")}</span>
+                </div>
+              ))}
             </div>
           </div>
 
@@ -4776,6 +5072,67 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                   {edu.date && <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{edu.date}</div>}
                 </div>
               ))}
+            </div>
+          )}
+
+          {/* 4. PROJECTS */}
+          {data.projects && data.projects.length > 0 && (
+            <div>
+              {renderVeronicaHeader("PROJECTS & INITIATIVES", <FolderGit2 style={{ width: 12, height: 12, color: "#ffffff" }} />)}
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                {data.projects.map((proj, idx) => (
+                  <div key={idx}>
+                    <div style={{ fontSize: "9.5pt", fontWeight: "700", color: "#0f172a" }}>
+                      {proj.name} {proj.tech ? <span style={{ fontSize: "8pt", color: "#c85a48", fontWeight: "600" }}>({proj.tech})</span> : null}
+                    </div>
+                    {proj.description && <div style={{ fontSize: "8.5pt", color: "#334155", lineHeight: 1.4 }}>{proj.description}</div>}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* 5. CERTIFICATIONS */}
+          {data.certifications && data.certifications.length > 0 && (
+            <div>
+              {renderVeronicaHeader("CERTIFICATIONS", <Award style={{ width: 12, height: 12, color: "#ffffff" }} />)}
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
+                {data.certifications.map((c, idx) => (
+                  <div key={idx}>
+                    <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{c.name}</div>
+                    <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{c.issuer} {c.date ? `(${c.date})` : ""}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* 6. ACHIEVEMENTS */}
+          {data.achievements && data.achievements.length > 0 && (
+            <div>
+              {renderVeronicaHeader("ACHIEVEMENTS & HONORS", <Sparkles style={{ width: 12, height: 12, color: "#ffffff" }} />)}
+              <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                {data.achievements.map((ach, idx) => (
+                  <div key={idx}>
+                    <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{ach.title}</div>
+                    {ach.description && <div style={{ fontSize: "7.5pt", color: "#334155" }}>{ach.description}</div>}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* 7. LANGUAGES */}
+          {data.languages && data.languages.length > 0 && (
+            <div>
+              {renderVeronicaHeader("LANGUAGES", <Globe style={{ width: 12, height: 12, color: "#ffffff" }} />)}
+              <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
+                {data.languages.map((l, idx) => (
+                  <div key={idx} style={{ fontSize: "8.5pt" }}>
+                    <strong style={{ color: "#0f172a" }}>{l.name}</strong> {l.proficiency ? <span style={{ color: "#64748b" }}>({l.proficiency})</span> : null}
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         </div>
@@ -4927,6 +5284,12 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                 <span>{portfolio}</span>
               </div>
             )}
+            {data.personalInfo?.customLinks && data.personalInfo.customLinks.map((cl, i) => (
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                <Globe style={{ width: "11px", height: "11px", color: "#a1a1aa" }} />
+                <span><strong>{cl.label}:</strong> {cl.url}</span>
+              </div>
+            ))}
           </div>
 
           {/* 2-Column Body */}
@@ -4975,6 +5338,23 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                   </div>
                 </div>
               )}
+
+              {/* PROJECTS */}
+              {data.projects && data.projects.length > 0 && (
+                <div>
+                  {renderSquareHeader("Key Projects")}
+                  <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                    {data.projects.map((proj, i) => (
+                      <div key={i}>
+                        <div style={{ fontSize: "9.5pt", fontWeight: "bold", color: "#18181b" }}>
+                          {proj.name} {proj.tech ? <span style={{ fontSize: "8pt", color: "#71717a" }}>({proj.tech})</span> : null}
+                        </div>
+                        {proj.description && <div style={{ fontSize: "8pt", color: "#52525b" }}>{proj.description}</div>}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Right Column (~45%) */}
@@ -5004,6 +5384,21 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                         <div style={{ fontSize: "7.5pt", color: "#71717a" }}>
                           {c.issuer} {c.date ? `(${c.date})` : ""}
                         </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* ACHIEVEMENTS */}
+              {data.achievements && data.achievements.length > 0 && (
+                <div>
+                  {renderSquareHeader("Achievements & Honors")}
+                  <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                    {data.achievements.map((ach, i) => (
+                      <div key={i}>
+                        <div style={{ fontSize: "8.5pt", fontWeight: "bold", color: "#18181b" }}>{ach.title}</div>
+                        {ach.description && <div style={{ fontSize: "7.5pt", color: "#71717a" }}>{ach.description}</div>}
                       </div>
                     ))}
                   </div>

@@ -47,6 +47,7 @@ import {
   Calendar,
   AlignLeft,
   List,
+  Upload,
 } from "lucide-react";
 import Link from "next/link";
 import { useReactToPrint } from "react-to-print";
@@ -1255,6 +1256,7 @@ export default function ResumeEditorPage({
   const [syncing, setSyncing] = useState(false);
   const [downloadingDocx, setDownloadingDocx] = useState(false);
   const [notification, setNotification] = useState<string | null>(null);
+  const [inlineEditActive, setInlineEditActive] = useState<boolean>(true);
 
   // Main editor panel navigation
   const [mainTab, setMainTab] = useState<"content" | "layout" | "design">("content");
@@ -1274,6 +1276,30 @@ export default function ResumeEditorPage({
   const notify = (msg: string) => {
     setNotification(msg);
     setTimeout(() => setNotification(null), 3500);
+  };
+
+  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 3 * 1024 * 1024) {
+      notify("Image size should be less than 3MB");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const base64 = event.target?.result as string;
+      if (data) {
+        setData({
+          ...data,
+          personalInfo: {
+            ...data.personalInfo,
+            photoUrl: base64,
+          },
+        });
+        notify("Photo uploaded successfully!");
+      }
+    };
+    reader.readAsDataURL(file);
   };
 
   const fetchResume = async () => {
@@ -1403,7 +1429,7 @@ export default function ResumeEditorPage({
     if (!data) return;
     setDownloadingDocx(true);
     try {
-      const blob = await generateResumeDocxBlob(data);
+      const blob = await generateResumeDocxBlob(data, currentTemplate);
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
@@ -3476,24 +3502,176 @@ export default function ResumeEditorPage({
                     />
                   </div>
 
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-700 mb-1">
-                      Photo URL (for photo templates)
+                  {/* Profile Photo Uploader */}
+                  <div className="p-3 bg-gray-50 border border-gray-200 rounded-xl space-y-2">
+                    <label className="block text-xs font-semibold text-gray-700">
+                      Profile Photo (for photo templates)
                     </label>
-                    <input
-                      className="w-full text-xs p-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500"
-                      value={data.personalInfo?.photoUrl || ""}
-                      onChange={(e) =>
-                        setData({
-                          ...data,
-                          personalInfo: {
-                            ...data.personalInfo,
-                            photoUrl: e.target.value,
-                          },
-                        })
-                      }
-                      placeholder="https://..."
-                    />
+                    <div className="flex items-center gap-3">
+                      <div className="w-14 h-14 rounded-full border-2 border-blue-500 overflow-hidden bg-white flex items-center justify-center flex-shrink-0 shadow-2xs">
+                        {data.personalInfo?.photoUrl ? (
+                          <img
+                            src={data.personalInfo.photoUrl}
+                            alt="Profile"
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <User className="w-6 h-6 text-gray-400" />
+                        )}
+                      </div>
+                      <div className="space-y-1.5 flex-1">
+                        <div className="flex items-center gap-2">
+                          <label className="cursor-pointer inline-flex items-center gap-1 px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-semibold rounded-md transition-colors shadow-2xs">
+                            <Upload className="w-3 h-3" />
+                            <span>Upload Image</span>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              className="hidden"
+                              onChange={handlePhotoUpload}
+                            />
+                          </label>
+                          {data.personalInfo?.photoUrl && (
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setData({
+                                  ...data,
+                                  personalInfo: {
+                                    ...data.personalInfo,
+                                    photoUrl: "",
+                                  },
+                                })
+                              }
+                              className="text-[11px] text-red-600 hover:text-red-700 font-medium px-2 py-1 hover:bg-red-50 rounded transition-colors"
+                            >
+                              Remove
+                            </button>
+                          )}
+                        </div>
+                        <input
+                          className="w-full text-[11px] p-1.5 border border-gray-300 rounded bg-white focus:ring-1 focus:ring-blue-500"
+                          value={data.personalInfo?.photoUrl || ""}
+                          onChange={(e) =>
+                            setData({
+                              ...data,
+                              personalInfo: {
+                                ...data.personalInfo,
+                                photoUrl: e.target.value,
+                              },
+                            })
+                          }
+                          placeholder="Or paste image URL: https://..."
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Custom & Additional Links Section */}
+                  <div className="pt-3 border-t border-gray-200">
+                    <div className="flex justify-between items-center mb-2">
+                      <div>
+                        <span className="text-xs font-bold text-gray-800">
+                          Custom Links (LeetCode, Medium, Blog, etc.)
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const links = data.personalInfo?.customLinks || [];
+                          setData({
+                            ...data,
+                            personalInfo: {
+                              ...data.personalInfo,
+                              customLinks: [...links, { label: "", url: "" }],
+                            },
+                          });
+                        }}
+                        className="inline-flex items-center gap-1 text-[11px] font-semibold text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 px-2 py-1 rounded border border-blue-200 transition-colors"
+                      >
+                        <Plus className="w-3 h-3" /> Add Link
+                      </button>
+                    </div>
+
+                    {(!data.personalInfo?.customLinks ||
+                      data.personalInfo.customLinks.length === 0) ? (
+                      <p className="text-[11px] text-gray-400 italic py-1">
+                        No custom links added yet. Click &quot;Add Link&quot; to add links.
+                      </p>
+                    ) : (
+                      <div className="space-y-2">
+                        {data.personalInfo.customLinks.map((link, idx) => (
+                          <div
+                            key={idx}
+                            className="flex items-center gap-2 bg-gray-50 p-2 rounded border border-gray-200"
+                          >
+                            <input
+                              type="text"
+                              className="w-1/3 text-xs p-1.5 bg-white border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
+                              placeholder="Label (e.g. LeetCode)"
+                              value={link.label || ""}
+                              onChange={(e) => {
+                                const updated = [
+                                  ...(data.personalInfo?.customLinks || []),
+                                ];
+                                updated[idx] = {
+                                  ...updated[idx],
+                                  label: e.target.value,
+                                };
+                                setData({
+                                  ...data,
+                                  personalInfo: {
+                                    ...data.personalInfo,
+                                    customLinks: updated,
+                                  },
+                                });
+                              }}
+                            />
+                            <input
+                              type="url"
+                              className="flex-1 text-xs p-1.5 bg-white border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
+                              placeholder="https://..."
+                              value={link.url || ""}
+                              onChange={(e) => {
+                                const updated = [
+                                  ...(data.personalInfo?.customLinks || []),
+                                ];
+                                updated[idx] = {
+                                  ...updated[idx],
+                                  url: e.target.value,
+                                };
+                                setData({
+                                  ...data,
+                                  personalInfo: {
+                                    ...data.personalInfo,
+                                    customLinks: updated,
+                                  },
+                                });
+                              }}
+                            />
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const updated = (
+                                  data.personalInfo?.customLinks || []
+                                ).filter((_: any, i: number) => i !== idx);
+                                setData({
+                                  ...data,
+                                  personalInfo: {
+                                    ...data.personalInfo,
+                                    customLinks: updated,
+                                  },
+                                });
+                              }}
+                              className="p-1 text-gray-400 hover:text-red-500 transition-colors"
+                              title="Delete link"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
@@ -5013,21 +5191,52 @@ export default function ResumeEditorPage({
 
       {/* ── Right Panel: Real-Time Live Preview (Dynamic Dimensions) ── */}
       <div className="flex-1 bg-gray-200/80 overflow-y-auto flex flex-col items-center py-6 px-4">
-        {/* Dynamic Page Dimensions Indicator Bar */}
-        <div className="mb-3 flex items-center gap-2 bg-white/95 backdrop-blur px-3 py-1.5 rounded-full shadow-sm border border-gray-300 text-xs text-gray-700">
-          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-          <span className="font-bold text-gray-900">{pageDim.label}</span>
-          <span className="text-gray-300">|</span>
-          <span className="text-gray-500 capitalize">{pageDim.orientation}</span>
-          <span className="text-gray-300">|</span>
-          <span className="text-[10px] bg-blue-50 text-blue-700 font-semibold px-2 py-0.5 rounded-full border border-blue-100">
-            ATS 100% Readable
-          </span>
+        {/* Dynamic Page Dimensions Indicator Bar & Word-by-Word Edit Toggle */}
+        <div className="mb-3 flex items-center justify-between w-full max-w-4xl px-2">
+          <div className="flex items-center gap-2 bg-white/95 backdrop-blur px-3 py-1.5 rounded-full shadow-sm border border-gray-300 text-xs text-gray-700">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span className="font-bold text-gray-900">{pageDim.label}</span>
+            <span className="text-gray-300">|</span>
+            <span className="text-gray-500 capitalize">{pageDim.orientation}</span>
+            <span className="text-gray-300">|</span>
+            <span className="text-[10px] bg-blue-50 text-blue-700 font-semibold px-2 py-0.5 rounded-full border border-blue-100">
+              ATS 100% Readable
+            </span>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => {
+              const next = !inlineEditActive;
+              setInlineEditActive(next);
+              notify(next ? "Direct Word-by-Word editing enabled! Click any text on the template to edit." : "Direct Word editing disabled.");
+            }}
+            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold shadow-sm transition-all border cursor-pointer ${
+              inlineEditActive
+                ? "bg-emerald-600 text-white border-emerald-700 ring-2 ring-emerald-300"
+                : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
+            }`}
+            title="Click to toggle direct on-page word editing"
+          >
+            <Paintbrush className="w-3.5 h-3.5" />
+            <span>{inlineEditActive ? "✏️ Word-by-Word Edit: ON" : "✏️ Enable Word Edit"}</span>
+          </button>
         </div>
 
+        {inlineEditActive && (
+          <div className="mb-2 text-[11px] text-emerald-800 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-full flex items-center gap-1.5 shadow-2xs">
+            <Sparkles className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0" />
+            <span><strong>Live Document Mode:</strong> Click on any word, heading, or bullet point directly on the resume below to edit it!</span>
+          </div>
+        )}
+
         <div
-          className="bg-white shadow-2xl relative transition-all duration-300"
+          className={`bg-white shadow-2xl relative transition-all duration-300 ${
+            inlineEditActive ? "outline-2 outline-dashed outline-emerald-400 ring-4 ring-emerald-50/50" : ""
+          }`}
           style={{ width: pageDim.width, minHeight: pageDim.height }}
+          contentEditable={inlineEditActive}
+          suppressContentEditableWarning={true}
         >
           {/* Dynamic Template Renderer with full customization */}
           <ResumeTemplateRenderer

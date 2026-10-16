@@ -62,6 +62,7 @@ export async function PUT(req: Request) {
         githubUrl: data.githubUrl,
         portfolioUrl: data.portfolioUrl,
         photoUrl: data.photoUrl,
+        customLinks: data.customLinks ? (typeof data.customLinks === "string" ? data.customLinks : JSON.stringify(data.customLinks)) : null,
       }
     });
     

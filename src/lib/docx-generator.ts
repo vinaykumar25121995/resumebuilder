@@ -14,19 +14,32 @@ import { ResumeData, getPageDimensions } from "@/components/ResumeTemplateRender
  * Generates a clean, ATS-compliant DOCX document from ResumeData.
  * Respects custom section ordering and styling choices while retaining 100% machine-readable text.
  */
-export async function generateResumeDocxBlob(data: ResumeData): Promise<Blob> {
+export async function generateResumeDocxBlob(
+  data: ResumeData,
+  template?: any
+): Promise<Blob> {
   const children: Paragraph[] = [];
   const cs = data.customStyles || {};
 
-  // Custom accent color in hex without #
-  const accentHex = (cs.accentColor || cs.headingColor || "#2563EB").replace(
-    "#",
-    ""
-  );
+  // Custom accent color in hex without #, falling back to template accent color
+  const accentHex = (
+    cs.accentColor ||
+    template?.accentColor ||
+    template?.primaryColor ||
+    cs.headingColor ||
+    "#2563EB"
+  ).replace("#", "");
 
-  const fontName = cs.fontFamily?.includes("Serif") || cs.fontFamily?.includes("Garamond")
-    ? "Georgia"
-    : "Calibri";
+  const rawFont = (cs.fontFamily || template?.fontFamily || "").toLowerCase();
+  const fontName =
+    rawFont.includes("serif") ||
+    rawFont.includes("garamond") ||
+    rawFont.includes("merriweather") ||
+    rawFont.includes("times")
+      ? "Georgia"
+      : rawFont.includes("mono")
+      ? "Consolas"
+      : "Calibri";
 
   const sfs = cs.sectionFontSizes || {};
   const lfs = cs.lineFontSizes || {};
@@ -176,6 +189,8 @@ export async function generateResumeDocxBlob(data: ResumeData): Promise<Blob> {
   // 1. Personal Header
   const fullName = data.personalInfo?.fullName || "Your Name";
   const title = data.personalInfo?.title || "";
+  const customLinksList =
+    data.personalInfo?.customLinks?.map((cl) => `${cl.label}: ${cl.url}`) || [];
   const contactParts = [
     data.personalInfo?.location,
     data.personalInfo?.phone,
@@ -183,6 +198,7 @@ export async function generateResumeDocxBlob(data: ResumeData): Promise<Blob> {
     data.personalInfo?.linkedin,
     data.personalInfo?.github,
     data.personalInfo?.portfolio,
+    ...customLinksList,
   ].filter(Boolean);
 
   const alignment =

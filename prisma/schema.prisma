@@ -87,6 +87,7 @@ model Profile {
   githubUrl          String?
   portfolioUrl       String?
   photoUrl           String?
+  customLinks        String?
   
   educations         Education[]
   experiences        Experience[]

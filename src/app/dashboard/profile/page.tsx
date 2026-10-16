@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import {
   User, Briefcase, GraduationCap, Code, FolderGit2, Award,
   Globe, Save, Plus, Trash2, CheckCircle, AlertCircle, Languages,
-  Link as LinkIcon, ChevronDown, ChevronUp
+  Link as LinkIcon, ChevronDown, ChevronUp, Upload
 } from "lucide-react";
 
 const sections = [
@@ -34,6 +34,7 @@ export default function ProfilePage() {
   const [profile, setProfile] = useState<any>({
     fullName: '', professionalTitle: '', phone: '', summary: '',
     city: '', state: '', country: '',
+    photoUrl: '', customLinks: [],
     linkedinUrl: '', githubUrl: '', portfolioUrl: '',
     experiences: [], educations: [], projects: [], skills: [],
     certifications: [], achievements: [], languages: []
@@ -51,11 +52,36 @@ export default function ProfilePage() {
     setTimeout(() => setNotification(null), 4000);
   };
 
+  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 3 * 1024 * 1024) {
+      showNotification('Image size should be less than 3MB', 'error');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const base64 = event.target?.result as string;
+      setProfile((p: any) => ({ ...p, photoUrl: base64 }));
+      showNotification('Profile photo uploaded!', 'success');
+    };
+    reader.readAsDataURL(file);
+  };
+
   const fetchProfile = async () => {
     try {
       const res = await fetch('/api/profile');
       if (res.ok) {
         const data = await res.json();
+        let parsedLinks: any[] = [];
+        try {
+          if (data.customLinks) {
+            parsedLinks = typeof data.customLinks === 'string' ? JSON.parse(data.customLinks) : data.customLinks;
+          }
+        } catch {
+          parsedLinks = [];
+        }
+
         setProfile({
           fullName: data.userName || '',
           professionalTitle: data.professionalTitle || '',
@@ -64,6 +90,8 @@ export default function ProfilePage() {
           city: data.city || '',
           state: data.state || '',
           country: data.country || '',
+          photoUrl: data.photoUrl || '',
+          customLinks: Array.isArray(parsedLinks) ? parsedLinks : [],
           linkedinUrl: data.linkedinUrl || '',
           githubUrl: data.githubUrl || '',
           portfolioUrl: data.portfolioUrl || '',
@@ -86,10 +114,14 @@ export default function ProfilePage() {
   const handleSave = async () => {
     setSaving(true);
     try {
+      const payload = {
+        ...profile,
+        customLinks: Array.isArray(profile.customLinks) ? JSON.stringify(profile.customLinks) : profile.customLinks,
+      };
       const res = await fetch('/api/profile', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(profile)
+        body: JSON.stringify(payload)
       });
       if (res.ok) {
         showNotification('Profile saved successfully!', 'success');
@@ -219,6 +251,37 @@ export default function ProfilePage() {
                 <h2 className="text-lg font-bold text-gray-900">Personal Information</h2>
               </div>
               <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-5">
+                {/* Profile Photo Upload */}
+                <div className="md:col-span-2 flex items-center gap-5 p-4 bg-gray-50 rounded-xl border border-gray-200">
+                  <div className="w-20 h-20 rounded-full border-2 border-blue-500 overflow-hidden bg-white flex items-center justify-center flex-shrink-0 shadow-sm">
+                    {profile.photoUrl ? (
+                      <img src={profile.photoUrl} alt="Profile" className="w-full h-full object-cover" />
+                    ) : (
+                      <User className="w-10 h-10 text-gray-400" />
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    <div className="text-sm font-semibold text-gray-800">Profile Photo</div>
+                    <p className="text-xs text-gray-500">Upload a headshot (JPG, PNG or WebP, max 3MB). Used in photo resume templates.</p>
+                    <div className="flex items-center gap-3">
+                      <label className="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium rounded-lg transition-colors shadow-xs">
+                        <Upload className="w-3.5 h-3.5" />
+                        <span>Upload Image</span>
+                        <input type="file" accept="image/*" className="hidden" onChange={handlePhotoUpload} />
+                      </label>
+                      {profile.photoUrl && (
+                        <button
+                          type="button"
+                          onClick={() => setProfile((p: any) => ({ ...p, photoUrl: '' }))}
+                          className="text-xs text-red-600 hover:text-red-700 font-medium px-2 py-1 hover:bg-red-50 rounded transition-colors"
+                        >
+                          Remove Photo
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Full Name *</label>
                   <input type="text" className="w-full rounded-lg border border-gray-300 p-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" value={profile.fullName} onChange={e => setProfile((p: any) => ({ ...p, fullName: e.target.value }))} placeholder="John Doe" />
@@ -258,15 +321,90 @@ export default function ProfilePage() {
               <div className="border-b border-gray-100 p-6">
                 <h2 className="text-lg font-bold text-gray-900">Professional Links</h2>
               </div>
-              <div className="p-6 space-y-5">
-                {[{key:'linkedinUrl', label:'LinkedIn URL', ph:'https://linkedin.com/in/yourname'},
-                  {key:'githubUrl', label:'GitHub URL', ph:'https://github.com/yourname'},
-                  {key:'portfolioUrl', label:'Portfolio URL', ph:'https://yourportfolio.com'}].map(({key,label,ph}) => (
-                  <div key={key}>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
-                    <input type="url" className="w-full rounded-lg border border-gray-300 p-2.5 text-sm focus:ring-2 focus:ring-blue-500" value={(profile as any)[key]} onChange={e => setProfile((p: any) => ({ ...p, [key]: e.target.value }))} placeholder={ph} />
+              <div className="p-6 space-y-6">
+                <div className="space-y-4">
+                  {[{key:'linkedinUrl', label:'LinkedIn URL', ph:'https://linkedin.com/in/yourname'},
+                    {key:'githubUrl', label:'GitHub URL', ph:'https://github.com/yourname'},
+                    {key:'portfolioUrl', label:'Portfolio URL', ph:'https://yourportfolio.com'}].map(({key,label,ph}) => (
+                    <div key={key}>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
+                      <input type="url" className="w-full rounded-lg border border-gray-300 p-2.5 text-sm focus:ring-2 focus:ring-blue-500" value={(profile as any)[key]} onChange={e => setProfile((p: any) => ({ ...p, [key]: e.target.value }))} placeholder={ph} />
+                    </div>
+                  ))}
+                </div>
+
+                {/* Custom Links Section */}
+                <div className="pt-5 border-t border-gray-200">
+                  <div className="flex justify-between items-center mb-3">
+                    <div>
+                      <h3 className="text-sm font-bold text-gray-900">Custom & Additional Links</h3>
+                      <p className="text-xs text-gray-500">Add custom URLs such as LeetCode, Medium, Kaggle, Dribbble, Behance, Blog, etc.</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const links = profile.customLinks || [];
+                        setProfile((p: any) => ({
+                          ...p,
+                          customLinks: [...links, { label: "", url: "" }],
+                        }));
+                      }}
+                      className="flex items-center gap-1 text-xs font-semibold text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg border border-blue-200 transition-colors"
+                    >
+                      <Plus className="w-3.5 h-3.5" /> Add Custom Link
+                    </button>
                   </div>
-                ))}
+
+                  {(!profile.customLinks || profile.customLinks.length === 0) ? (
+                    <p className="text-xs text-gray-400 italic py-2">No custom links added yet. Click &quot;Add Custom Link&quot; above to add any link you want.</p>
+                  ) : (
+                    <div className="space-y-3">
+                      {profile.customLinks.map((link: any, idx: number) => (
+                        <div key={idx} className="flex items-center gap-3 bg-gray-50 p-3 rounded-lg border border-gray-200">
+                          <div className="w-1/3">
+                            <label className="block text-[11px] font-medium text-gray-600 mb-0.5">Label (e.g. LeetCode)</label>
+                            <input
+                              type="text"
+                              className="w-full text-xs p-2 bg-white border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500"
+                              placeholder="LeetCode, Medium, etc."
+                              value={link.label || ""}
+                              onChange={(e) => {
+                                const updated = [...profile.customLinks];
+                                updated[idx] = { ...updated[idx], label: e.target.value };
+                                setProfile((p: any) => ({ ...p, customLinks: updated }));
+                              }}
+                            />
+                          </div>
+                          <div className="flex-1">
+                            <label className="block text-[11px] font-medium text-gray-600 mb-0.5">URL</label>
+                            <input
+                              type="url"
+                              className="w-full text-xs p-2 bg-white border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500"
+                              placeholder="https://..."
+                              value={link.url || ""}
+                              onChange={(e) => {
+                                const updated = [...profile.customLinks];
+                                updated[idx] = { ...updated[idx], url: e.target.value };
+                                setProfile((p: any) => ({ ...p, customLinks: updated }));
+                              }}
+                            />
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const updated = profile.customLinks.filter((_: any, i: number) => i !== idx);
+                              setProfile((p: any) => ({ ...p, customLinks: updated }));
+                            }}
+                            className="mt-4 p-1.5 text-gray-400 hover:text-red-500 transition-colors"
+                            title="Delete link"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           )}
