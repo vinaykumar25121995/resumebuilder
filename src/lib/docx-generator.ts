@@ -9,7 +9,7 @@ import {
   PageOrientation,
 } from "docx";
 import { ResumeData, getPageDimensions } from "@/components/ResumeTemplateRenderer";
-import { repairFormattingTags } from "@/lib/text-formatter";
+import { repairFormattingTags, TEXT_COLORS } from "@/lib/text-formatter";
 
 /**
  * Generates a clean, ATS-compliant DOCX document from ResumeData.
@@ -160,11 +160,12 @@ export async function generateResumeDocxBlob(
         const closing = part.indexOf(">");
         const colorVal = part.slice(7, closing);
         const content = part.slice(closing + 1, -8);
+        const resolvedHex = (TEXT_COLORS[colorVal]?.hex || colorVal).replace("#", "");
         runs.push(
           new TextRun({
             text: content,
             ...baseOptions,
-            color: colorVal.replace("#", ""),
+            color: resolvedHex,
             bold: true,
           })
         );

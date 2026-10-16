@@ -6,16 +6,19 @@ export const HIGHLIGHT_COLORS: Record<string, { label: string; bg: string; text:
   blue: { label: "Sky Blue", bg: "#bfdbfe", text: "#1e40af", docxName: "cyan" },
   purple: { label: "Lavender", bg: "#e9d5ff", text: "#6b21a8", docxName: "magenta" },
   coral: { label: "Soft Rose", bg: "#fecdd3", text: "#9f1239", docxName: "red" },
+  white: { label: "Clean White", bg: "#ffffff", text: "#111827", docxName: "white" },
 };
 
 export const TEXT_COLORS: Record<string, { label: string; hex: string }> = {
+  white: { label: "Pure White", hex: "#ffffff" },
+  charcoal: { label: "Charcoal Black", hex: "#111827" },
   blue: { label: "Primary Blue", hex: "#2563eb" },
   navy: { label: "Deep Navy", hex: "#1e3a8a" },
   emerald: { label: "Emerald Green", hex: "#059669" },
   crimson: { label: "Ruby Red", hex: "#dc2626" },
   violet: { label: "Royal Violet", hex: "#7c3aed" },
-  charcoal: { label: "Charcoal Black", hex: "#111827" },
 };
+
 
 export const FONT_SIZE_OPTIONS = [
   "7.5pt",
@@ -373,6 +376,10 @@ export function renderFormattedText(text: string | undefined): React.ReactNode {
               style={{
                 color: resolvedColor,
                 fontWeight: 600,
+                textShadow:
+                  resolvedColor.toLowerCase() === "#ffffff"
+                    ? "0 0 1.5px rgba(0,0,0,0.5)"
+                    : undefined,
               }}
             >
               {renderFormattedText(content)}

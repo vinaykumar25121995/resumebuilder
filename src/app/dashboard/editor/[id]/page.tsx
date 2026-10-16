@@ -4354,7 +4354,7 @@ export default function ResumeEditorPage({
                       className="p-1.5 rounded-lg border border-gray-200 bg-white flex items-center gap-1.5"
                     >
                       <span
-                        className="w-3.5 h-3.5 rounded-full flex-shrink-0"
+                        className="w-3.5 h-3.5 rounded-full flex-shrink-0 border border-gray-300"
                         style={{ backgroundColor: c.hex }}
                       />
                       <span className="text-[10px] font-semibold text-gray-700 truncate">
