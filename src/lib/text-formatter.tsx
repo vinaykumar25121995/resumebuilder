@@ -50,36 +50,250 @@ export function stripFormattingTags(text: string | undefined): string {
 }
 
 /**
+ * Auto-repairs unclosed or malformed formatting tags, strips orphaned closing tags,
+ * and normalizes runaway asterisks so that markup never bleeds as raw code into preview or print.
+ */
+export function repairFormattingTags(text: string | undefined): string {
+  if (!text) return "";
+  // Normalize runs of 3+ asterisks to 2
+  let s = text.replace(/\*{3,}/g, "**");
+
+  const tagRegex = /(\*\*|==(?:[a-zA-Z0-9#]+:)?|==|<\/?[a-zA-Z0-9#:]+>)/g;
+  let result = "";
+  let lastIndex = 0;
+  const stack: Array<{ type: string; close: string; open: string }> = [];
+
+  let match: RegExpExecArray | null;
+  while ((match = tagRegex.exec(s)) !== null) {
+    const rawTag = match[0];
+    const tagIndex = match.index;
+    result += s.substring(lastIndex, tagIndex);
+    lastIndex = tagRegex.lastIndex;
+
+    const remaining = s.substring(lastIndex);
+    const hasRemainingContent =
+      remaining.replace(/(?:==|<\/[a-zA-Z0-9#:]+>|\s)+$/g, "").trim().length > 0;
+
+    if (rawTag === "**") {
+      const boldIdx = stack.findIndex((t) => t.type === "bold");
+      if (boldIdx !== -1) {
+        while (stack.length > boldIdx) {
+          result += stack.pop()!.close;
+        }
+      } else if (hasRemainingContent) {
+        stack.push({ type: "bold", close: "**", open: "**" });
+        result += "**";
+      }
+      // If no matching opening bold and no remaining content, drop orphaned closing **
+    } else if (rawTag.startsWith("==") && rawTag !== "==") {
+      stack.push({ type: "hl", close: "==", open: rawTag });
+      result += rawTag;
+    } else if (rawTag === "==") {
+      const hlIdx = stack.findIndex((t) => t.type === "hl");
+      if (hlIdx !== -1) {
+        while (stack.length > hlIdx) {
+          result += stack.pop()!.close;
+        }
+      } else if (hasRemainingContent && remaining.includes("==")) {
+        stack.push({ type: "hl", close: "==", open: "==" });
+        result += "==";
+      }
+      // Else drop orphaned closing ==
+    } else if (rawTag === "<u>") {
+      stack.push({ type: "u", close: "</u>", open: "<u>" });
+      result += "<u>";
+    } else if (rawTag === "</u>") {
+      const uIdx = stack.findIndex((t) => t.type === "u");
+      if (uIdx !== -1) {
+        while (stack.length > uIdx) {
+          result += stack.pop()!.close;
+        }
+      }
+      // Else drop orphaned </u>
+    } else if (rawTag.startsWith("<color:")) {
+      stack.push({ type: "color", close: "</color>", open: rawTag });
+      result += rawTag;
+    } else if (rawTag === "</color>") {
+      const cIdx = stack.findIndex((t) => t.type === "color");
+      if (cIdx !== -1) {
+        while (stack.length > cIdx) {
+          result += stack.pop()!.close;
+        }
+      }
+    } else if (rawTag.startsWith("<size:")) {
+      stack.push({ type: "size", close: "</size>", open: rawTag });
+      result += rawTag;
+    } else if (rawTag === "</size>") {
+      const sIdx = stack.findIndex((t) => t.type === "size");
+      if (sIdx !== -1) {
+        while (stack.length > sIdx) {
+          result += stack.pop()!.close;
+        }
+      }
+    } else if (rawTag === "<mark>") {
+      stack.push({ type: "mark", close: "</mark>", open: "<mark>" });
+      result += "<mark>";
+    } else if (rawTag === "</mark>") {
+      const mIdx = stack.findIndex((t) => t.type === "mark");
+      if (mIdx !== -1) {
+        while (stack.length > mIdx) {
+          result += stack.pop()!.close;
+        }
+      }
+    } else {
+      result += rawTag;
+    }
+  }
+
+  result += s.substring(lastIndex);
+
+  // Auto-close any unclosed tags in reverse order
+  while (stack.length > 0) {
+    result += stack.pop()!.close;
+  }
+
+  return result;
+}
+
+/**
+ * Splits a comma/newline separated skills string into individual items
+ * without breaking formatting tags or leaving dangling tags.
+ * If multiple skills were highlighted or formatted together, active formatting
+ * is cleanly distributed to each item so all pills render formatted.
+ */
+export function splitSkillsList(text: string | undefined): string[] {
+  if (!text) return [];
+
+  // Fast path if no comma or newline
+  if (!text.includes(",") && !text.includes("\n")) {
+    const repaired = repairFormattingTags(text.trim());
+    return repaired ? [repaired] : [];
+  }
+
+  const items: string[] = [];
+  let current = "";
+  const activeTags: Array<{ open: string; close: string }> = [];
+
+  const tagRegex = /(\*\*|==(?:[a-zA-Z0-9#]+:)?|==|<\/?[a-zA-Z0-9#:]+>)/g;
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+
+  while ((match = tagRegex.exec(text)) !== null) {
+    const before = text.substring(lastIndex, match.index);
+    lastIndex = tagRegex.lastIndex;
+
+    for (let i = 0; i < before.length; i++) {
+      const char = before[i];
+      if (char === "," || char === "\n") {
+        if (current.trim()) {
+          let item = current;
+          for (let j = activeTags.length - 1; j >= 0; j--) {
+            item += activeTags[j].close;
+          }
+          const repaired = repairFormattingTags(item.trim());
+          if (repaired) items.push(repaired);
+        }
+        current = "";
+        for (let j = 0; j < activeTags.length; j++) {
+          current += activeTags[j].open;
+        }
+      } else {
+        current += char;
+      }
+    }
+
+    const rawTag = match[0];
+    current += rawTag;
+
+    if (rawTag === "**") {
+      const bIdx = activeTags.findIndex((t) => t.open === "**");
+      if (bIdx !== -1) activeTags.splice(bIdx, 1);
+      else activeTags.push({ open: "**", close: "**" });
+    } else if (rawTag.startsWith("==") && rawTag !== "==") {
+      activeTags.push({ open: rawTag, close: "==" });
+    } else if (rawTag === "==") {
+      const hIdx = activeTags.findIndex((t) => t.close === "==");
+      if (hIdx !== -1) activeTags.splice(hIdx, 1);
+      else activeTags.push({ open: "==", close: "==" });
+    } else if (rawTag.startsWith("</")) {
+      const closeName = rawTag.slice(2, -1);
+      const idx = activeTags.findIndex((t) => t.close.startsWith("</" + closeName));
+      if (idx !== -1) activeTags.splice(idx, 1);
+    } else if (rawTag.startsWith("<")) {
+      if (rawTag === "<u>") activeTags.push({ open: "<u>", close: "</u>" });
+      else if (rawTag.startsWith("<color:")) activeTags.push({ open: rawTag, close: "</color>" });
+      else if (rawTag.startsWith("<size:")) activeTags.push({ open: rawTag, close: "</size>" });
+      else if (rawTag === "<mark>") activeTags.push({ open: "<mark>", close: "</mark>" });
+    }
+  }
+
+  const remainder = text.substring(lastIndex);
+  for (let i = 0; i < remainder.length; i++) {
+    const char = remainder[i];
+    if (char === "," || char === "\n") {
+      if (current.trim()) {
+        let item = current;
+        for (let j = activeTags.length - 1; j >= 0; j--) {
+          item += activeTags[j].close;
+        }
+        const repaired = repairFormattingTags(item.trim());
+        if (repaired) items.push(repaired);
+      }
+      current = "";
+      for (let j = 0; j < activeTags.length; j++) {
+        current += activeTags[j].open;
+      }
+    } else {
+      current += char;
+    }
+  }
+
+  if (current.trim()) {
+    let item = current;
+    for (let j = activeTags.length - 1; j >= 0; j--) {
+      item += activeTags[j].close;
+    }
+    const repaired = repairFormattingTags(item.trim());
+    if (repaired) items.push(repaired);
+  }
+
+  return items;
+}
+
+/**
  * Renders text containing formatting syntax into React nodes with bold, underline,
  * background highlighting, custom text colors, and individual line/phrase font sizing.
  */
 export function renderFormattedText(text: string | undefined): React.ReactNode {
   if (!text) return null;
 
+  // First repair any unclosed or malformed tags so raw markup never leaks
+  const cleanText = repairFormattingTags(text);
+
   // Fast path: if no formatting markers exist, return string directly
   if (
-    !text.includes("**") &&
-    !text.includes("==") &&
-    !text.includes("<u>") &&
-    !text.includes("<mark") &&
-    !text.includes("<color") &&
-    !text.includes("<hl") &&
-    !text.includes("<size")
+    !cleanText.includes("**") &&
+    !cleanText.includes("==") &&
+    !cleanText.includes("<u>") &&
+    !cleanText.includes("<mark") &&
+    !cleanText.includes("<color") &&
+    !cleanText.includes("<hl") &&
+    !cleanText.includes("<size")
   ) {
-    return text;
+    return cleanText;
   }
 
   // Regex matches:
-  // 1. **bold**
+  // 1. **bold** (or ****bold****)
   // 2. ==color:text== or ==text==
   // 3. <u>underline</u>
   // 4. <color:hex_or_name>text</color>
   // 5. <hl:color>text</hl> or <mark>text</mark>
   // 6. <size:Xpt>text</size>
   const tokenRegex =
-    /(\*\*[^*]+?\*\*|==(?:[a-zA-Z0-9#]+:)?[^=]+?==|<u>[\s\S]*?<\/u>|<color:[^>]+>[\s\S]*?<\/color>|<hl:[^>]+>[\s\S]*?<\/hl>|<mark>[\s\S]*?<\/mark>|<size:[^>]+>[\s\S]*?<\/size>)/g;
+    /(\*{2,}[\s\S]+?\*{2,}|==(?:[a-zA-Z0-9#]+:)?[^=]+?==|<u>[\s\S]*?<\/u>|<color:[^>]+>[\s\S]*?<\/color>|<hl:[^>]+>[\s\S]*?<\/hl>|<mark>[\s\S]*?<\/mark>|<size:[^>]+>[\s\S]*?<\/size>)/g;
 
-  const parts = text.split(tokenRegex);
+  const parts = cleanText.split(tokenRegex);
 
   return (
     <>
@@ -88,7 +302,7 @@ export function renderFormattedText(text: string | undefined): React.ReactNode {
 
         // 1. Bold: **text**
         if (part.startsWith("**") && part.endsWith("**") && part.length >= 4) {
-          const content = part.slice(2, -2);
+          const content = part.replace(/^\*+|\*+$/g, "");
           return (
             <strong key={idx} style={{ fontWeight: 700, color: "inherit" }}>
               {renderFormattedText(content)}
@@ -233,13 +447,25 @@ export function applyTextFormatting(
   let wrapped = textToWrap;
   switch (formatType) {
     case "bold":
-      wrapped = `**${textToWrap}**`;
+      if (textToWrap.startsWith("**") && textToWrap.endsWith("**") && textToWrap.length >= 4) {
+        wrapped = textToWrap.replace(/^\*+|\*+$/g, "");
+      } else {
+        wrapped = `**${textToWrap.replace(/^\*+|\*+$/g, "")}**`;
+      }
       break;
     case "underline":
-      wrapped = `<u>${textToWrap}</u>`;
+      if (textToWrap.startsWith("<u>") && textToWrap.endsWith("</u>") && textToWrap.length >= 7) {
+        wrapped = textToWrap.slice(3, -4);
+      } else {
+        wrapped = `<u>${textToWrap}</u>`;
+      }
       break;
     case "highlight":
-      wrapped = `==${param}:${textToWrap}==`;
+      if (textToWrap.startsWith("==") && textToWrap.endsWith("==") && textToWrap.length >= 4) {
+        wrapped = textToWrap.slice(2, -2).replace(/^[a-zA-Z0-9#]+:/, "");
+      } else {
+        wrapped = `==${param}:${textToWrap}==`;
+      }
       break;
     case "color":
       wrapped = `<color:${param}>${textToWrap}</color>`;

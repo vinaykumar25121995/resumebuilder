@@ -69,6 +69,8 @@ import {
   applyTextFormatting,
   stripFormattingTags,
   renderFormattedText,
+  repairFormattingTags,
+  splitSkillsList,
   HIGHLIGHT_COLORS,
   TEXT_COLORS,
   FONT_SIZE_OPTIONS,
@@ -1123,43 +1125,46 @@ function SkillCategoryEditor({
       {/* Interactive Pills with Reorder and Live Formatting */}
       {skillsList.length > 0 && (
         <div className="flex flex-wrap gap-1.5 p-2 bg-white rounded-lg border border-gray-200">
-          {skillsList.map((sk, sIdx) => (
-            <span
-              key={sIdx}
-              className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium border ${themeClasses}`}
-            >
-              <span>{renderFormattedText(sk)}</span>
-              <button
-                type="button"
-                disabled={sIdx === 0}
-                onClick={() => onMoveItem(sIdx, "up")}
-                className="text-gray-400 hover:text-blue-700 disabled:opacity-25"
-                title="Move skill earlier"
+          {skillsList.map((sk, sIdx) => {
+            const repaired = repairFormattingTags(sk);
+            return (
+              <span
+                key={sIdx}
+                className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium border ${themeClasses}`}
               >
-                ▲
-              </button>
-              <button
-                type="button"
-                disabled={sIdx === skillsList.length - 1}
-                onClick={() => onMoveItem(sIdx, "down")}
-                className="text-gray-400 hover:text-blue-700 disabled:opacity-25"
-                title="Move skill later"
-              >
-                ▼
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  const updated = skillsList.filter((_, i) => i !== sIdx);
-                  onChangeList(updated);
-                }}
-                className="text-gray-400 hover:text-red-500 font-bold ml-0.5"
-                title="Remove skill"
-              >
-                ×
-              </button>
-            </span>
-          ))}
+                <span>{renderFormattedText(repaired)}</span>
+                <button
+                  type="button"
+                  disabled={sIdx === 0}
+                  onClick={() => onMoveItem(sIdx, "up")}
+                  className="text-gray-400 hover:text-blue-700 disabled:opacity-25"
+                  title="Move skill earlier"
+                >
+                  ▲
+                </button>
+                <button
+                  type="button"
+                  disabled={sIdx === skillsList.length - 1}
+                  onClick={() => onMoveItem(sIdx, "down")}
+                  className="text-gray-400 hover:text-blue-700 disabled:opacity-25"
+                  title="Move skill later"
+                >
+                  ▼
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const updated = skillsList.filter((_, i) => i !== sIdx);
+                    onChangeList(updated);
+                  }}
+                  className="text-gray-400 hover:text-red-500 font-bold ml-0.5"
+                  title="Remove skill"
+                >
+                  ×
+                </button>
+              </span>
+            );
+          })}
         </div>
       )}
 
@@ -1169,12 +1174,7 @@ function SkillCategoryEditor({
         value={textValue}
         onChange={(newVal) => {
           setTextValue(newVal);
-          onChangeList(
-            newVal
-              .split(",")
-              .map((s) => s.trim())
-              .filter(Boolean)
-          );
+          onChangeList(splitSkillsList(newVal));
         }}
         showLineHighlight={false}
         lineFontSize={fontSize || defaultFontSize}
@@ -1187,12 +1187,7 @@ function SkillCategoryEditor({
         value={textValue}
         onChange={(e) => {
           setTextValue(e.target.value);
-          onChangeList(
-            e.target.value
-              .split(",")
-              .map((s) => s.trim())
-              .filter(Boolean)
-          );
+          onChangeList(splitSkillsList(e.target.value));
         }}
         placeholder="Edit comma-separated skills: e.g. Python, SQL, Tableau..."
       />
@@ -1206,7 +1201,7 @@ function SkillCategoryEditor({
           <div className="flex flex-wrap gap-1">
             {skillsList.map((sk, idx) => (
               <span key={idx} className="after:content-[','] last:after:content-[''] mr-1 inline-block">
-                {renderFormattedText(sk)}
+                {renderFormattedText(repairFormattingTags(sk))}
               </span>
             ))}
           </div>

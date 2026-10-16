@@ -9,6 +9,7 @@ import {
   PageOrientation,
 } from "docx";
 import { ResumeData, getPageDimensions } from "@/components/ResumeTemplateRenderer";
+import { repairFormattingTags } from "@/lib/text-formatter";
 
 /**
  * Generates a clean, ATS-compliant DOCX document from ResumeData.
@@ -94,19 +95,20 @@ export async function generateResumeDocxBlob(
     baseOptions: { font: string; size: number; color?: string; bold?: boolean; italics?: boolean }
   ): TextRun[] => {
     if (!text) return [];
+    const cleanText = repairFormattingTags(text);
     if (
-      !text.includes("**") &&
-      !text.includes("==") &&
-      !text.includes("<u>") &&
-      !text.includes("<color:") &&
-      !text.includes("<size:")
+      !cleanText.includes("**") &&
+      !cleanText.includes("==") &&
+      !cleanText.includes("<u>") &&
+      !cleanText.includes("<color:") &&
+      !cleanText.includes("<size:")
     ) {
-      return [new TextRun({ text, ...baseOptions })];
+      return [new TextRun({ text: cleanText, ...baseOptions })];
     }
 
     const tokenRegex =
-      /(\*\*[^*]+?\*\*|==(?:[a-zA-Z0-9#]+:)?[^=]+?==|<u>[\s\S]*?<\/u>|<color:[^>]+>[\s\S]*?<\/color>|<size:[^>]+>[\s\S]*?<\/size>)/g;
-    const parts = text.split(tokenRegex);
+      /(\*{2,}[\s\S]+?\*{2,}|==(?:[a-zA-Z0-9#]+:)?[^=]+?==|<u>[\s\S]*?<\/u>|<color:[^>]+>[\s\S]*?<\/color>|<size:[^>]+>[\s\S]*?<\/size>)/g;
+    const parts = cleanText.split(tokenRegex);
     const runs: TextRun[] = [];
 
     parts.forEach((part) => {
@@ -115,7 +117,7 @@ export async function generateResumeDocxBlob(
       if (part.startsWith("**") && part.endsWith("**")) {
         runs.push(
           new TextRun({
-            text: part.slice(2, -2),
+            text: part.replace(/^\*+|\*+$/g, ""),
             ...baseOptions,
             bold: true,
           })
