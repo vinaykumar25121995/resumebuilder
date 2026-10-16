@@ -785,6 +785,7 @@ function ExperienceBulletItem({
 function ProjectItemEditor({
   proj,
   projIdx,
+  bulletChar = "•",
   canMoveUp,
   canMoveDown,
   onMoveUp,
@@ -792,19 +793,29 @@ function ProjectItemEditor({
   onUpdateName,
   onUpdateTech,
   onUpdateDesc,
+  onAddBullet,
+  onUpdateBullet,
+  onDeleteBullet,
+  onMoveBullet,
+  onUpdateBulletFontSize,
   onDelete,
   nameFontSize,
   techFontSize,
   descFontSize,
+  bulletFontSize,
   onUpdateNameFontSize,
   onUpdateTechFontSize,
   onUpdateDescFontSize,
+  onUpdateBulletFontSizeGeneral,
   onResetNameFontSize,
   onResetTechFontSize,
   onResetDescFontSize,
+  onResetBulletFontSizeGeneral,
+  fallbackBulletFontSize = 9.5,
 }: {
   proj: any;
   projIdx: number;
+  bulletChar?: string;
   canMoveUp?: boolean;
   canMoveDown?: boolean;
   onMoveUp?: () => void;
@@ -812,21 +823,41 @@ function ProjectItemEditor({
   onUpdateName: (v: string) => void;
   onUpdateTech: (v: string) => void;
   onUpdateDesc: (v: string) => void;
+  onAddBullet?: () => void;
+  onUpdateBullet?: (bulletIdx: number, val: string) => void;
+  onDeleteBullet?: (bulletIdx: number) => void;
+  onMoveBullet?: (bulletIdx: number, dir: "up" | "down") => void;
+  onUpdateBulletFontSize?: (bulletIdx: number, size: number) => void;
   onDelete: () => void;
   nameFontSize?: number;
   techFontSize?: number;
   descFontSize?: number;
+  bulletFontSize?: number;
   onUpdateNameFontSize?: (v: number) => void;
   onUpdateTechFontSize?: (v: number) => void;
   onUpdateDescFontSize?: (v: number) => void;
+  onUpdateBulletFontSizeGeneral?: (v: number) => void;
   onResetNameFontSize?: () => void;
   onResetTechFontSize?: () => void;
   onResetDescFontSize?: () => void;
+  onResetBulletFontSizeGeneral?: () => void;
+  fallbackBulletFontSize?: number;
 }) {
+  const [showRawDesc, setShowRawDesc] = useState(false);
   const descRef = useRef<HTMLTextAreaElement>(null);
 
+  const bullets: string[] =
+    Array.isArray(proj.bullets) && proj.bullets.length > 0
+      ? proj.bullets
+      : proj.description
+      ? proj.description
+          .split("\n")
+          .map((s: string) => s.trim())
+          .filter(Boolean)
+      : [];
+
   return (
-    <div className="p-3 border border-gray-200 rounded-xl bg-gray-50/50 space-y-2 relative">
+    <div className="p-3 border border-gray-200 rounded-xl bg-gray-50/50 space-y-2.5 relative">
       <div className="flex items-center justify-between pb-1.5 mb-1 border-b border-gray-200">
         <div className="flex items-center gap-1.5">
           <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-100 text-blue-800">
@@ -913,42 +944,113 @@ function ProjectItemEditor({
         />
       </div>
 
-      <div className="space-y-1">
-        <div className="flex items-center justify-between">
-          <label className="text-[10px] font-bold text-gray-500 uppercase">
-            Description
+      {/* Bullet Points with Reorder (Up/Down), Font Size, and Custom Bullet Glyph */}
+      <div className="space-y-1.5">
+        <div className="flex items-center justify-between mb-1">
+          <label className="text-[10px] font-bold text-gray-500 uppercase flex items-center gap-1.5">
+            <span>Bullet Points & Key Deliverables</span>
+            <span className="text-[10px] font-bold text-blue-600">
+              ({bulletChar === "accent-dot" ? "●" : bulletChar})
+            </span>
           </label>
-          {onUpdateDescFontSize && (
-            <LineFontSizeSelector
-              compact
-              value={descFontSize}
-              fallback={9.5}
-              onChange={onUpdateDescFontSize}
-              onReset={onResetDescFontSize}
-            />
+          {onUpdateBulletFontSizeGeneral && (
+            <div className="flex items-center gap-1.5">
+              <span className="text-[9px] text-gray-400">Bullets Size:</span>
+              <LineFontSizeSelector
+                compact
+                value={bulletFontSize ?? descFontSize}
+                fallback={fallbackBulletFontSize}
+                onChange={onUpdateBulletFontSizeGeneral}
+                onReset={onResetBulletFontSizeGeneral}
+              />
+            </div>
           )}
         </div>
-        <FormattedEditorToolbar
-          inputRef={descRef}
-          value={proj.description || ""}
-          onChange={onUpdateDesc}
-          showLineHighlight={false}
-          lineFontSize={descFontSize}
-          onLineFontSizeChange={onUpdateDescFontSize}
-        />
-        <textarea
-          ref={descRef}
-          className="w-full text-xs p-1.5 border border-gray-300 rounded h-16 leading-relaxed"
-          value={proj.description || ""}
-          onChange={(e) => onUpdateDesc(e.target.value)}
-          placeholder="Describe scope, tools used, and key impact..."
-        />
-        {proj.description && (
-          <div className="text-[11px] p-1.5 bg-white border border-gray-100 rounded leading-relaxed text-gray-800">
-            <span className="text-[9px] font-bold text-gray-400 block uppercase mb-0.5">
-              Rendered Preview:
+
+        <div className="space-y-1.5">
+          {bullets.map((bullet, bIdx) => (
+            <ExperienceBulletItem
+              key={bIdx}
+              bullet={bullet}
+              bulletChar={proj.bulletChar || bulletChar || "•"}
+              canMoveUp={bIdx > 0}
+              canMoveDown={bIdx < bullets.length - 1}
+              fontSize={
+                proj.bulletFontSizes?.[bIdx] ??
+                proj.bulletFontSize ??
+                bulletFontSize ??
+                descFontSize ??
+                fallbackBulletFontSize
+              }
+              onFontSizeChange={(size) => {
+                if (onUpdateBulletFontSize) {
+                  onUpdateBulletFontSize(bIdx, size);
+                }
+              }}
+              onMoveUp={() => onMoveBullet && onMoveBullet(bIdx, "up")}
+              onMoveDown={() => onMoveBullet && onMoveBullet(bIdx, "down")}
+              onChange={(newVal) => onUpdateBullet && onUpdateBullet(bIdx, newVal)}
+              onDelete={() => onDeleteBullet && onDeleteBullet(bIdx)}
+            />
+          ))}
+        </div>
+
+        <div className="flex items-center justify-between pt-1">
+          <button
+            type="button"
+            onClick={() => {
+              if (onAddBullet) {
+                onAddBullet();
+              } else {
+                const newBullets = [
+                  ...bullets,
+                  "Delivered key project milestone with measurable business impact",
+                ];
+                onUpdateDesc(newBullets.join("\n"));
+              }
+            }}
+            className="text-[11px] font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1"
+          >
+            <Plus className="w-3 h-3" /> Add Project Bullet Point
+          </button>
+          <button
+            type="button"
+            onClick={() => setShowRawDesc(!showRawDesc)}
+            className="text-[10px] text-gray-500 hover:text-gray-700 underline"
+          >
+            {showRawDesc ? "Hide Raw Text" : "Bulk / Raw Text Editor"}
+          </button>
+        </div>
+
+        {/* Collapsible raw textarea for bulk paste / editing */}
+        {showRawDesc && (
+          <div className="space-y-1 pt-2 border-t border-gray-200">
+            <span className="text-[10px] font-semibold text-gray-500 block">
+              Multi-line Text (each line becomes a separate bullet):
             </span>
-            {renderFormattedText(proj.description)}
+            <FormattedEditorToolbar
+              inputRef={descRef}
+              value={proj.description || bullets.join("\n")}
+              onChange={onUpdateDesc}
+              showLineHighlight={false}
+              lineFontSize={descFontSize}
+              onLineFontSizeChange={onUpdateDescFontSize}
+            />
+            <textarea
+              ref={descRef}
+              className="w-full text-xs p-1.5 border border-gray-300 rounded h-16 leading-relaxed"
+              value={proj.description || bullets.join("\n")}
+              onChange={(e) => onUpdateDesc(e.target.value)}
+              placeholder="Describe scope, tools used, and key impact (one bullet per line)..."
+            />
+            {(proj.description || bullets.length > 0) && (
+              <div className="text-[11px] p-1.5 bg-white border border-gray-100 rounded leading-relaxed text-gray-800">
+                <span className="text-[9px] font-bold text-gray-400 block uppercase mb-0.5">
+                  Rendered Preview:
+                </span>
+                {renderFormattedText(proj.description || bullets.join("\n"))}
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -1684,6 +1786,49 @@ export default function ResumeEditorPage({
 
     updatedExp[expIdx].bullets = bullets;
     setData({ ...data, experience: updatedExp });
+  };
+
+  // ─── Bullet Point Reordering in Projects ────────────────────────────────────
+
+  const moveProjectBullet = (
+    projIdx: number,
+    bulletIdx: number,
+    direction: "up" | "down"
+  ) => {
+    if (!data?.projects) return;
+    const updated = [...data.projects];
+    const proj = updated[projIdx];
+    const bullets = [
+      ...(Array.isArray(proj.bullets) && proj.bullets.length > 0
+        ? proj.bullets
+        : proj.description
+        ? proj.description
+            .split("\n")
+            .map((l: string) => l.trim())
+            .filter(Boolean)
+        : []),
+    ];
+    const targetIdx = direction === "up" ? bulletIdx - 1 : bulletIdx + 1;
+    if (targetIdx < 0 || targetIdx >= bullets.length) return;
+
+    const temp = bullets[bulletIdx];
+    bullets[bulletIdx] = bullets[targetIdx];
+    bullets[targetIdx] = temp;
+
+    let fontSizes = proj.bulletFontSizes ? [...proj.bulletFontSizes] : undefined;
+    if (fontSizes && fontSizes.length >= bullets.length) {
+      const tempSize = fontSizes[bulletIdx];
+      fontSizes[bulletIdx] = fontSizes[targetIdx];
+      fontSizes[targetIdx] = tempSize;
+    }
+
+    updated[projIdx] = {
+      ...proj,
+      bullets,
+      bulletFontSizes: fontSizes,
+      description: bullets.join("\n"),
+    };
+    setData({ ...data, projects: updated });
   };
 
   // ─── Entry & Content Reordering Helpers ─────────────────────────────────────
@@ -4603,6 +4748,7 @@ export default function ResumeEditorPage({
                               name: "Project Name",
                               tech: "Python, SQL",
                               description: "Built end-to-end analytics workflow.",
+                              bullets: ["Built end-to-end analytics workflow."],
                             },
                           ],
                         })
@@ -4618,11 +4764,19 @@ export default function ResumeEditorPage({
                       key={proj.id || projIdx}
                       proj={proj}
                       projIdx={projIdx}
+                      bulletChar={
+                        proj.bulletChar ||
+                        cs.bulletChar ||
+                        currentTemplate.style.bulletChar ||
+                        "•"
+                      }
                       canMoveUp={projIdx > 0}
                       canMoveDown={projIdx < (data.projects?.length || 1) - 1}
                       nameFontSize={proj.nameFontSize}
                       techFontSize={proj.techFontSize}
                       descFontSize={proj.descFontSize}
+                      bulletFontSize={proj.bulletFontSize}
+                      fallbackBulletFontSize={getLineFontSizeVal("bullets", 9.5)}
                       onUpdateNameFontSize={(val) => {
                         const updated = [...(data.projects || [])];
                         updated[projIdx] = { ...updated[projIdx], nameFontSize: val };
@@ -4636,6 +4790,11 @@ export default function ResumeEditorPage({
                       onUpdateDescFontSize={(val) => {
                         const updated = [...(data.projects || [])];
                         updated[projIdx] = { ...updated[projIdx], descFontSize: val };
+                        setData({ ...data, projects: updated });
+                      }}
+                      onUpdateBulletFontSizeGeneral={(val) => {
+                        const updated = [...(data.projects || [])];
+                        updated[projIdx] = { ...updated[projIdx], bulletFontSize: val };
                         setData({ ...data, projects: updated });
                       }}
                       onResetNameFontSize={() => {
@@ -4653,21 +4812,122 @@ export default function ResumeEditorPage({
                         updated[projIdx] = { ...updated[projIdx], descFontSize: undefined };
                         setData({ ...data, projects: updated });
                       }}
+                      onResetBulletFontSizeGeneral={() => {
+                        const updated = [...(data.projects || [])];
+                        updated[projIdx] = { ...updated[projIdx], bulletFontSize: undefined };
+                        setData({ ...data, projects: updated });
+                      }}
                       onMoveUp={() => moveProjectItem(projIdx, "up")}
                       onMoveDown={() => moveProjectItem(projIdx, "down")}
                       onUpdateName={(val) => {
                         const updated = [...(data.projects || [])];
-                        updated[projIdx].name = val;
+                        updated[projIdx] = { ...updated[projIdx], name: val };
                         setData({ ...data, projects: updated });
                       }}
                       onUpdateTech={(val) => {
                         const updated = [...(data.projects || [])];
-                        updated[projIdx].tech = val;
+                        updated[projIdx] = { ...updated[projIdx], tech: val };
                         setData({ ...data, projects: updated });
                       }}
                       onUpdateDesc={(val) => {
                         const updated = [...(data.projects || [])];
-                        updated[projIdx].description = val;
+                        const lines = val
+                          .split("\n")
+                          .map((l: string) => l.trim())
+                          .filter(Boolean);
+                        updated[projIdx] = {
+                          ...updated[projIdx],
+                          description: val,
+                          bullets: lines.length > 0 ? lines : undefined,
+                        };
+                        setData({ ...data, projects: updated });
+                      }}
+                      onAddBullet={() => {
+                        const updated = [...(data.projects || [])];
+                        const currentBullets =
+                          Array.isArray(proj.bullets) && proj.bullets.length > 0
+                            ? [...proj.bullets]
+                            : proj.description
+                            ? proj.description
+                                .split("\n")
+                                .map((l: string) => l.trim())
+                                .filter(Boolean)
+                            : [];
+                        currentBullets.push(
+                          "Delivered key project milestone with measurable business impact"
+                        );
+                        updated[projIdx] = {
+                          ...updated[projIdx],
+                          bullets: currentBullets,
+                          description: currentBullets.join("\n"),
+                        };
+                        setData({ ...data, projects: updated });
+                      }}
+                      onUpdateBullet={(bIdx, val) => {
+                        const updated = [...(data.projects || [])];
+                        const currentBullets =
+                          Array.isArray(proj.bullets) && proj.bullets.length > 0
+                            ? [...proj.bullets]
+                            : proj.description
+                            ? proj.description
+                                .split("\n")
+                                .map((l: string) => l.trim())
+                                .filter(Boolean)
+                            : [];
+                        currentBullets[bIdx] = val;
+                        updated[projIdx] = {
+                          ...updated[projIdx],
+                          bullets: currentBullets,
+                          description: currentBullets.join("\n"),
+                        };
+                        setData({ ...data, projects: updated });
+                      }}
+                      onDeleteBullet={(bIdx) => {
+                        const updated = [...(data.projects || [])];
+                        const currentBullets =
+                          Array.isArray(proj.bullets) && proj.bullets.length > 0
+                            ? [...proj.bullets]
+                            : proj.description
+                            ? proj.description
+                                .split("\n")
+                                .map((l: string) => l.trim())
+                                .filter(Boolean)
+                            : [];
+                        const newBullets = currentBullets.filter((_, idx) => idx !== bIdx);
+                        const newSizes = proj.bulletFontSizes?.filter((_, idx) => idx !== bIdx);
+                        updated[projIdx] = {
+                          ...updated[projIdx],
+                          bullets: newBullets,
+                          bulletFontSizes: newSizes,
+                          description: newBullets.join("\n"),
+                        };
+                        setData({ ...data, projects: updated });
+                      }}
+                      onMoveBullet={(bIdx, dir) => {
+                        moveProjectBullet(projIdx, bIdx, dir);
+                      }}
+                      onUpdateBulletFontSize={(bIdx, size) => {
+                        const updated = [...(data.projects || [])];
+                        const currentBullets =
+                          Array.isArray(proj.bullets) && proj.bullets.length > 0
+                            ? [...proj.bullets]
+                            : proj.description
+                            ? proj.description
+                                .split("\n")
+                                .map((l: string) => l.trim())
+                                .filter(Boolean)
+                            : [];
+                        const bulletSizes = [...(proj.bulletFontSizes || [])];
+                        while (bulletSizes.length < currentBullets.length) {
+                          bulletSizes.push(
+                            proj.bulletFontSize ?? getLineFontSizeVal("bullets", 9.5)
+                          );
+                        }
+                        bulletSizes[bIdx] = size;
+                        updated[projIdx] = {
+                          ...updated[projIdx],
+                          bulletFontSizes: bulletSizes,
+                        };
                         setData({ ...data, projects: updated });
                       }}
                       onDelete={() => {

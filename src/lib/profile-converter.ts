@@ -90,13 +90,25 @@ export function convertProfileToResumeData(profile: any, user?: any): ResumeData
   });
 
   // Convert projects
-  const projects = (profile.projects || []).map((proj: any, idx: number) => ({
-    id: proj.id || `proj-${idx}`,
-    name: proj.name || "",
-    description: proj.description || "",
-    tech: proj.technologies || "",
-    url: proj.url || "",
-  }));
+  const projects = (profile.projects || []).map((proj: any, idx: number) => {
+    let bullets: string[] = [];
+    if (Array.isArray(proj.bullets) && proj.bullets.length > 0) {
+      bullets = proj.bullets;
+    } else if (proj.description) {
+      bullets = proj.description
+        .split("\n")
+        .map((line: string) => line.replace(/^[•\-\*\s]+/, "").trim())
+        .filter((line: string) => line.length > 0);
+    }
+    return {
+      id: proj.id || `proj-${idx}`,
+      name: proj.name || "",
+      description: proj.description || "",
+      bullets: bullets.length > 0 ? bullets : (proj.description ? [proj.description] : []),
+      tech: proj.technologies || "",
+      url: proj.url || "",
+    };
+  });
 
   // Convert certifications
   const certifications = (profile.certifications || []).map((cert: any, idx: number) => ({

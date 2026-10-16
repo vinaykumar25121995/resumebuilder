@@ -469,19 +469,28 @@ export async function generateResumeDocxBlob(
         })
       );
 
-      if (proj.description) {
+      const projectBullets =
+        proj.bullets && proj.bullets.length > 0
+          ? proj.bullets
+          : proj.description
+          ? proj.description.includes("\n")
+            ? proj.description.split("\n").map((s) => s.trim()).filter(Boolean)
+            : [proj.description.trim()]
+          : [];
+
+      projectBullets.forEach((b) => {
         children.push(
           new Paragraph({
             bullet: { level: 0 },
-            spacing: { before: 20, after: 60 },
-            children: createFormattedRuns(proj.description, {
+            spacing: { before: 20, after: 40 },
+            children: createFormattedRuns(b, {
               size: descHalfPt,
               font: fontName,
               color: "374151",
             }),
           })
         );
-      }
+      });
     });
   };
 

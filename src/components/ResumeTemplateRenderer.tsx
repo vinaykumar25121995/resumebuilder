@@ -297,6 +297,10 @@ export interface ResumeData {
     description?: string;
     tech?: string;
     url?: string;
+    bullets?: string[];
+    bulletChar?: string;
+    bulletFontSize?: number;
+    bulletFontSizes?: number[];
     nameFontSize?: number;
     techFontSize?: number;
     descFontSize?: number;
@@ -705,6 +709,30 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
       );
     };
 
+    const renderProjectContent = (
+      proj: any,
+      isSidebar: boolean = false,
+      fallbackPt: string = "8.5pt"
+    ) => {
+      const pBullets: string[] =
+        proj.bullets && proj.bullets.length > 0
+          ? proj.bullets
+          : proj.description
+          ? proj.description.includes("\n")
+            ? proj.description.split("\n").map((s: string) => s.trim()).filter(Boolean)
+            : [proj.description.trim()]
+          : [];
+
+      return renderBulletList(
+        pBullets,
+        isSidebar,
+        proj.bulletChar,
+        fallbackPt,
+        proj.bulletFontSizes,
+        proj.bulletFontSize
+      );
+    };
+
     const renderSection = (sectionId: string, isSidebar: boolean = false) => {
       const headingStyle = getSectionHeadingStyle(isSidebar);
       const textColor = isSidebar ? sidebarTextColor || "#000" : "inherit";
@@ -1056,18 +1084,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                         </span>
                       )}
                     </div>
-                    {proj.description && (
-                      <p
-                        style={{
-                          fontSize: `${descPt}pt`,
-                          margin: "3px 0 0 0",
-                          lineHeight,
-                          ...opacityStyle,
-                        }}
-                      >
-                        {renderFormattedText(proj.description)}
-                      </p>
-                    )}
+                    {renderProjectContent(proj, isSidebar, `${descPt}pt`)}
                   </div>
                 );
               })}
@@ -1362,15 +1379,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                         <span>{exp.date}</span>
                         <span>{exp.location}</span>
                       </div>
-                      {exp.bullets && exp.bullets.length > 0 && (
-                        <ul style={{ margin: "2px 0 0 0", paddingLeft: "14px" }}>
-                          {exp.bullets.map((b, bIdx) => (
-                            <li key={bIdx} style={{ fontSize: "8.5pt", color: "#334155", lineHeight: 1.4, marginBottom: "2px" }}>
-                              {renderFormattedText(b)}
-                            </li>
-                          ))}
-                        </ul>
-                      )}
+                      {renderBulletList(exp.bullets, false, exp.bulletChar, "8.5pt", exp.bulletFontSizes, exp.bulletFontSize)}
                     </div>
                   ))}
                 </div>
@@ -1410,9 +1419,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                   {data.projects.map((proj, idx) => (
                     <div key={proj.id || idx}>
                       <div style={{ fontSize: "9pt", fontWeight: "700", color: "#0f172a" }}>{proj.name}</div>
-                      <ul style={{ margin: "2px 0 0 0", paddingLeft: "14px" }}>
-                        <li style={{ fontSize: "8.5pt", color: "#334155", lineHeight: 1.4 }}>{proj.description}</li>
-                      </ul>
+                      {renderProjectContent(proj, false, "8.5pt")}
                     </div>
                   ))}
                 </div>
@@ -1728,7 +1735,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                         </div>
                         <div style={{ fontSize: "8pt", color: "#38bdf8" }}>{exp.company}</div>
                         <div style={{ fontSize: "7.5pt", color: "#94a3b8" }}>{exp.date}</div>
-                        {renderBulletList(exp.bullets, false, "•", "7.5pt")}
+                        {renderBulletList(exp.bullets, true, exp.bulletChar, "7.5pt", exp.bulletFontSizes, exp.bulletFontSize)}
                       </div>
                     ))}
                   </div>
@@ -1757,7 +1764,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                           <span style={{ fontSize: "8pt", color: "#94a3b8" }}>{exp.location}</span>
                         )}
                       </div>
-                      {renderBulletList(exp.bullets, false, "•", "8.5pt")}
+                      {renderBulletList(exp.bullets, false, exp.bulletChar, "8.5pt", exp.bulletFontSizes, exp.bulletFontSize)}
                     </div>
                   ))}
                 </div>
@@ -1810,7 +1817,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                 <div key="skills" style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
                   {techSkills.length > 0 && (
                     <div>
-                      {renderSidebarHeading("Hard Skills", <Layers style={{ width: "10px", height: "10px", color: "#38bdf8" }} />)}
+                      {renderSidebarHeading("Technical Skills", <Layers style={{ width: "10px", height: "10px", color: "#38bdf8" }} />)}
                       <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
                         {techSkills.map((sk, i) => (
                           <div key={i} style={{ fontSize: "8.5pt", color: "#cbd5e1", lineHeight: "1.3" }}>
@@ -1883,7 +1890,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                         <div style={{ fontSize: "8.5pt", fontWeight: "bold", color: "#ffffff" }}>
                           {proj.name} {proj.tech ? <span style={{ fontSize: "7.5pt", color: "#38bdf8" }}>({proj.tech})</span> : null}
                         </div>
-                        {proj.description && <div style={{ fontSize: "7.5pt", color: "#94a3b8" }}>{proj.description}</div>}
+                        {renderProjectContent(proj, true, "7.5pt")}
                       </div>
                     ))}
                   </div>
@@ -1899,7 +1906,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                       <div style={{ fontSize: "9.5pt", fontWeight: "bold", color: "#0f172a" }}>
                         {proj.name} {proj.tech ? <span style={{ fontSize: "8pt", color: "#0284c7" }}>({proj.tech})</span> : null}
                       </div>
-                      {proj.description && <div style={{ fontSize: "8.5pt", color: "#334155" }}>{proj.description}</div>}
+                      {renderProjectContent(proj, false, "8.5pt")}
                     </div>
                   ))}
                 </div>
@@ -2297,7 +2304,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                         {renderFormattedText(exp.company || "")}
                         {exp.location ? ` - ${exp.location}` : ""}
                       </div>
-                      {renderBulletList(exp.bullets, false, "•", "8.5pt")}
+                      {renderBulletList(exp.bullets, false, exp.bulletChar, "8.5pt", exp.bulletFontSizes, exp.bulletFontSize)}
                     </div>
                   ))}
                 </div>
@@ -2338,7 +2345,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                       <div style={{ fontSize: "9.5pt", fontWeight: "700", color: "#0f172a" }}>
                         {proj.name} {proj.tech ? <span style={{ fontSize: "8pt", fontStyle: "italic", color: "#c84b31" }}> | {proj.tech}</span> : null}
                       </div>
-                      {proj.description && <div style={{ fontSize: "8.5pt", color: "#4b5563", lineHeight: 1.4 }}>{proj.description}</div>}
+                      {renderProjectContent(proj, false, "8.5pt")}
                     </div>
                   ))}
                 </div>
@@ -2559,7 +2566,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                         {renderFormattedText(exp.company || "")}
                         {exp.location ? ` • ${exp.location}` : ""}
                       </div>
-                      {renderBulletList(exp.bullets, isSidebar, "•", "8.5pt")}
+                      {renderBulletList(exp.bullets, isSidebar, exp.bulletChar, "8.5pt", exp.bulletFontSizes, exp.bulletFontSize)}
                     </div>
                   ))}
                 </div>
@@ -2581,11 +2588,9 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                   {data.projects.map((proj, i) => (
                     <div key={i}>
                       <div style={{ fontSize: "9pt", fontWeight: "bold", color: "#0f172a" }}>{proj.name}</div>
-                      {proj.description && (
-                        <div style={{ fontSize: "8pt", color: "#475569", lineHeight: "1.4" }}>{proj.description}</div>
-                      )}
+                      {renderProjectContent(proj, isSidebar, "8pt")}
                       {proj.tech && (
-                        <div style={{ fontSize: "7.5pt", color: "#0891b2", fontStyle: "italic" }}>{proj.tech}</div>
+                        <div style={{ fontSize: "7.5pt", color: "#0891b2", fontStyle: "italic", marginTop: "2px" }}>{proj.tech}</div>
                       )}
                     </div>
                   ))}
@@ -2603,7 +2608,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                         <Layers style={{ width: "8px", height: "8px", color: "#ffffff" }} />
                       </div>
                       <span style={{ fontSize: "10.5pt", fontWeight: "800", textTransform: "uppercase", letterSpacing: "1px", color: "#0f172a" }}>
-                        Hard Skills
+                        Technical Skills
                       </span>
                     </div>
                     <div style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
@@ -2969,15 +2974,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                       <div style={{ fontSize: "9.5pt", fontWeight: "700", color: "#0f172a" }}>{exp.title}</div>
                       <div style={{ fontSize: "8.5pt", color: "#4c1d95", fontWeight: "600" }}>{exp.company}</div>
                       {exp.date && <div style={{ fontSize: "8pt", color: "#64748b", margin: "1px 0" }}>{exp.date}</div>}
-                      {exp.bullets && exp.bullets.length > 0 && (
-                        <ul style={{ margin: "2px 0 0 0", paddingLeft: "14px" }}>
-                          {exp.bullets.map((b, bIdx) => (
-                            <li key={bIdx} style={{ fontSize: "8.5pt", color: "#334155", lineHeight: 1.4, marginBottom: "2px" }}>
-                              {renderFormattedText(b)}
-                            </li>
-                          ))}
-                        </ul>
-                      )}
+                      {renderBulletList(exp.bullets, isSidebar, exp.bulletChar, "8.5pt", exp.bulletFontSizes, exp.bulletFontSize)}
                     </div>
                   ))}
                 </div>
@@ -2994,7 +2991,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                       <div style={{ fontSize: "9pt", fontWeight: "700", color: "#0f172a" }}>
                         {proj.name} {proj.tech ? <span style={{ fontSize: "8pt", color: "#4c1d95" }}>({proj.tech})</span> : null}
                       </div>
-                      {proj.description && <div style={{ fontSize: "8pt", color: "#334155" }}>{proj.description}</div>}
+                      {renderProjectContent(proj, isSidebar, "8pt")}
                     </div>
                   ))}
                 </div>
@@ -3021,7 +3018,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                     {renderHeaderLine("SOFT SKILLS")}
                     <div style={{ display: "flex", flexDirection: "column", gap: "4px", fontSize: "8.5pt", color: "#334155" }}>
                       {softSkills.map((s, idx) => (
-                        <div key={idx}>• {s}</div>
+                        <div key={idx}>{bulletChar === "accent-dot" ? "●" : bulletChar} {s}</div>
                       ))}
                     </div>
                   </div>
@@ -3272,15 +3269,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                       <div style={{ fontSize: "9.5pt", fontWeight: "700", color: "#0f172a" }}>{exp.title}</div>
                       <div style={{ fontSize: "8.5pt", color: "#334155", fontWeight: "600" }}>{exp.company}</div>
                       {exp.date && <div style={{ fontSize: "8pt", color: "#b8860b", margin: "1px 0" }}>{exp.date}</div>}
-                      {exp.bullets && exp.bullets.length > 0 && (
-                        <ul style={{ margin: "2px 0 0 0", paddingLeft: "14px" }}>
-                          {exp.bullets.map((b, bIdx) => (
-                            <li key={bIdx} style={{ fontSize: "8.5pt", color: "#334155", lineHeight: 1.4, marginBottom: "2px" }}>
-                              {renderFormattedText(b)}
-                            </li>
-                          ))}
-                        </ul>
-                      )}
+                      {renderBulletList(exp.bullets, isSidebar, exp.bulletChar, "8.5pt", exp.bulletFontSizes, exp.bulletFontSize)}
                     </div>
                   ))}
                 </div>
@@ -3297,7 +3286,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                       <div style={{ fontSize: "9pt", fontWeight: "700", color: "#0f172a" }}>
                         {proj.name} {proj.tech ? <span style={{ fontSize: "8pt", color: "#b8860b" }}>({proj.tech})</span> : null}
                       </div>
-                      {proj.description && <div style={{ fontSize: "8pt", color: "#334155" }}>{proj.description}</div>}
+                      {renderProjectContent(proj, isSidebar, "8pt")}
                     </div>
                   ))}
                 </div>
@@ -3309,7 +3298,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
               <div key="skills" style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                 {hardSkills.length > 0 && (
                   <div>
-                    {renderGoldHeader("HARD SKILLS")}
+                    {renderGoldHeader("TECHNICAL SKILLS")}
                     <div style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
                       {hardSkills.map((s, idx) => (
                         <span
@@ -3640,17 +3629,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                       <div style={{ fontSize: "9.5pt", fontWeight: "700", color: "#0f172a" }}>{exp.title}</div>
                       <div style={{ fontSize: "8.5pt", color: "#334155", fontWeight: "600" }}>{exp.company}</div>
                       {exp.date && <div style={{ fontSize: "7.5pt", color: "#64748b", margin: "1px 0" }}>{exp.date}</div>}
-                      {exp.bullets && exp.bullets.length > 0 && (
-                        <div style={{ borderLeft: "2px solid #94a3b8", paddingLeft: "8px", marginTop: "4px" }}>
-                          <ul style={{ margin: 0, paddingLeft: "12px" }}>
-                            {exp.bullets.map((b, bIdx) => (
-                              <li key={bIdx} style={{ fontSize: "8.5pt", color: "#334155", lineHeight: 1.4, marginBottom: "2px" }}>
-                                {renderFormattedText(b)}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
+                      {renderBulletList(exp.bullets, isSidebar, exp.bulletChar, "8.5pt", exp.bulletFontSizes, exp.bulletFontSize)}
                     </div>
                   ))}
                 </div>
@@ -3693,7 +3672,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                       <div style={{ fontSize: "9pt", fontWeight: "700", color: "#0f172a" }}>
                         {proj.name} {proj.tech ? <span style={{ fontSize: "8pt", color: "#64748b" }}>({proj.tech})</span> : null}
                       </div>
-                      {proj.description && <div style={{ fontSize: "8pt", color: "#334155" }}>{proj.description}</div>}
+                      {renderProjectContent(proj, isSidebar, "8pt")}
                     </div>
                   ))}
                 </div>
@@ -3706,7 +3685,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                 {renderSimpleHeader("SKILLS")}
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px", fontSize: "8pt", color: "#334155" }}>
                   {allSkills.map((s, idx) => (
-                    <div key={idx} style={{ padding: "2px 0" }}>• {s}</div>
+                    <div key={idx} style={{ padding: "2px 0" }}>{bulletChar === "accent-dot" ? "●" : bulletChar} {s}</div>
                   ))}
                 </div>
               </div>
@@ -3931,15 +3910,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                       <div style={{ fontSize: "8pt", color: "#e06d53", fontWeight: "600", margin: "1px 0" }}>
                         {exp.date} {exp.location ? `• ${exp.location}` : ""}
                       </div>
-                      {exp.bullets && exp.bullets.length > 0 && (
-                        <ul style={{ margin: "2px 0 0 0", paddingLeft: "14px" }}>
-                          {exp.bullets.map((b, bIdx) => (
-                            <li key={bIdx} style={{ fontSize: "8.5pt", color: "#334155", lineHeight: 1.4, marginBottom: "2px" }}>
-                              {renderFormattedText(b)}
-                            </li>
-                          ))}
-                        </ul>
-                      )}
+                      {renderBulletList(exp.bullets, isSidebar, exp.bulletChar, "8.5pt", exp.bulletFontSizes, exp.bulletFontSize)}
                     </div>
                   ))}
                 </div>
@@ -3965,7 +3936,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
               <div key="skills" style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                 {hardSkills.length > 0 && (
                   <div>
-                    {renderNickHeader("HARD SKILLS")}
+                    {renderNickHeader("TECHNICAL SKILLS")}
                     <div style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
                       {hardSkills.map((s, idx) => (
                         <span
@@ -4018,11 +3989,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                   {data.projects.map((p, idx) => (
                     <div key={idx}>
                       <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{p.name}</div>
-                      {p.description && (
-                        <ul style={{ margin: "2px 0 0 0", paddingLeft: "14px" }}>
-                          <li style={{ fontSize: "8pt", color: "#334155", lineHeight: 1.35 }}>{p.description}</li>
-                        </ul>
-                      )}
+                      {renderProjectContent(p, isSidebar, "8pt")}
                     </div>
                   ))}
                 </div>
@@ -4254,15 +4221,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                       <div style={{ fontSize: "9.5pt", fontWeight: "700", color: "#0f172a" }}>{exp.title}</div>
                       <div style={{ fontSize: "8.5pt", color: "#1e3a5f", fontWeight: "600" }}>{exp.company}</div>
                       {exp.date && <div style={{ fontSize: "8pt", color: "#64748b", margin: "1px 0" }}>{exp.date}</div>}
-                      {exp.bullets && exp.bullets.length > 0 && (
-                        <ul style={{ margin: "2px 0 0 0", paddingLeft: "14px" }}>
-                          {exp.bullets.map((b, bIdx) => (
-                            <li key={bIdx} style={{ fontSize: "8.5pt", color: "#334155", lineHeight: 1.4, marginBottom: "2px" }}>
-                              {renderFormattedText(b)}
-                            </li>
-                          ))}
-                        </ul>
-                      )}
+                      {renderBulletList(exp.bullets, isSidebar, exp.bulletChar, "8.5pt", exp.bulletFontSizes, exp.bulletFontSize)}
                     </div>
                   ))}
                 </div>
@@ -4333,7 +4292,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                       <div style={{ fontSize: "9pt", fontWeight: "700", color: "#0f172a" }}>
                         {proj.name} {proj.tech ? <span style={{ fontSize: "8pt", color: "#1e3a5f" }}>({proj.tech})</span> : null}
                       </div>
-                      {proj.description && <div style={{ fontSize: "8pt", color: "#334155" }}>{proj.description}</div>}
+                      {renderProjectContent(proj, isSidebar, "8pt")}
                     </div>
                   ))}
                 </div>
@@ -4570,15 +4529,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                         <span>{exp.date}</span>
                         <span>{exp.location}</span>
                       </div>
-                      {exp.bullets && exp.bullets.length > 0 && (
-                        <ul style={{ margin: "2px 0 0 0", paddingLeft: "14px" }}>
-                          {exp.bullets.map((b, bIdx) => (
-                            <li key={bIdx} style={{ fontSize: "8.5pt", color: "#334155", lineHeight: 1.4, marginBottom: "2px" }}>
-                              {renderFormattedText(b)}
-                            </li>
-                          ))}
-                        </ul>
-                      )}
+                      {renderBulletList(exp.bullets, isSidebar, exp.bulletChar, "8.5pt", exp.bulletFontSizes, exp.bulletFontSize)}
                     </div>
                   ))}
                 </div>
@@ -4635,7 +4586,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                       <div style={{ fontSize: "9pt", fontWeight: "700", color: "#0f172a" }}>
                         {proj.name} {proj.tech ? <span style={{ fontSize: "8pt", color: "#174375" }}>({proj.tech})</span> : null}
                       </div>
-                      {proj.description && <div style={{ fontSize: "8pt", color: "#334155" }}>{proj.description}</div>}
+                      {renderProjectContent(proj, isSidebar, "8pt")}
                     </div>
                   ))}
                 </div>
@@ -4897,15 +4848,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                       <div style={{ fontSize: "7.5pt", color: "#64748b", margin: "1px 0" }}>
                         {exp.date} {exp.location ? `• ${exp.location}` : ""}
                       </div>
-                      {exp.bullets && exp.bullets.length > 0 && (
-                        <ul style={{ margin: "2px 0 0 0", paddingLeft: "14px" }}>
-                          {exp.bullets.map((b, bIdx) => (
-                            <li key={bIdx} style={{ fontSize: "8.5pt", color: "#334155", lineHeight: 1.4, marginBottom: "2px" }}>
-                              {renderFormattedText(b)}
-                            </li>
-                          ))}
-                        </ul>
-                      )}
+                      {renderBulletList(exp.bullets, isSidebar, exp.bulletChar, "8.5pt", exp.bulletFontSizes, exp.bulletFontSize)}
                     </div>
                   ))}
                 </div>
@@ -4944,7 +4887,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                 {renderMelissaHeader("GENERAL SKILLS")}
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "5px", fontSize: "8pt", color: "#334155" }}>
                   {allSkills.map((s, idx) => (
-                    <div key={idx} style={{ padding: "1px 0" }}>• {s}</div>
+                    <div key={idx} style={{ padding: "1px 0" }}>{bulletChar === "accent-dot" ? "●" : bulletChar} {s}</div>
                   ))}
                 </div>
               </div>
@@ -4958,9 +4901,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                   {data.projects.map((p, idx) => (
                     <div key={idx}>
                       <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{p.name}</div>
-                      <p style={{ fontSize: "8pt", color: "#334155", lineHeight: 1.35, margin: "2px 0 0 0" }}>
-                        {p.description}
-                      </p>
+                      {renderProjectContent(p, isSidebar, "8pt")}
                     </div>
                   ))}
                 </div>
@@ -5251,35 +5192,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                       <div style={{ fontSize: "9.5pt", fontWeight: "700", color: "#0f172a" }}>{exp.title}</div>
                       <div style={{ fontSize: "8.5pt", color: "#1e3a5f", fontWeight: "600" }}>{exp.company}</div>
                       {exp.date && <div style={{ fontSize: "7.5pt", color: "#c85a48", margin: "1px 0" }}>{exp.date}</div>}
-                      {exp.bullets && exp.bullets.length > 0 && (
-                        <ul style={{ margin: "2px 0 0 0", paddingLeft: "14px", listStyleType: "none" }}>
-                          {exp.bullets.map((b, bIdx) => (
-                            <li
-                              key={bIdx}
-                              style={{
-                                fontSize: "8.5pt",
-                                color: "#334155",
-                                lineHeight: 1.4,
-                                marginBottom: "2px",
-                                position: "relative",
-                                paddingLeft: "12px",
-                              }}
-                            >
-                              <span
-                                style={{
-                                  position: "absolute",
-                                  left: 0,
-                                  top: "5px",
-                                  width: "5px",
-                                  height: "5px",
-                                  backgroundColor: "#c85a48",
-                                }}
-                              />
-                              {renderFormattedText(b)}
-                            </li>
-                          ))}
-                        </ul>
-                      )}
+                      {renderBulletList(exp.bullets, false, exp.bulletChar, "8.5pt", exp.bulletFontSizes, exp.bulletFontSize)}
                     </div>
                   ))}
                 </div>
@@ -5310,7 +5223,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                       <div style={{ fontSize: "9.5pt", fontWeight: "700", color: "#0f172a" }}>
                         {proj.name} {proj.tech ? <span style={{ fontSize: "8pt", color: "#c85a48", fontWeight: "600" }}>({proj.tech})</span> : null}
                       </div>
-                      {proj.description && <div style={{ fontSize: "8.5pt", color: "#334155", lineHeight: 1.4 }}>{proj.description}</div>}
+                      {renderProjectContent(proj, false, "8.5pt")}
                     </div>
                   ))}
                 </div>
@@ -5549,7 +5462,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                         {renderFormattedText(exp.company || "")}
                         {exp.location ? ` - ${exp.location}` : ""}
                       </div>
-                      {renderBulletList(exp.bullets, isSidebar, "•", "8.5pt")}
+                      {renderBulletList(exp.bullets, isSidebar, exp.bulletChar, "8.5pt", exp.bulletFontSizes, exp.bulletFontSize)}
                     </div>
                   ))}
                 </div>
@@ -5585,7 +5498,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                       <div style={{ fontSize: "9.5pt", fontWeight: "bold", color: "#18181b" }}>
                         {proj.name} {proj.tech ? <span style={{ fontSize: "8pt", color: "#71717a" }}>({proj.tech})</span> : null}
                       </div>
-                      {proj.description && <div style={{ fontSize: "8pt", color: "#52525b" }}>{proj.description}</div>}
+                      {renderProjectContent(proj, isSidebar, "8pt")}
                     </div>
                   ))}
                 </div>
@@ -5599,7 +5512,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4px 8px" }}>
                   {allSkills.map((sk, i) => (
                     <div key={i} style={{ fontSize: "8pt", color: "#3f3f46", fontWeight: 500 }}>
-                      • {sk}
+                      {bulletChar === "accent-dot" ? "●" : bulletChar} {sk}
                     </div>
                   ))}
                 </div>
