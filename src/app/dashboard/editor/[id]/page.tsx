@@ -71,10 +71,19 @@ import {
   renderFormattedText,
   repairFormattingTags,
   splitSkillsList,
+  parseSkillItem,
+  formatSkillItem,
+  ParsedSkill,
+  domToMarkup,
   HIGHLIGHT_COLORS,
   TEXT_COLORS,
   FONT_SIZE_OPTIONS,
 } from "@/lib/text-formatter";
+import {
+  VisualRichTextarea,
+  VisualRichInput,
+} from "@/components/RichTextEditor";
+
 
 const FONT_SIZE_STEPPER_OPTIONS = [
   7.5, 8, 8.5, 9, 9.5, 10, 10.5, 11, 11.5, 12, 12.5, 13, 14, 15, 16, 18, 20, 22, 24,
@@ -481,7 +490,7 @@ function ExperienceBulletItem({
   fontSize?: number;
   onFontSizeChange?: (size: number) => void;
 }) {
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLDivElement>(null);
   const [showHlMenu, setShowHlMenu] = useState(false);
   const [showColorMenu, setShowColorMenu] = useState(false);
   const [showSizeMenu, setShowSizeMenu] = useState(false);
@@ -498,34 +507,52 @@ function ExperienceBulletItem({
       }
       return;
     }
-    const start = el.selectionStart ?? 0;
-    const end = el.selectionEnd ?? 0;
+    el.focus();
 
-    if (start === end) {
-      if (bullet.trim()) {
-        const res = applyTextFormatting(bullet, 0, bullet.length, type, param);
-        onChange(res.newText);
-      } else {
-        const res = applyTextFormatting(bullet, 0, 0, type, param);
-        onChange(res.newText);
-      }
+    if (type === "bold") {
+      document.execCommand("bold", false);
+      onChange(domToMarkup(el));
+      return;
+    }
+    if (type === "underline") {
+      document.execCommand("underline", false);
+      onChange(domToMarkup(el));
       return;
     }
 
-    const res = applyTextFormatting(bullet, start, end, type, param);
-    onChange(res.newText);
-    setTimeout(() => {
-      el.focus();
-      el.setSelectionRange(res.newCursorStart, res.newCursorEnd);
-    }, 10);
-  };
+    const selection = window.getSelection();
+    if (!selection || selection.rangeCount === 0 || selection.isCollapsed) {
+      const res = applyTextFormatting(bullet, 0, bullet.length, type, param);
+      onChange(res.newText);
+      return;
+    }
 
-  const hasFormatting =
-    bullet.includes("**") ||
-    bullet.includes("==") ||
-    bullet.includes("<u>") ||
-    bullet.includes("<color:") ||
-    bullet.includes("<size:");
+    const range = selection.getRangeAt(0);
+    if (type === "size") {
+      const span = document.createElement("span");
+      span.style.fontSize = param.includes("pt") ? param : `${param}pt`;
+      span.appendChild(range.extractContents());
+      range.insertNode(span);
+    } else if (type === "color") {
+      const span = document.createElement("span");
+      const hex = TEXT_COLORS[param]?.hex || (param.startsWith("#") ? param : "#2563eb");
+      span.style.color = hex;
+      span.style.fontWeight = "600";
+      span.appendChild(range.extractContents());
+      range.insertNode(span);
+    } else if (type === "highlight") {
+      const mark = document.createElement("mark");
+      const bg = HIGHLIGHT_COLORS[param]?.bg || (param.startsWith("#") ? param : "#fef08a");
+      mark.style.backgroundColor = bg;
+      mark.style.color = "inherit";
+      mark.style.padding = "1px 3px";
+      mark.style.borderRadius = "2px";
+      mark.appendChild(range.extractContents());
+      range.insertNode(mark);
+    }
+    selection.removeAllRanges();
+    onChange(domToMarkup(el));
+  };
 
   return (
     <div className="space-y-1 bg-white p-2 rounded-lg border border-gray-200 shadow-xs">
@@ -556,14 +583,15 @@ function ExperienceBulletItem({
           {bulletChar}
         </span>
 
-        {/* Bullet Input */}
-        <input
-          ref={inputRef}
-          className="flex-1 min-w-[200px] text-xs p-1.5 border border-gray-200 rounded text-gray-800 focus:ring-1 focus:ring-blue-500 bg-gray-50/50 focus:bg-white"
-          value={bullet}
-          onChange={(e) => onChange(e.target.value)}
-          placeholder="Describe your achievement with metrics & results..."
-        />
+        {/* Visual Rich Bullet Input */}
+        <div className="flex-1 min-w-[200px]">
+          <VisualRichInput
+            inputRef={inputRef}
+            value={bullet}
+            onChange={onChange}
+            placeholder="Describe your achievement with metrics & results..."
+          />
+        </div>
 
         {/* Individual Bullet Font Size Stepper & Dropdown */}
         {onFontSizeChange && (
@@ -621,7 +649,7 @@ function ExperienceBulletItem({
               applyFormat("bold");
             }}
             className="p-1 rounded hover:bg-gray-100 text-gray-700 font-bold transition-colors"
-            title="Bold selection (**word**)"
+            title="Bold selected text"
           >
             <Bold className="w-3 h-3" />
           </button>
@@ -633,7 +661,7 @@ function ExperienceBulletItem({
               applyFormat("underline");
             }}
             className="p-1 rounded hover:bg-gray-100 text-gray-700 transition-colors"
-            title="Underline selection (<u>word</u>)"
+            title="Underline selected text"
           >
             <Underline className="w-3 h-3" />
           </button>
@@ -649,7 +677,7 @@ function ExperienceBulletItem({
                 setShowColorMenu(false);
               }}
               className="px-1 py-0.5 rounded hover:bg-blue-50 text-blue-700 font-bold text-[9px] transition-colors"
-              title="Change size of selected text (<size:Xpt>)"
+              title="Change size of selected text"
             >
               <Type className="w-3 h-3" />
             </button>
@@ -746,19 +774,6 @@ function ExperienceBulletItem({
             )}
           </div>
 
-          {/* Highlight Whole Bullet Line */}
-          <button
-            type="button"
-            onMouseDown={(e) => {
-              e.preventDefault();
-              applyFormat("highlight", "yellow");
-            }}
-            className="px-1 py-0.5 rounded bg-amber-50 hover:bg-amber-100 text-amber-800 text-[9px] font-bold transition-colors"
-            title="Highlight entire line/bullet"
-          >
-            ⚡ Line
-          </button>
-
           {/* Delete Bullet */}
           <button
             type="button"
@@ -770,16 +785,6 @@ function ExperienceBulletItem({
           </button>
         </div>
       </div>
-
-      {/* Rendered Preview Badge if formatted */}
-      {hasFormatting && (
-        <div className="ml-7 text-[11px] p-1.5 bg-gray-50 border border-gray-100 rounded-md leading-relaxed text-gray-800">
-          <span className="text-[9px] font-bold text-gray-400 block uppercase mb-0.5">
-            Rendered Preview:
-          </span>
-          {renderFormattedText(bullet)}
-        </div>
-      )}
     </div>
   );
 }
@@ -1030,29 +1035,14 @@ function ProjectItemEditor({
             <span className="text-[10px] font-semibold text-gray-500 block">
               Multi-line Text (each line becomes a separate bullet):
             </span>
-            <FormattedEditorToolbar
-              inputRef={descRef}
+            <VisualRichTextarea
               value={proj.description || bullets.join("\n")}
               onChange={onUpdateDesc}
-              showLineHighlight={false}
               lineFontSize={descFontSize}
               onLineFontSizeChange={onUpdateDescFontSize}
-            />
-            <textarea
-              ref={descRef}
-              className="w-full text-xs p-1.5 border border-gray-300 rounded h-16 leading-relaxed"
-              value={proj.description || bullets.join("\n")}
-              onChange={(e) => onUpdateDesc(e.target.value)}
               placeholder="Describe scope, tools used, and key impact (one bullet per line)..."
+              minHeight="90px"
             />
-            {(proj.description || bullets.length > 0) && (
-              <div className="text-[11px] p-1.5 bg-white border border-gray-100 rounded leading-relaxed text-gray-800">
-                <span className="text-[9px] font-bold text-gray-400 block uppercase mb-0.5">
-                  Rendered Preview:
-                </span>
-                {renderFormattedText(proj.description || bullets.join("\n"))}
-              </div>
-            )}
           </div>
         )}
       </div>
@@ -1083,12 +1073,13 @@ function SkillCategoryEditor({
   onMoveItem: (idx: number, dir: "up" | "down") => void;
   theme?: "blue" | "emerald" | "purple" | "amber";
 }) {
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const [textValue, setTextValue] = useState(skillsList.join(", "));
-
-  useEffect(() => {
-    setTextValue(skillsList.join(", "));
-  }, [skillsList]);
+  const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
+  const [editingIdx, setEditingIdx] = useState<number | null>(null);
+  const [editingText, setEditingText] = useState("");
+  const [newSkillInput, setNewSkillInput] = useState("");
+  const [showBulkEdit, setShowBulkEdit] = useState(false);
+  const [bulkEditText, setBulkEditText] = useState("");
+  const [showSizeDropdown, setShowSizeDropdown] = useState(false);
 
   const themeClasses = {
     blue: "bg-blue-50 text-blue-800 border-blue-200",
@@ -1097,47 +1088,405 @@ function SkillCategoryEditor({
     amber: "bg-amber-50 text-amber-800 border-amber-200",
   }[theme];
 
-  const hasFormatting =
-    textValue.includes("**") ||
-    textValue.includes("==") ||
-    textValue.includes("<u>") ||
-    textValue.includes("<color:") ||
-    textValue.includes("<size:");
+  // Helper to update a single skill item at index
+  const updateSkillItem = (idx: number, updater: (parsed: ParsedSkill) => ParsedSkill) => {
+    const raw = skillsList[idx];
+    const parsed = parseSkillItem(raw);
+    const updated = updater(parsed);
+    const formatted = formatSkillItem(updated);
+    const newList = [...skillsList];
+    newList[idx] = formatted;
+    onChangeList(newList);
+  };
+
+  // Add new skill(s) from input (handles comma-separated)
+  const handleAddSkills = () => {
+    if (!newSkillInput.trim()) return;
+    const tokens = newSkillInput
+      .split(/[,;\n]/)
+      .map((s) => s.trim())
+      .filter(Boolean);
+    if (tokens.length === 0) return;
+    onChangeList([...skillsList, ...tokens]);
+    setNewSkillInput("");
+  };
+
+  // Handle Bulk Edit Save (Pure plain text - strips all code tags)
+  const handleSaveBulkEdit = () => {
+    const tokens = bulkEditText
+      .split(/[,;\n]/)
+      .map((s) => stripFormattingTags(s).trim())
+      .filter(Boolean);
+    onChangeList(tokens);
+    setShowBulkEdit(false);
+    setSelectedIdx(null);
+  };
+
+  // Bulk actions for all skills in this category
+  const handleBulkFormat = (action: "boldAll" | "unboldAll" | "clearAll") => {
+    const updated = skillsList.map((sk) => {
+      const parsed = parseSkillItem(sk);
+      if (action === "boldAll") parsed.isBold = true;
+      else if (action === "unboldAll") parsed.isBold = false;
+      else if (action === "clearAll") {
+        parsed.isBold = false;
+        parsed.isUnderline = false;
+        parsed.color = undefined;
+        parsed.highlight = undefined;
+        parsed.fontSize = undefined;
+      }
+      return formatSkillItem(parsed);
+    });
+    onChangeList(updated);
+  };
+
+  const selectedSkill =
+    selectedIdx !== null && skillsList[selectedIdx]
+      ? parseSkillItem(skillsList[selectedIdx])
+      : null;
 
   return (
-    <div className="p-3.5 border border-gray-200 rounded-xl bg-gray-50/50 space-y-2.5">
-      <div className="flex items-center justify-between">
-        <label className="text-xs font-bold text-gray-700 uppercase">
-          {title} ({skillsList.length})
-        </label>
+    <div className="p-3.5 border border-gray-200 rounded-xl bg-gray-50/50 space-y-3">
+      {/* Header with Title and Category Font Size Stepper */}
+      <div className="flex items-center justify-between flex-wrap gap-2 pb-2 border-b border-gray-200">
         <div className="flex items-center gap-2">
-          <LineFontSizeSelector
-            compact
-            value={fontSize}
-            fallback={defaultFontSize}
-            onChange={onFontSizeChange}
-            onReset={onResetFontSize}
-          />
-          <span className="text-[10px] text-gray-400">Reorder with ▲ ▼</span>
+          <label className="text-xs font-bold text-gray-700 uppercase">
+            {title} ({skillsList.length})
+          </label>
+          <span className="text-[10px] text-gray-400">Click a skill to format</span>
+        </div>
+
+        <div className="flex items-center gap-2">
+          {/* Category Font Size Stepper */}
+          <div className="flex items-center gap-1 bg-white border border-gray-200 rounded px-1.5 py-0.5 shadow-2xs">
+            <span className="text-[10px] font-semibold text-gray-500">Category Size:</span>
+            <LineFontSizeSelector
+              compact
+              value={fontSize}
+              fallback={defaultFontSize}
+              onChange={onFontSizeChange}
+              onReset={onResetFontSize}
+            />
+          </div>
+
+          {/* Bulk Plain Text Button */}
+          <button
+            type="button"
+            onClick={() => {
+              setBulkEditText(skillsList.map((s) => stripFormattingTags(s)).join(", "));
+              setShowBulkEdit(!showBulkEdit);
+            }}
+            className="px-2 py-1 rounded text-[10px] font-semibold bg-white border border-gray-300 text-gray-700 hover:bg-gray-100 transition-colors shadow-2xs"
+            title="Edit all skills as plain comma-separated text without any code"
+          >
+            {showBulkEdit ? "Close Plain Text" : "✎ Bulk Text"}
+          </button>
         </div>
       </div>
 
-      {/* Interactive Pills with Reorder and Live Formatting */}
-      {skillsList.length > 0 && (
-        <div className="flex flex-wrap gap-1.5 p-2 bg-white rounded-lg border border-gray-200">
+      {/* Bulk Plain Text Editor (Collapsible) */}
+      {showBulkEdit && (
+        <div className="p-2.5 bg-white border border-blue-200 rounded-lg space-y-2 animate-in fade-in">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-bold text-blue-900">
+              Plain Text Editor (No HTML / Code)
+            </span>
+            <span className="text-[10px] text-gray-400">Separate skills with commas</span>
+          </div>
+          <textarea
+            className="w-full text-xs p-2 border border-gray-300 rounded h-16 leading-relaxed text-gray-800 focus:ring-1 focus:ring-blue-500"
+            value={bulkEditText}
+            onChange={(e) => setBulkEditText(e.target.value)}
+            placeholder="e.g. Python, SQL, Machine Learning, Tableau, Excel..."
+          />
+          <div className="flex justify-end gap-2">
+            <button
+              type="button"
+              onClick={() => setShowBulkEdit(false)}
+              className="px-2 py-1 text-xs text-gray-500 hover:text-gray-700"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={handleSaveBulkEdit}
+              className="px-3 py-1 bg-blue-600 text-white rounded text-xs font-semibold hover:bg-blue-700"
+            >
+              Apply Changes
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Visual Formatting Toolbar for Selected Skill */}
+      {selectedIdx !== null && selectedSkill && (
+        <div className="p-2 bg-blue-50/70 border border-blue-200 rounded-lg space-y-2 animate-in fade-in">
+          <div className="flex items-center justify-between gap-1 flex-wrap text-xs">
+            <div className="flex items-center gap-1.5">
+              <span className="text-[10px] font-bold text-blue-900 uppercase">
+                Selected:
+              </span>
+              {editingIdx === selectedIdx ? (
+                <div className="flex items-center gap-1">
+                  <input
+                    type="text"
+                    className="px-2 py-0.5 text-xs font-bold bg-white border border-blue-400 rounded text-gray-900 focus:outline-none"
+                    value={editingText}
+                    onChange={(e) => setEditingText(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        updateSkillItem(selectedIdx, (p) => ({ ...p, name: editingText.trim() }));
+                        setEditingIdx(null);
+                      }
+                    }}
+                    autoFocus
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      updateSkillItem(selectedIdx, (p) => ({ ...p, name: editingText.trim() }));
+                      setEditingIdx(null);
+                    }}
+                    className="px-1.5 py-0.5 text-[10px] bg-blue-600 text-white rounded font-bold hover:bg-blue-700"
+                  >
+                    Save
+                  </button>
+                </div>
+              ) : (
+                <span
+                  onClick={() => {
+                    setEditingIdx(selectedIdx);
+                    setEditingText(selectedSkill.name);
+                  }}
+                  className="font-bold text-blue-800 bg-white px-2 py-0.5 rounded border border-blue-200 cursor-pointer hover:border-blue-400"
+                  title="Click to rename"
+                >
+                  {selectedSkill.name || "Untitled"} ✎
+                </span>
+              )}
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setSelectedIdx(null)}
+              className="text-[10px] font-bold text-gray-500 hover:text-gray-800 px-1 py-0.5"
+            >
+              Done ✓
+            </button>
+          </div>
+
+          {/* Formatting Controls Bar */}
+          <div className="flex items-center gap-1 flex-wrap bg-white p-1 rounded border border-gray-200">
+            {/* Bold Toggle */}
+            <button
+              type="button"
+              onClick={() => updateSkillItem(selectedIdx, (p) => ({ ...p, isBold: !p.isBold }))}
+              className={`p-1 rounded text-xs font-bold transition-colors ${
+                selectedSkill.isBold
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              }`}
+              title="Toggle Bold"
+            >
+              <Bold className="w-3.5 h-3.5" />
+            </button>
+
+            {/* Underline Toggle */}
+            <button
+              type="button"
+              onClick={() => updateSkillItem(selectedIdx, (p) => ({ ...p, isUnderline: !p.isUnderline }))}
+              className={`p-1 rounded text-xs transition-colors ${
+                selectedSkill.isUnderline
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              }`}
+              title="Toggle Underline"
+            >
+              <Underline className="w-3.5 h-3.5" />
+            </button>
+
+            {/* Font Size Stepper for Selected Skill */}
+            <div className="flex items-center bg-gray-50 border border-gray-300 rounded px-1 py-0.5 gap-0.5">
+              <span className="text-[9px] text-gray-500 font-semibold">Size:</span>
+              <button
+                type="button"
+                onClick={() => {
+                  const currentPt = parseFloat(
+                    selectedSkill.fontSize?.replace("pt", "") || `${fontSize || defaultFontSize}`
+                  );
+                  const newPt = Math.max(7, Math.round((currentPt - 0.5) * 2) / 2);
+                  updateSkillItem(selectedIdx, (p) => ({ ...p, fontSize: `${newPt}pt` }));
+                }}
+                className="px-1 text-[9px] font-bold text-gray-600 hover:bg-gray-200 rounded"
+              >
+                -
+              </button>
+              <span className="text-[9px] font-mono font-bold text-blue-700 min-w-[26px] text-center">
+                {selectedSkill.fontSize || `${fontSize || defaultFontSize}pt`}
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  const currentPt = parseFloat(
+                    selectedSkill.fontSize?.replace("pt", "") || `${fontSize || defaultFontSize}`
+                  );
+                  const newPt = Math.min(20, Math.round((currentPt + 0.5) * 2) / 2);
+                  updateSkillItem(selectedIdx, (p) => ({ ...p, fontSize: `${newPt}pt` }));
+                }}
+                className="px-1 text-[9px] font-bold text-gray-600 hover:bg-gray-200 rounded"
+              >
+                +
+              </button>
+
+              {/* Quick Font Size Dropdown */}
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setShowSizeDropdown(!showSizeDropdown)}
+                  className="text-[9px] text-blue-600 font-bold px-1 hover:bg-blue-100 rounded"
+                  title="Select font size"
+                >
+                  ▼
+                </button>
+                {showSizeDropdown && (
+                  <div className="absolute left-0 top-full mt-1 z-50 bg-white border border-gray-200 rounded-lg shadow-xl p-1 grid grid-cols-3 gap-1 min-w-[150px]">
+                    {FONT_SIZE_OPTIONS.map((pt) => (
+                      <button
+                        key={pt}
+                        type="button"
+                        onClick={() => {
+                          updateSkillItem(selectedIdx, (p) => ({ ...p, fontSize: pt }));
+                          setShowSizeDropdown(false);
+                        }}
+                        className="px-1 py-0.5 text-[9px] font-mono rounded hover:bg-blue-50 text-center"
+                      >
+                        {pt}
+                      </button>
+                    ))}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        updateSkillItem(selectedIdx, (p) => ({ ...p, fontSize: undefined }));
+                        setShowSizeDropdown(false);
+                      }}
+                      className="col-span-3 text-[9px] text-gray-500 hover:bg-gray-100 rounded py-0.5 text-center"
+                    >
+                      Reset to Default
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Highlight Color Swatches */}
+            <div className="relative flex items-center gap-1 border-l border-gray-200 pl-1">
+              <span className="text-[9px] text-gray-500 font-semibold">Highlight:</span>
+              {Object.entries(HIGHLIGHT_COLORS).map(([k, color]) => (
+                <button
+                  key={k}
+                  type="button"
+                  onClick={() =>
+                    updateSkillItem(selectedIdx, (p) => ({
+                      ...p,
+                      highlight: p.highlight === k ? undefined : k,
+                    }))
+                  }
+                  className={`w-4 h-4 rounded-full border transition-transform ${
+                    selectedSkill.highlight === k
+                      ? "ring-2 ring-blue-500 scale-125 border-gray-800"
+                      : "border-gray-300 hover:scale-110"
+                  }`}
+                  style={{ backgroundColor: color.bg }}
+                  title={`Highlight in ${color.label}`}
+                />
+              ))}
+            </div>
+
+            {/* Text Color Swatches */}
+            <div className="relative flex items-center gap-1 border-l border-gray-200 pl-1">
+              <span className="text-[9px] text-gray-500 font-semibold">Color:</span>
+              {Object.entries(TEXT_COLORS).map(([k, color]) => (
+                <button
+                  key={k}
+                  type="button"
+                  onClick={() =>
+                    updateSkillItem(selectedIdx, (p) => ({
+                      ...p,
+                      color: p.color === k ? undefined : k,
+                    }))
+                  }
+                  className={`w-4 h-4 rounded-full border transition-transform ${
+                    selectedSkill.color === k
+                      ? "ring-2 ring-blue-500 scale-125 border-gray-800"
+                      : "border-gray-300 hover:scale-110"
+                  }`}
+                  style={{ backgroundColor: color.hex }}
+                  title={`Text Color: ${color.label}`}
+                />
+              ))}
+            </div>
+
+            {/* Clear Formatting from Skill */}
+            <button
+              type="button"
+              onClick={() =>
+                updateSkillItem(selectedIdx, (p) => ({
+                  name: p.name,
+                  isBold: false,
+                  isUnderline: false,
+                  color: undefined,
+                  highlight: undefined,
+                  fontSize: undefined,
+                }))
+              }
+              className="p-1 text-gray-400 hover:text-red-500 rounded ml-auto transition-colors"
+              title="Clear all formatting from this skill"
+            >
+              <Eraser className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Interactive Visual Pills */}
+      {skillsList.length === 0 ? (
+        <div className="p-4 bg-white rounded-lg border border-dashed border-gray-300 text-center text-xs text-gray-400">
+          No skills added yet. Type a skill name below and press Enter.
+        </div>
+      ) : (
+        <div className="flex flex-wrap gap-1.5 p-2 bg-white rounded-lg border border-gray-200 min-h-[50px]">
           {skillsList.map((sk, sIdx) => {
+            const isSelected = selectedIdx === sIdx;
             const repaired = repairFormattingTags(sk);
+
             return (
               <span
                 key={sIdx}
-                className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium border ${themeClasses}`}
+                onClick={() => {
+                  setSelectedIdx(isSelected ? null : sIdx);
+                  setEditingIdx(null);
+                }}
+                className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium border cursor-pointer select-none transition-all ${
+                  isSelected
+                    ? "ring-2 ring-blue-500 bg-white shadow-md border-blue-400"
+                    : `${themeClasses} hover:shadow-xs hover:border-gray-400`
+                }`}
+                title="Click to format this skill"
               >
-                <span>{renderFormattedText(repaired)}</span>
+                <span className="inline-block pointer-events-none">
+                  {renderFormattedText(repaired)}
+                </span>
+
+                {/* Reorder Buttons */}
                 <button
                   type="button"
                   disabled={sIdx === 0}
-                  onClick={() => onMoveItem(sIdx, "up")}
-                  className="text-gray-400 hover:text-blue-700 disabled:opacity-25"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onMoveItem(sIdx, "up");
+                    if (selectedIdx === sIdx) setSelectedIdx(sIdx - 1);
+                  }}
+                  className="text-gray-400 hover:text-blue-700 disabled:opacity-20 px-0.5 ml-0.5"
                   title="Move skill earlier"
                 >
                   ▲
@@ -1145,19 +1494,27 @@ function SkillCategoryEditor({
                 <button
                   type="button"
                   disabled={sIdx === skillsList.length - 1}
-                  onClick={() => onMoveItem(sIdx, "down")}
-                  className="text-gray-400 hover:text-blue-700 disabled:opacity-25"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onMoveItem(sIdx, "down");
+                    if (selectedIdx === sIdx) setSelectedIdx(sIdx + 1);
+                  }}
+                  className="text-gray-400 hover:text-blue-700 disabled:opacity-20 px-0.5"
                   title="Move skill later"
                 >
                   ▼
                 </button>
+
+                {/* Delete Button */}
                 <button
                   type="button"
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.stopPropagation();
                     const updated = skillsList.filter((_, i) => i !== sIdx);
                     onChangeList(updated);
+                    if (selectedIdx === sIdx) setSelectedIdx(null);
                   }}
-                  className="text-gray-400 hover:text-red-500 font-bold ml-0.5"
+                  className="text-gray-400 hover:text-red-500 font-bold ml-1 text-sm leading-none"
                   title="Remove skill"
                 >
                   ×
@@ -1168,43 +1525,58 @@ function SkillCategoryEditor({
         </div>
       )}
 
-      {/* Formatted Editor Toolbar */}
-      <FormattedEditorToolbar
-        inputRef={textareaRef}
-        value={textValue}
-        onChange={(newVal) => {
-          setTextValue(newVal);
-          onChangeList(splitSkillsList(newVal));
-        }}
-        showLineHighlight={false}
-        lineFontSize={fontSize || defaultFontSize}
-        onLineFontSizeChange={onFontSizeChange}
-      />
+      {/* Add New Skill Input Row */}
+      <div className="flex gap-1.5">
+        <input
+          type="text"
+          className="flex-1 text-xs p-2 border border-gray-300 rounded-lg bg-white focus:ring-1 focus:ring-blue-500 focus:outline-none placeholder:text-gray-400 text-gray-800"
+          value={newSkillInput}
+          onChange={(e) => setNewSkillInput(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              handleAddSkills();
+            }
+          }}
+          placeholder="Add skill (or paste comma-separated: e.g. Python, SQL, Tableau)..."
+        />
+        <button
+          type="button"
+          onClick={handleAddSkills}
+          disabled={!newSkillInput.trim()}
+          className="px-3 py-2 bg-blue-600 text-white rounded-lg text-xs font-semibold hover:bg-blue-700 disabled:opacity-40 transition-colors flex items-center gap-1 shadow-2xs"
+        >
+          <span>+ Add</span>
+        </button>
+      </div>
 
-      <textarea
-        ref={textareaRef}
-        className="w-full text-xs p-2.5 border border-gray-300 rounded-lg h-18 bg-white focus:ring-1 focus:ring-blue-500 leading-relaxed text-gray-800"
-        value={textValue}
-        onChange={(e) => {
-          setTextValue(e.target.value);
-          onChangeList(splitSkillsList(e.target.value));
-        }}
-        placeholder="Edit comma-separated skills: e.g. Python, SQL, Tableau..."
-      />
-
-      {/* Rendered Preview if formatted */}
-      {hasFormatting && (
-        <div className="p-2 bg-white rounded-lg border border-gray-200 text-xs text-gray-800 leading-relaxed shadow-2xs">
-          <span className="text-[9px] font-bold text-gray-400 uppercase block mb-0.5">
-            Rendered Preview:
-          </span>
-          <div className="flex flex-wrap gap-1">
-            {skillsList.map((sk, idx) => (
-              <span key={idx} className="after:content-[','] last:after:content-[''] mr-1 inline-block">
-                {renderFormattedText(repairFormattingTags(sk))}
-              </span>
-            ))}
-          </div>
+      {/* Quick Category Batch Actions */}
+      {skillsList.length > 0 && (
+        <div className="flex items-center gap-2 pt-1 text-[10px] text-gray-500">
+          <span className="font-semibold text-gray-400 uppercase">Batch:</span>
+          <button
+            type="button"
+            onClick={() => handleBulkFormat("boldAll")}
+            className="hover:text-blue-600 underline"
+          >
+            Bold All
+          </button>
+          <span>•</span>
+          <button
+            type="button"
+            onClick={() => handleBulkFormat("unboldAll")}
+            className="hover:text-blue-600 underline"
+          >
+            Unbold All
+          </button>
+          <span>•</span>
+          <button
+            type="button"
+            onClick={() => handleBulkFormat("clearAll")}
+            className="hover:text-red-600 underline"
+          >
+            Clear Formatting
+          </button>
         </div>
       )}
     </div>
@@ -1316,7 +1688,7 @@ function EducationEntryEditor({
         </div>
       </div>
 
-      {/* Degree Field with Formatted Toolbar */}
+      {/* Degree Field */}
       <div className="space-y-1">
         <div className="flex items-center justify-between mb-0.5">
           <label className="text-[10px] font-bold text-gray-500 uppercase">
@@ -1330,32 +1702,15 @@ function EducationEntryEditor({
             onReset={onResetDegreeFontSize}
           />
         </div>
-        <FormattedEditorToolbar
-          inputRef={degreeInputRef}
+        <VisualRichInput
           value={edu.degree || ""}
           onChange={onUpdateDegree}
-          showLineHighlight={false}
-          lineFontSize={edu.degreeFontSize || defaultDegreeFontSize}
-          onLineFontSizeChange={onUpdateDegreeFontSize}
-        />
-        <input
-          ref={degreeInputRef}
-          className="w-full text-xs p-2 border border-gray-300 rounded-lg font-bold bg-white text-gray-800 focus:ring-1 focus:ring-blue-500"
-          value={edu.degree || ""}
-          onChange={(e) => onUpdateDegree(e.target.value)}
+          className="w-full font-bold p-2"
           placeholder="e.g. Bachelor of Science in Computer Science"
         />
-        {hasDegreeFormatting && (
-          <div className="text-[11px] p-1.5 bg-white border border-gray-200 rounded-md text-gray-800 shadow-2xs">
-            <span className="text-[9px] font-bold text-gray-400 block uppercase mb-0.5">
-              Rendered Degree Preview:
-            </span>
-            {renderFormattedText(edu.degree)}
-          </div>
-        )}
       </div>
 
-      {/* School / Institution Field with Formatted Toolbar */}
+      {/* School / Institution Field */}
       <div className="space-y-1">
         <div className="flex items-center justify-between mb-0.5">
           <label className="text-[10px] font-bold text-gray-500 uppercase">
@@ -1369,29 +1724,12 @@ function EducationEntryEditor({
             onReset={onResetSchoolFontSize}
           />
         </div>
-        <FormattedEditorToolbar
-          inputRef={schoolInputRef}
+        <VisualRichInput
           value={edu.school || ""}
           onChange={onUpdateSchool}
-          showLineHighlight={false}
-          lineFontSize={edu.schoolFontSize || defaultSchoolFontSize}
-          onLineFontSizeChange={onUpdateSchoolFontSize}
-        />
-        <input
-          ref={schoolInputRef}
-          className="w-full text-xs p-2 border border-gray-300 rounded-lg bg-white text-gray-800 focus:ring-1 focus:ring-blue-500"
-          value={edu.school || ""}
-          onChange={(e) => onUpdateSchool(e.target.value)}
+          className="w-full p-2"
           placeholder="e.g. University of California, Berkeley"
         />
-        {hasSchoolFormatting && (
-          <div className="text-[11px] p-1.5 bg-white border border-gray-200 rounded-md text-gray-800 shadow-2xs">
-            <span className="text-[9px] font-bold text-gray-400 block uppercase mb-0.5">
-              Rendered School Preview:
-            </span>
-            {renderFormattedText(edu.school)}
-          </div>
-        )}
       </div>
 
       {/* Dates and Score / GPA */}
@@ -1539,6 +1877,7 @@ function CertificateEntryEditor({
       </div>
 
       {/* Certificate Name with Formatted Toolbar */}
+      {/* Certificate Name */}
       <div className="space-y-1">
         <div className="flex items-center justify-between mb-0.5">
           <label className="text-[10px] font-bold text-gray-500 uppercase">
@@ -1552,29 +1891,12 @@ function CertificateEntryEditor({
             onReset={onResetNameFontSize}
           />
         </div>
-        <FormattedEditorToolbar
-          inputRef={nameInputRef}
+        <VisualRichInput
           value={cert.name || ""}
           onChange={onUpdateName}
-          showLineHighlight={false}
-          lineFontSize={cert.nameFontSize || defaultNameFontSize}
-          onLineFontSizeChange={onUpdateNameFontSize}
-        />
-        <input
-          ref={nameInputRef}
-          className="w-full text-xs p-2 border border-gray-300 rounded-lg font-bold bg-white text-gray-800 focus:ring-1 focus:ring-blue-500"
-          value={cert.name || ""}
-          onChange={(e) => onUpdateName(e.target.value)}
+          className="w-full font-bold p-2"
           placeholder="e.g. AWS Certified Solutions Architect"
         />
-        {hasNameFormatting && (
-          <div className="text-[11px] p-1.5 bg-white border border-gray-200 rounded-md text-gray-800 shadow-2xs">
-            <span className="text-[9px] font-bold text-gray-400 block uppercase mb-0.5">
-              Rendered Name Preview:
-            </span>
-            {renderFormattedText(cert.name)}
-          </div>
-        )}
       </div>
 
       {/* Issuer and Date */}
@@ -1591,29 +1913,12 @@ function CertificateEntryEditor({
             onReset={onResetIssuerFontSize}
           />
         </div>
-        <FormattedEditorToolbar
-          inputRef={issuerInputRef}
+        <VisualRichInput
           value={cert.issuer || ""}
           onChange={onUpdateIssuer}
-          showLineHighlight={false}
-          lineFontSize={cert.issuerFontSize || defaultIssuerFontSize}
-          onLineFontSizeChange={onUpdateIssuerFontSize}
-        />
-        <input
-          ref={issuerInputRef}
-          className="w-full text-xs p-2 border border-gray-300 rounded-lg bg-white text-gray-800 focus:ring-1 focus:ring-blue-500"
-          value={cert.issuer || ""}
-          onChange={(e) => onUpdateIssuer(e.target.value)}
+          className="w-full p-2"
           placeholder="e.g. Amazon Web Services"
         />
-        {hasIssuerFormatting && (
-          <div className="text-[11px] p-1.5 bg-white border border-gray-200 rounded-md text-gray-800 shadow-2xs">
-            <span className="text-[9px] font-bold text-gray-400 block uppercase mb-0.5">
-              Rendered Issuer Preview:
-            </span>
-            {renderFormattedText(cert.issuer)}
-          </div>
-        )}
       </div>
 
       <div className="flex items-center justify-between gap-2">
@@ -1748,32 +2053,15 @@ function LanguageEntryEditor({
             onReset={onResetNameFontSize}
           />
         </div>
-        <FormattedEditorToolbar
-          inputRef={nameInputRef}
+        <VisualRichInput
           value={lang.name || ""}
           onChange={onUpdateName}
-          showLineHighlight={false}
-          lineFontSize={lang.nameFontSize || defaultNameFontSize}
-          onLineFontSizeChange={onUpdateNameFontSize}
-        />
-        <input
-          ref={nameInputRef}
-          className="w-full text-xs p-2 border border-gray-300 rounded-lg font-bold bg-white text-gray-800 focus:ring-1 focus:ring-blue-500"
-          value={lang.name || ""}
-          onChange={(e) => onUpdateName(e.target.value)}
+          className="w-full font-bold p-2"
           placeholder="e.g. English, French, Spanish"
         />
-        {hasNameFormatting && (
-          <div className="text-[11px] p-1.5 bg-white border border-gray-200 rounded-md text-gray-800 shadow-2xs">
-            <span className="text-[9px] font-bold text-gray-400 block uppercase mb-0.5">
-              Rendered Name Preview:
-            </span>
-            {renderFormattedText(lang.name)}
-          </div>
-        )}
       </div>
 
-      {/* Proficiency with Formatted Toolbar */}
+      {/* Proficiency */}
       <div className="space-y-1">
         <div className="flex items-center justify-between mb-0.5">
           <label className="text-[10px] font-bold text-gray-500 uppercase">
@@ -1787,29 +2075,12 @@ function LanguageEntryEditor({
             onReset={onResetProficiencyFontSize}
           />
         </div>
-        <FormattedEditorToolbar
-          inputRef={profInputRef}
+        <VisualRichInput
           value={lang.proficiency || ""}
           onChange={onUpdateProficiency}
-          showLineHighlight={false}
-          lineFontSize={lang.proficiencyFontSize || defaultProficiencyFontSize}
-          onLineFontSizeChange={onUpdateProficiencyFontSize}
-        />
-        <input
-          ref={profInputRef}
-          className="w-full text-xs p-2 border border-gray-300 rounded-lg bg-white text-gray-800 focus:ring-1 focus:ring-blue-500"
-          value={lang.proficiency || ""}
-          onChange={(e) => onUpdateProficiency(e.target.value)}
+          className="w-full p-2"
           placeholder="e.g. Native / Full Professional / Working Proficiency"
         />
-        {hasProfFormatting && (
-          <div className="text-[11px] p-1.5 bg-white border border-gray-200 rounded-md text-gray-800 shadow-2xs">
-            <span className="text-[9px] font-bold text-gray-400 block uppercase mb-0.5">
-              Rendered Proficiency Preview:
-            </span>
-            {renderFormattedText(lang.proficiency)}
-          </div>
-        )}
       </div>
     </div>
   );
@@ -4660,33 +4931,14 @@ export default function ResumeEditorPage({
                     </span>
                   </div>
 
-                  {/* Formatting Toolbar */}
-                  <FormattedEditorToolbar
-                    inputRef={summaryInputRef}
+                  <VisualRichTextarea
                     value={data.summary || ""}
                     onChange={(newVal) => setData({ ...data, summary: newVal })}
-                    showLineHighlight={false}
                     lineFontSize={getLineFontSizeVal("descriptions", 9.5)}
                     onLineFontSizeChange={(pt) => updateLineFontSize("descriptions", pt, true)}
-                  />
-
-                  <textarea
-                    ref={summaryInputRef}
-                    className="w-full text-xs p-3 border border-gray-300 rounded-lg h-36 focus:ring-1 focus:ring-blue-500 leading-relaxed text-gray-800"
-                    value={data.summary || ""}
-                    onChange={(e) => setData({ ...data, summary: e.target.value })}
                     placeholder="Write a clear, ATS-friendly summary highlighting your primary domain expertise and key results..."
+                    minHeight="140px"
                   />
-
-                  {/* Live Rendered Preview */}
-                  {data.summary && (
-                    <div className="p-3 bg-gray-50 border border-gray-200 rounded-lg text-xs leading-relaxed text-gray-800 shadow-xs">
-                      <span className="block text-[10px] font-bold text-gray-400 uppercase mb-1">
-                        Live Formatted Preview:
-                      </span>
-                      {renderFormattedText(data.summary)}
-                    </div>
-                  )}
                 </div>
               )}
 

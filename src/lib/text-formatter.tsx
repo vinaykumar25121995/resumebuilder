@@ -490,3 +490,218 @@ export function applyTextFormatting(
 
   return { newText, newCursorStart, newCursorEnd };
 }
+
+export interface ParsedSkill {
+  name: string;
+  isBold: boolean;
+  isUnderline: boolean;
+  fontSize?: string;
+  color?: string;
+  highlight?: string;
+}
+
+export function parseSkillItem(skill: string | undefined): ParsedSkill {
+  if (!skill) return { name: "", isBold: false, isUnderline: false };
+  let name = skill;
+  let isBold = false;
+  let isUnderline = false;
+  let fontSize: string | undefined = undefined;
+  let color: string | undefined = undefined;
+  let highlight: string | undefined = undefined;
+
+  // Extract size: <size:Xpt>
+  const sizeMatch = name.match(/<size:([^>]+)>/i);
+  if (sizeMatch) {
+    fontSize = sizeMatch[1].trim();
+    name = name.replace(/<\/?size(?::[^>]+)?>/gi, "");
+  }
+
+  // Extract color: <color:X>
+  const colorMatch = name.match(/<color:([^>]+)>/i);
+  if (colorMatch) {
+    color = colorMatch[1].trim();
+    name = name.replace(/<\/?color(?::[^>]+)?>/gi, "");
+  }
+
+  // Extract highlight: ==color: or == or <mark>
+  const hlMatch = name.match(/==([a-zA-Z0-9#]+):/i);
+  if (hlMatch) {
+    highlight = hlMatch[1].trim();
+    name = name.replace(/==[a-zA-Z0-9#]+:/gi, "").replace(/==/g, "");
+  } else if (name.includes("==")) {
+    highlight = "yellow";
+    name = name.replace(/==/g, "");
+  } else if (name.includes("<mark>")) {
+    highlight = "yellow";
+    name = name.replace(/<\/?mark>/gi, "");
+  }
+
+  // Extract bold: **
+  if (name.includes("**")) {
+    isBold = true;
+    name = name.replace(/\*{2,}/g, "");
+  }
+
+  // Extract underline: <u>
+  if (name.includes("<u>")) {
+    isUnderline = true;
+    name = name.replace(/<\/?u>/gi, "");
+  }
+
+  return {
+    name: name.trim(),
+    isBold,
+    isUnderline,
+    fontSize,
+    color,
+    highlight,
+  };
+}
+
+export function formatSkillItem(parsed: ParsedSkill): string {
+  let res = (parsed.name || "").trim();
+  if (!res) return "";
+  if (parsed.isBold) {
+    res = `**${res}**`;
+  }
+  if (parsed.isUnderline) {
+    res = `<u>${res}</u>`;
+  }
+  if (parsed.color) {
+    res = `<color:${parsed.color}>${res}</color>`;
+  }
+  if (parsed.highlight) {
+    res = `==${parsed.highlight}:${res}==`;
+  }
+  if (parsed.fontSize) {
+    const pt = parsed.fontSize.includes("pt") ? parsed.fontSize : `${parsed.fontSize}pt`;
+    res = `<size:${pt}>${res}</size>`;
+  }
+  return res;
+}
+
+export function markupToHtml(markup: string | undefined): string {
+  if (!markup) return "";
+  const clean = repairFormattingTags(markup);
+  let html = clean;
+
+  // 1. Bold: **text** -> <strong>text</strong>
+  html = html.replace(/\*\*([^*]+?)\*\*/g, "<strong>$1</strong>");
+
+  // 2. Underline: <u>text</u> -> already <u>text</u>
+
+  // 3. Highlight: ==color:text== or ==text==
+  html = html.replace(/==([a-zA-Z0-9#]+):([^=]+?)==/g, (_, color, content) => {
+    const bg = HIGHLIGHT_COLORS[color]?.bg || (color.startsWith("#") ? color : "#fef08a");
+    return `<mark style="background-color: ${bg}; padding: 1px 3px; border-radius: 2px;">${content}</mark>`;
+  });
+  html = html.replace(/==([^=]+?)==/g, '<mark style="background-color: #fef08a; padding: 1px 3px; border-radius: 2px;">$1</mark>');
+
+  // 4. Color: <color:nameOrHex>text</color>
+  html = html.replace(/<color:([^>]+)>([\s\S]*?)<\/color>/g, (_, color, content) => {
+    const hex = TEXT_COLORS[color]?.hex || (color.startsWith("#") ? color : "#2563eb");
+    return `<span style="color: ${hex}; font-weight: 600;">${content}</span>`;
+  });
+
+  // 5. Size: <size:Xpt>text</size>
+  html = html.replace(/<size:([^>]+)>([\s\S]*?)<\/size>/g, (_, size, content) => {
+    const pt = size.includes("pt") ? size : `${size}pt`;
+    return `<span style="font-size: ${pt};">${content}</span>`;
+  });
+
+  // 6. Newlines to <br>
+  html = html.replace(/\n/g, "<br>");
+
+  return html;
+}
+
+export function domToMarkup(node: Node | null): string {
+  if (!node) return "";
+  if (node.nodeType === 3) {
+    // TEXT_NODE
+    return node.nodeValue || "";
+  }
+  if (node.nodeType !== 1) {
+    // Not an ELEMENT_NODE
+    return "";
+  }
+  const el = node as HTMLElement;
+  const tag = el.tagName.toLowerCase();
+
+  if (tag === "br") {
+    return "\n";
+  }
+
+  let inner = "";
+  for (let i = 0; i < el.childNodes.length; i++) {
+    inner += domToMarkup(el.childNodes[i]);
+  }
+
+  if (!inner) return "";
+  let res = inner;
+
+  if (tag === "strong" || tag === "b" || el.style?.fontWeight === "bold" || parseInt(el.style?.fontWeight || "0") >= 600) {
+    if (!res.startsWith("**") || !res.endsWith("**")) {
+      res = `**${res}**`;
+    }
+  }
+
+  if (tag === "u" || el.style?.textDecoration?.includes("underline")) {
+    if (!res.startsWith("<u>") || !res.endsWith("</u>")) {
+      res = `<u>${res}</u>`;
+    }
+  }
+
+  if (tag === "mark" || el.style?.backgroundColor) {
+    const bg = (el.style?.backgroundColor || "").toLowerCase();
+    let colorKey = "yellow";
+    for (const [k, v] of Object.entries(HIGHLIGHT_COLORS)) {
+      if (v.bg.toLowerCase() === bg || rgbToHex(bg) === v.bg.toLowerCase()) {
+        colorKey = k;
+        break;
+      }
+    }
+    if (!res.startsWith("==")) {
+      res = `==${colorKey}:${res}==`;
+    }
+  }
+
+  if (el.style?.color) {
+    const colorVal = el.style.color.toLowerCase();
+    let colorKey = colorVal;
+    for (const [k, v] of Object.entries(TEXT_COLORS)) {
+      if (v.hex.toLowerCase() === colorVal || rgbToHex(colorVal) === v.hex.toLowerCase()) {
+        colorKey = k;
+        break;
+      }
+    }
+    if (!res.startsWith("<color:")) {
+      res = `<color:${colorKey}>${res}</color>`;
+    }
+  }
+
+  if (el.style?.fontSize) {
+    const pt = el.style.fontSize;
+    if (!res.startsWith("<size:")) {
+      res = `<size:${pt}>${res}</size>`;
+    }
+  }
+
+  if (tag === "div" || tag === "p") {
+    if (!res.endsWith("\n")) {
+      res += "\n";
+    }
+  }
+
+  return res;
+}
+
+function rgbToHex(rgb: string): string {
+  const match = rgb.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/i);
+  if (!match) return rgb;
+  const r = parseInt(match[1]).toString(16).padStart(2, "0");
+  const g = parseInt(match[2]).toString(16).padStart(2, "0");
+  const b = parseInt(match[3]).toString(16).padStart(2, "0");
+  return `#${r}${g}${b}`.toLowerCase();
+}
+
