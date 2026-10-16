@@ -172,7 +172,7 @@ export default function PublicTemplatesPage() {
                 href="/register?plan=pro"
                 className="inline-flex items-center justify-center gap-1.5 text-xs font-semibold px-4 py-2 rounded-xl border border-slate-700 text-slate-300 hover:text-white hover:bg-slate-800 transition-colors"
               >
-                <span>Unlock Pro Access ($12/mo)</span>
+                <span>Unlock Pro Access (₹12/mo)</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>

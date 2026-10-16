@@ -421,7 +421,7 @@ export default function TemplatesPage() {
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-600 hover:to-orange-700 text-white px-5 py-2.5 rounded-xl text-xs font-extrabold shadow-lg shadow-amber-500/30 transition-all transform hover:scale-[1.02]"
               >
                 <Crown className="w-4 h-4 text-amber-200 fill-amber-200" />
-                <span>Upgrade to Pro ($12/mo)</span>
+                <span>Upgrade to Pro (₹12/mo)</span>
               </button>
             )}
 
@@ -911,7 +911,7 @@ export default function TemplatesPage() {
                   ) : (
                     <>
                       <Crown className="w-4 h-4 fill-slate-950 text-slate-950" />
-                      <span>Activate Pro Access ($12/mo)</span>
+                      <span>Activate Pro Access (₹12/mo)</span>
                     </>
                   )}
                 </button>

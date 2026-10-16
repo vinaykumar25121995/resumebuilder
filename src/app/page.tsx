@@ -646,7 +646,7 @@ export default function Home() {
                 <h3 className="text-xl font-bold mb-2 text-gray-900">Free</h3>
                 <p className="text-xs text-gray-500 mb-4">Perfect for getting started with standard ATS resumes.</p>
                 <div className="mb-6">
-                  <span className="text-5xl font-bold text-gray-900">$0</span>
+                  <span className="text-5xl font-bold text-gray-900">₹0</span>
                   <span className="text-sm text-gray-500 ml-1">forever</span>
                 </div>
                 <ul className="space-y-3 mb-8">
@@ -683,7 +683,7 @@ export default function Home() {
                 <p className="text-xs text-blue-100 mb-4">Complete suite for serious job seekers and career transitions.</p>
                 <div className="mb-6">
                   <span className="text-5xl font-bold text-white">
-                    {billingCycle === "annual" ? "$9.60" : "$12"}
+                    {billingCycle === "annual" ? "₹9.60" : "₹12"}
                   </span>
                   <span className="text-sm text-blue-200 ml-1">
                     {billingCycle === "annual" ? "/month (billed annually)" : "/month"}
@@ -724,7 +724,7 @@ export default function Home() {
                 <p className="text-xs text-gray-500 mb-4">For university career centers, recruiting agencies & teams.</p>
                 <div className="mb-6">
                   <span className="text-5xl font-bold text-gray-900">
-                    {billingCycle === "annual" ? "$23.20" : "$29"}
+                    {billingCycle === "annual" ? "₹23.20" : "₹29"}
                   </span>
                   <span className="text-sm text-gray-500 ml-1">
                     {billingCycle === "annual" ? "/seat/mo (billed annually)" : "/seat/month"}
