@@ -1058,6 +1058,768 @@ function ProjectItemEditor({
   );
 }
 
+function SkillCategoryEditor({
+  title,
+  categoryKey,
+  skillsList,
+  fontSize,
+  defaultFontSize = 9.5,
+  onFontSizeChange,
+  onResetFontSize,
+  onChangeList,
+  onMoveItem,
+  theme = "blue",
+}: {
+  title: string;
+  categoryKey: "technical" | "tools" | "concepts" | "soft";
+  skillsList: string[];
+  fontSize?: number;
+  defaultFontSize?: number;
+  onFontSizeChange: (val: number) => void;
+  onResetFontSize: () => void;
+  onChangeList: (newList: string[]) => void;
+  onMoveItem: (idx: number, dir: "up" | "down") => void;
+  theme?: "blue" | "emerald" | "purple" | "amber";
+}) {
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [textValue, setTextValue] = useState(skillsList.join(", "));
+
+  useEffect(() => {
+    setTextValue(skillsList.join(", "));
+  }, [skillsList]);
+
+  const themeClasses = {
+    blue: "bg-blue-50 text-blue-800 border-blue-200",
+    emerald: "bg-emerald-50 text-emerald-800 border-emerald-200",
+    purple: "bg-purple-50 text-purple-800 border-purple-200",
+    amber: "bg-amber-50 text-amber-800 border-amber-200",
+  }[theme];
+
+  const hasFormatting =
+    textValue.includes("**") ||
+    textValue.includes("==") ||
+    textValue.includes("<u>") ||
+    textValue.includes("<color:") ||
+    textValue.includes("<size:");
+
+  return (
+    <div className="p-3.5 border border-gray-200 rounded-xl bg-gray-50/50 space-y-2.5">
+      <div className="flex items-center justify-between">
+        <label className="text-xs font-bold text-gray-700 uppercase">
+          {title} ({skillsList.length})
+        </label>
+        <div className="flex items-center gap-2">
+          <LineFontSizeSelector
+            compact
+            value={fontSize}
+            fallback={defaultFontSize}
+            onChange={onFontSizeChange}
+            onReset={onResetFontSize}
+          />
+          <span className="text-[10px] text-gray-400">Reorder with ▲ ▼</span>
+        </div>
+      </div>
+
+      {/* Interactive Pills with Reorder and Live Formatting */}
+      {skillsList.length > 0 && (
+        <div className="flex flex-wrap gap-1.5 p-2 bg-white rounded-lg border border-gray-200">
+          {skillsList.map((sk, sIdx) => (
+            <span
+              key={sIdx}
+              className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium border ${themeClasses}`}
+            >
+              <span>{renderFormattedText(sk)}</span>
+              <button
+                type="button"
+                disabled={sIdx === 0}
+                onClick={() => onMoveItem(sIdx, "up")}
+                className="text-gray-400 hover:text-blue-700 disabled:opacity-25"
+                title="Move skill earlier"
+              >
+                ▲
+              </button>
+              <button
+                type="button"
+                disabled={sIdx === skillsList.length - 1}
+                onClick={() => onMoveItem(sIdx, "down")}
+                className="text-gray-400 hover:text-blue-700 disabled:opacity-25"
+                title="Move skill later"
+              >
+                ▼
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  const updated = skillsList.filter((_, i) => i !== sIdx);
+                  onChangeList(updated);
+                }}
+                className="text-gray-400 hover:text-red-500 font-bold ml-0.5"
+                title="Remove skill"
+              >
+                ×
+              </button>
+            </span>
+          ))}
+        </div>
+      )}
+
+      {/* Formatted Editor Toolbar */}
+      <FormattedEditorToolbar
+        inputRef={textareaRef}
+        value={textValue}
+        onChange={(newVal) => {
+          setTextValue(newVal);
+          onChangeList(
+            newVal
+              .split(",")
+              .map((s) => s.trim())
+              .filter(Boolean)
+          );
+        }}
+        showLineHighlight={false}
+        lineFontSize={fontSize || defaultFontSize}
+        onLineFontSizeChange={onFontSizeChange}
+      />
+
+      <textarea
+        ref={textareaRef}
+        className="w-full text-xs p-2.5 border border-gray-300 rounded-lg h-18 bg-white focus:ring-1 focus:ring-blue-500 leading-relaxed text-gray-800"
+        value={textValue}
+        onChange={(e) => {
+          setTextValue(e.target.value);
+          onChangeList(
+            e.target.value
+              .split(",")
+              .map((s) => s.trim())
+              .filter(Boolean)
+          );
+        }}
+        placeholder="Edit comma-separated skills: e.g. Python, SQL, Tableau..."
+      />
+
+      {/* Rendered Preview if formatted */}
+      {hasFormatting && (
+        <div className="p-2 bg-white rounded-lg border border-gray-200 text-xs text-gray-800 leading-relaxed shadow-2xs">
+          <span className="text-[9px] font-bold text-gray-400 uppercase block mb-0.5">
+            Rendered Preview:
+          </span>
+          <div className="flex flex-wrap gap-1">
+            {skillsList.map((sk, idx) => (
+              <span key={idx} className="after:content-[','] last:after:content-[''] mr-1 inline-block">
+                {renderFormattedText(sk)}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function EducationEntryEditor({
+  edu,
+  eduIdx,
+  total,
+  onMoveUp,
+  onMoveDown,
+  onDelete,
+  onUpdateDegree,
+  onUpdateSchool,
+  onUpdateDate,
+  onUpdateScore,
+  onUpdateDegreeFontSize,
+  onResetDegreeFontSize,
+  onUpdateSchoolFontSize,
+  onResetSchoolFontSize,
+  onUpdateDateFontSize,
+  onResetDateFontSize,
+  onUpdateScoreFontSize,
+  onResetScoreFontSize,
+  defaultDegreeFontSize = 11,
+  defaultSchoolFontSize = 10,
+  defaultDateFontSize = 9,
+  defaultScoreFontSize = 9,
+}: {
+  edu: any;
+  eduIdx: number;
+  total: number;
+  onMoveUp: () => void;
+  onMoveDown: () => void;
+  onDelete: () => void;
+  onUpdateDegree: (val: string) => void;
+  onUpdateSchool: (val: string) => void;
+  onUpdateDate: (val: string) => void;
+  onUpdateScore: (val: string) => void;
+  onUpdateDegreeFontSize: (val: number) => void;
+  onResetDegreeFontSize: () => void;
+  onUpdateSchoolFontSize: (val: number) => void;
+  onResetSchoolFontSize: () => void;
+  onUpdateDateFontSize: (val: number) => void;
+  onResetDateFontSize: () => void;
+  onUpdateScoreFontSize: (val: number) => void;
+  onResetScoreFontSize: () => void;
+  defaultDegreeFontSize?: number;
+  defaultSchoolFontSize?: number;
+  defaultDateFontSize?: number;
+  defaultScoreFontSize?: number;
+}) {
+  const degreeInputRef = useRef<HTMLInputElement>(null);
+  const schoolInputRef = useRef<HTMLInputElement>(null);
+
+  const hasDegreeFormatting =
+    (edu.degree || "").includes("**") ||
+    (edu.degree || "").includes("==") ||
+    (edu.degree || "").includes("<u>") ||
+    (edu.degree || "").includes("<color:") ||
+    (edu.degree || "").includes("<size:");
+
+  const hasSchoolFormatting =
+    (edu.school || "").includes("**") ||
+    (edu.school || "").includes("==") ||
+    (edu.school || "").includes("<u>") ||
+    (edu.school || "").includes("<color:") ||
+    (edu.school || "").includes("<size:");
+
+  return (
+    <div className="p-3.5 border border-gray-200 rounded-xl bg-gray-50/50 space-y-3 relative">
+      {/* Top Action Bar */}
+      <div className="flex items-center justify-between pb-1.5 border-b border-gray-200">
+        <div className="flex items-center gap-1.5">
+          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-100 text-blue-800">
+            Degree #{eduIdx + 1}
+          </span>
+          <span className="text-xs font-bold text-gray-700 truncate max-w-[170px]">
+            {edu.degree || "Untitled Degree"}
+          </span>
+        </div>
+        <div className="flex items-center gap-1">
+          <button
+            type="button"
+            disabled={eduIdx === 0}
+            onClick={onMoveUp}
+            className="p-1 rounded text-gray-500 hover:text-blue-600 hover:bg-white disabled:opacity-30 disabled:pointer-events-none transition-colors"
+            title="Move Education Up"
+          >
+            <ArrowUp className="w-3.5 h-3.5" />
+          </button>
+          <button
+            type="button"
+            disabled={eduIdx === total - 1}
+            onClick={onMoveDown}
+            className="p-1 rounded text-gray-500 hover:text-blue-600 hover:bg-white disabled:opacity-30 disabled:pointer-events-none transition-colors"
+            title="Move Education Down"
+          >
+            <ArrowDown className="w-3.5 h-3.5" />
+          </button>
+          <button
+            onClick={onDelete}
+            className="p-1 rounded text-gray-400 hover:text-red-500 hover:bg-white transition-colors"
+            title="Remove Education"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      </div>
+
+      {/* Degree Field with Formatted Toolbar */}
+      <div className="space-y-1">
+        <div className="flex items-center justify-between mb-0.5">
+          <label className="text-[10px] font-bold text-gray-500 uppercase">
+            Degree / Major
+          </label>
+          <LineFontSizeSelector
+            compact
+            value={edu.degreeFontSize}
+            fallback={defaultDegreeFontSize}
+            onChange={onUpdateDegreeFontSize}
+            onReset={onResetDegreeFontSize}
+          />
+        </div>
+        <FormattedEditorToolbar
+          inputRef={degreeInputRef}
+          value={edu.degree || ""}
+          onChange={onUpdateDegree}
+          showLineHighlight={false}
+          lineFontSize={edu.degreeFontSize || defaultDegreeFontSize}
+          onLineFontSizeChange={onUpdateDegreeFontSize}
+        />
+        <input
+          ref={degreeInputRef}
+          className="w-full text-xs p-2 border border-gray-300 rounded-lg font-bold bg-white text-gray-800 focus:ring-1 focus:ring-blue-500"
+          value={edu.degree || ""}
+          onChange={(e) => onUpdateDegree(e.target.value)}
+          placeholder="e.g. Bachelor of Science in Computer Science"
+        />
+        {hasDegreeFormatting && (
+          <div className="text-[11px] p-1.5 bg-white border border-gray-200 rounded-md text-gray-800 shadow-2xs">
+            <span className="text-[9px] font-bold text-gray-400 block uppercase mb-0.5">
+              Rendered Degree Preview:
+            </span>
+            {renderFormattedText(edu.degree)}
+          </div>
+        )}
+      </div>
+
+      {/* School / Institution Field with Formatted Toolbar */}
+      <div className="space-y-1">
+        <div className="flex items-center justify-between mb-0.5">
+          <label className="text-[10px] font-bold text-gray-500 uppercase">
+            Institution / School
+          </label>
+          <LineFontSizeSelector
+            compact
+            value={edu.schoolFontSize}
+            fallback={defaultSchoolFontSize}
+            onChange={onUpdateSchoolFontSize}
+            onReset={onResetSchoolFontSize}
+          />
+        </div>
+        <FormattedEditorToolbar
+          inputRef={schoolInputRef}
+          value={edu.school || ""}
+          onChange={onUpdateSchool}
+          showLineHighlight={false}
+          lineFontSize={edu.schoolFontSize || defaultSchoolFontSize}
+          onLineFontSizeChange={onUpdateSchoolFontSize}
+        />
+        <input
+          ref={schoolInputRef}
+          className="w-full text-xs p-2 border border-gray-300 rounded-lg bg-white text-gray-800 focus:ring-1 focus:ring-blue-500"
+          value={edu.school || ""}
+          onChange={(e) => onUpdateSchool(e.target.value)}
+          placeholder="e.g. University of California, Berkeley"
+        />
+        {hasSchoolFormatting && (
+          <div className="text-[11px] p-1.5 bg-white border border-gray-200 rounded-md text-gray-800 shadow-2xs">
+            <span className="text-[9px] font-bold text-gray-400 block uppercase mb-0.5">
+              Rendered School Preview:
+            </span>
+            {renderFormattedText(edu.school)}
+          </div>
+        )}
+      </div>
+
+      {/* Dates and Score / GPA */}
+      <div className="grid grid-cols-2 gap-2">
+        <div>
+          <div className="flex items-center justify-between mb-1">
+            <label className="text-[10px] font-bold text-gray-500 uppercase">
+              Dates
+            </label>
+            <LineFontSizeSelector
+              compact
+              value={edu.dateFontSize}
+              fallback={defaultDateFontSize}
+              onChange={onUpdateDateFontSize}
+              onReset={onResetDateFontSize}
+            />
+          </div>
+          <input
+            className="w-full text-xs p-1.5 border border-gray-300 rounded-lg bg-white"
+            value={edu.date || ""}
+            onChange={(e) => onUpdateDate(e.target.value)}
+            placeholder="2018 – 2022"
+          />
+        </div>
+        <div>
+          <div className="flex items-center justify-between mb-1">
+            <label className="text-[10px] font-bold text-gray-500 uppercase">
+              Score / GPA
+            </label>
+            <LineFontSizeSelector
+              compact
+              value={edu.scoreFontSize}
+              fallback={defaultScoreFontSize}
+              onChange={onUpdateScoreFontSize}
+              onReset={onResetScoreFontSize}
+            />
+          </div>
+          <input
+            className="w-full text-xs p-1.5 border border-gray-300 rounded-lg bg-white"
+            value={edu.score || ""}
+            onChange={(e) => onUpdateScore(e.target.value)}
+            placeholder="3.8 / 4.0 or 85%"
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function CertificateEntryEditor({
+  cert,
+  certIdx,
+  total,
+  onMoveUp,
+  onMoveDown,
+  onDelete,
+  onUpdateName,
+  onUpdateIssuer,
+  onUpdateDate,
+  onUpdateNameFontSize,
+  onResetNameFontSize,
+  onUpdateIssuerFontSize,
+  onResetIssuerFontSize,
+  onUpdateDateFontSize,
+  onResetDateFontSize,
+  defaultNameFontSize = 10.5,
+  defaultIssuerFontSize = 9.5,
+  defaultDateFontSize = 9,
+}: {
+  cert: any;
+  certIdx: number;
+  total: number;
+  onMoveUp: () => void;
+  onMoveDown: () => void;
+  onDelete: () => void;
+  onUpdateName: (val: string) => void;
+  onUpdateIssuer: (val: string) => void;
+  onUpdateDate: (val: string) => void;
+  onUpdateNameFontSize: (val: number) => void;
+  onResetNameFontSize: () => void;
+  onUpdateIssuerFontSize: (val: number) => void;
+  onResetIssuerFontSize: () => void;
+  onUpdateDateFontSize: (val: number) => void;
+  onResetDateFontSize: () => void;
+  defaultNameFontSize?: number;
+  defaultIssuerFontSize?: number;
+  defaultDateFontSize?: number;
+}) {
+  const nameInputRef = useRef<HTMLInputElement>(null);
+  const issuerInputRef = useRef<HTMLInputElement>(null);
+
+  const hasNameFormatting =
+    (cert.name || "").includes("**") ||
+    (cert.name || "").includes("==") ||
+    (cert.name || "").includes("<u>") ||
+    (cert.name || "").includes("<color:") ||
+    (cert.name || "").includes("<size:");
+
+  const hasIssuerFormatting =
+    (cert.issuer || "").includes("**") ||
+    (cert.issuer || "").includes("==") ||
+    (cert.issuer || "").includes("<u>") ||
+    (cert.issuer || "").includes("<color:") ||
+    (cert.issuer || "").includes("<size:");
+
+  return (
+    <div className="p-3.5 border border-gray-200 rounded-xl bg-gray-50/50 space-y-3 relative">
+      {/* Top Action Bar */}
+      <div className="flex items-center justify-between pb-1.5 border-b border-gray-200">
+        <div className="flex items-center gap-1.5">
+          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-100 text-blue-800">
+            Cert #{certIdx + 1}
+          </span>
+          <span className="text-xs font-bold text-gray-700 truncate max-w-[170px]">
+            {cert.name || "Untitled Certificate"}
+          </span>
+        </div>
+        <div className="flex items-center gap-1">
+          <button
+            type="button"
+            disabled={certIdx === 0}
+            onClick={onMoveUp}
+            className="p-1 rounded text-gray-500 hover:text-blue-600 hover:bg-white disabled:opacity-30 disabled:pointer-events-none transition-colors"
+            title="Move Certificate Up"
+          >
+            <ArrowUp className="w-3.5 h-3.5" />
+          </button>
+          <button
+            type="button"
+            disabled={certIdx === total - 1}
+            onClick={onMoveDown}
+            className="p-1 rounded text-gray-500 hover:text-blue-600 hover:bg-white disabled:opacity-30 disabled:pointer-events-none transition-colors"
+            title="Move Certificate Down"
+          >
+            <ArrowDown className="w-3.5 h-3.5" />
+          </button>
+          <button
+            onClick={onDelete}
+            className="p-1 rounded text-gray-400 hover:text-red-500 hover:bg-white transition-colors"
+            title="Remove Certificate"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      </div>
+
+      {/* Certificate Name with Formatted Toolbar */}
+      <div className="space-y-1">
+        <div className="flex items-center justify-between mb-0.5">
+          <label className="text-[10px] font-bold text-gray-500 uppercase">
+            Certificate Name
+          </label>
+          <LineFontSizeSelector
+            compact
+            value={cert.nameFontSize}
+            fallback={defaultNameFontSize}
+            onChange={onUpdateNameFontSize}
+            onReset={onResetNameFontSize}
+          />
+        </div>
+        <FormattedEditorToolbar
+          inputRef={nameInputRef}
+          value={cert.name || ""}
+          onChange={onUpdateName}
+          showLineHighlight={false}
+          lineFontSize={cert.nameFontSize || defaultNameFontSize}
+          onLineFontSizeChange={onUpdateNameFontSize}
+        />
+        <input
+          ref={nameInputRef}
+          className="w-full text-xs p-2 border border-gray-300 rounded-lg font-bold bg-white text-gray-800 focus:ring-1 focus:ring-blue-500"
+          value={cert.name || ""}
+          onChange={(e) => onUpdateName(e.target.value)}
+          placeholder="e.g. AWS Certified Solutions Architect"
+        />
+        {hasNameFormatting && (
+          <div className="text-[11px] p-1.5 bg-white border border-gray-200 rounded-md text-gray-800 shadow-2xs">
+            <span className="text-[9px] font-bold text-gray-400 block uppercase mb-0.5">
+              Rendered Name Preview:
+            </span>
+            {renderFormattedText(cert.name)}
+          </div>
+        )}
+      </div>
+
+      {/* Issuer and Date */}
+      <div className="space-y-1">
+        <div className="flex items-center justify-between mb-0.5">
+          <label className="text-[10px] font-bold text-gray-500 uppercase">
+            Issuer / Organization
+          </label>
+          <LineFontSizeSelector
+            compact
+            value={cert.issuerFontSize}
+            fallback={defaultIssuerFontSize}
+            onChange={onUpdateIssuerFontSize}
+            onReset={onResetIssuerFontSize}
+          />
+        </div>
+        <FormattedEditorToolbar
+          inputRef={issuerInputRef}
+          value={cert.issuer || ""}
+          onChange={onUpdateIssuer}
+          showLineHighlight={false}
+          lineFontSize={cert.issuerFontSize || defaultIssuerFontSize}
+          onLineFontSizeChange={onUpdateIssuerFontSize}
+        />
+        <input
+          ref={issuerInputRef}
+          className="w-full text-xs p-2 border border-gray-300 rounded-lg bg-white text-gray-800 focus:ring-1 focus:ring-blue-500"
+          value={cert.issuer || ""}
+          onChange={(e) => onUpdateIssuer(e.target.value)}
+          placeholder="e.g. Amazon Web Services"
+        />
+        {hasIssuerFormatting && (
+          <div className="text-[11px] p-1.5 bg-white border border-gray-200 rounded-md text-gray-800 shadow-2xs">
+            <span className="text-[9px] font-bold text-gray-400 block uppercase mb-0.5">
+              Rendered Issuer Preview:
+            </span>
+            {renderFormattedText(cert.issuer)}
+          </div>
+        )}
+      </div>
+
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex-1">
+          <label className="text-[10px] font-bold text-gray-500 uppercase block mb-1">
+            Date / Expiration
+          </label>
+          <input
+            className="w-full text-xs p-1.5 border border-gray-300 rounded-lg bg-white"
+            value={cert.date || ""}
+            onChange={(e) => onUpdateDate(e.target.value)}
+            placeholder="2023 – Present"
+          />
+        </div>
+        <div className="flex-shrink-0">
+          <span className="text-[10px] font-bold text-gray-500 uppercase block mb-1">
+            Date Size
+          </span>
+          <LineFontSizeSelector
+            compact
+            value={cert.dateFontSize}
+            fallback={defaultDateFontSize}
+            onChange={onUpdateDateFontSize}
+            onReset={onResetDateFontSize}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function LanguageEntryEditor({
+  lang,
+  langIdx,
+  total,
+  onMoveUp,
+  onMoveDown,
+  onDelete,
+  onUpdateName,
+  onUpdateProficiency,
+  onUpdateNameFontSize,
+  onResetNameFontSize,
+  onUpdateProficiencyFontSize,
+  onResetProficiencyFontSize,
+  defaultNameFontSize = 9.5,
+  defaultProficiencyFontSize = 9,
+}: {
+  lang: any;
+  langIdx: number;
+  total: number;
+  onMoveUp: () => void;
+  onMoveDown: () => void;
+  onDelete: () => void;
+  onUpdateName: (val: string) => void;
+  onUpdateProficiency: (val: string) => void;
+  onUpdateNameFontSize: (val: number) => void;
+  onResetNameFontSize: () => void;
+  onUpdateProficiencyFontSize: (val: number) => void;
+  onResetProficiencyFontSize: () => void;
+  defaultNameFontSize?: number;
+  defaultProficiencyFontSize?: number;
+}) {
+  const nameInputRef = useRef<HTMLInputElement>(null);
+  const profInputRef = useRef<HTMLInputElement>(null);
+
+  const hasNameFormatting =
+    (lang.name || "").includes("**") ||
+    (lang.name || "").includes("==") ||
+    (lang.name || "").includes("<u>") ||
+    (lang.name || "").includes("<color:") ||
+    (lang.name || "").includes("<size:");
+
+  const hasProfFormatting =
+    (lang.proficiency || "").includes("**") ||
+    (lang.proficiency || "").includes("==") ||
+    (lang.proficiency || "").includes("<u>") ||
+    (lang.proficiency || "").includes("<color:") ||
+    (lang.proficiency || "").includes("<size:");
+
+  return (
+    <div className="p-3.5 border border-gray-200 rounded-xl bg-gray-50/50 space-y-3 relative">
+      {/* Top Action Bar */}
+      <div className="flex items-center justify-between pb-1.5 border-b border-gray-200">
+        <div className="flex items-center gap-1.5">
+          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-100 text-blue-800">
+            Language #{langIdx + 1}
+          </span>
+          <span className="text-xs font-bold text-gray-700 truncate max-w-[170px]">
+            {lang.name || "Language"}
+          </span>
+        </div>
+        <div className="flex items-center gap-1">
+          <button
+            type="button"
+            disabled={langIdx === 0}
+            onClick={onMoveUp}
+            className="p-1 rounded text-gray-500 hover:text-blue-600 hover:bg-white disabled:opacity-30 disabled:pointer-events-none transition-colors"
+            title="Move Language Up"
+          >
+            <ArrowUp className="w-3.5 h-3.5" />
+          </button>
+          <button
+            type="button"
+            disabled={langIdx === total - 1}
+            onClick={onMoveDown}
+            className="p-1 rounded text-gray-500 hover:text-blue-600 hover:bg-white disabled:opacity-30 disabled:pointer-events-none transition-colors"
+            title="Move Language Down"
+          >
+            <ArrowDown className="w-3.5 h-3.5" />
+          </button>
+          <button
+            onClick={onDelete}
+            className="p-1 rounded text-gray-400 hover:text-red-500 hover:bg-white transition-colors"
+            title="Remove Language"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      </div>
+
+      {/* Language Name with Formatted Toolbar */}
+      <div className="space-y-1">
+        <div className="flex items-center justify-between mb-0.5">
+          <label className="text-[10px] font-bold text-gray-500 uppercase">
+            Language Name
+          </label>
+          <LineFontSizeSelector
+            compact
+            value={lang.nameFontSize}
+            fallback={defaultNameFontSize}
+            onChange={onUpdateNameFontSize}
+            onReset={onResetNameFontSize}
+          />
+        </div>
+        <FormattedEditorToolbar
+          inputRef={nameInputRef}
+          value={lang.name || ""}
+          onChange={onUpdateName}
+          showLineHighlight={false}
+          lineFontSize={lang.nameFontSize || defaultNameFontSize}
+          onLineFontSizeChange={onUpdateNameFontSize}
+        />
+        <input
+          ref={nameInputRef}
+          className="w-full text-xs p-2 border border-gray-300 rounded-lg font-bold bg-white text-gray-800 focus:ring-1 focus:ring-blue-500"
+          value={lang.name || ""}
+          onChange={(e) => onUpdateName(e.target.value)}
+          placeholder="e.g. English, French, Spanish"
+        />
+        {hasNameFormatting && (
+          <div className="text-[11px] p-1.5 bg-white border border-gray-200 rounded-md text-gray-800 shadow-2xs">
+            <span className="text-[9px] font-bold text-gray-400 block uppercase mb-0.5">
+              Rendered Name Preview:
+            </span>
+            {renderFormattedText(lang.name)}
+          </div>
+        )}
+      </div>
+
+      {/* Proficiency with Formatted Toolbar */}
+      <div className="space-y-1">
+        <div className="flex items-center justify-between mb-0.5">
+          <label className="text-[10px] font-bold text-gray-500 uppercase">
+            Proficiency / Fluency Level
+          </label>
+          <LineFontSizeSelector
+            compact
+            value={lang.proficiencyFontSize}
+            fallback={defaultProficiencyFontSize}
+            onChange={onUpdateProficiencyFontSize}
+            onReset={onResetProficiencyFontSize}
+          />
+        </div>
+        <FormattedEditorToolbar
+          inputRef={profInputRef}
+          value={lang.proficiency || ""}
+          onChange={onUpdateProficiency}
+          showLineHighlight={false}
+          lineFontSize={lang.proficiencyFontSize || defaultProficiencyFontSize}
+          onLineFontSizeChange={onUpdateProficiencyFontSize}
+        />
+        <input
+          ref={profInputRef}
+          className="w-full text-xs p-2 border border-gray-300 rounded-lg bg-white text-gray-800 focus:ring-1 focus:ring-blue-500"
+          value={lang.proficiency || ""}
+          onChange={(e) => onUpdateProficiency(e.target.value)}
+          placeholder="e.g. Native / Full Professional / Working Proficiency"
+        />
+        {hasProfFormatting && (
+          <div className="text-[11px] p-1.5 bg-white border border-gray-200 rounded-md text-gray-800 shadow-2xs">
+            <span className="text-[9px] font-bold text-gray-400 block uppercase mb-0.5">
+              Rendered Proficiency Preview:
+            </span>
+            {renderFormattedText(lang.proficiency)}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function SectionPositionAndFontBar({
   sectionId,
   label,
@@ -4232,272 +4994,120 @@ export default function ResumeEditorPage({
                   />
 
                   {/* Technical Skills */}
-                  <div className="p-3 border border-gray-200 rounded-xl bg-gray-50/50 space-y-2">
-                    <div className="flex items-center justify-between">
-                      <label className="text-xs font-bold text-gray-700 uppercase">
-                        Technical Skills ({data.skills?.technical?.length || 0})
-                      </label>
-                      <div className="flex items-center gap-2">
-                        <LineFontSizeSelector
-                          compact
-                          value={data.skills?.technicalFontSize}
-                          fallback={getLineFontSizeVal("skillItems", 9.5)}
-                          onChange={(val) =>
-                            setData({
-                              ...data,
-                              skills: { ...data.skills, technicalFontSize: val },
-                            })
-                          }
-                          onReset={() =>
-                            setData({
-                              ...data,
-                              skills: { ...data.skills, technicalFontSize: undefined },
-                            })
-                          }
-                        />
-                        <span className="text-[10px] text-gray-400">Reorder with ▲ ▼</span>
-                      </div>
-                    </div>
-
-                    {/* Interactive Pills with Reorder */}
-                    {data.skills?.technical && data.skills.technical.length > 0 && (
-                      <div className="flex flex-wrap gap-1.5 p-2 bg-white rounded-lg border border-gray-200">
-                        {data.skills.technical.map((sk, sIdx) => (
-                          <span
-                            key={sIdx}
-                            className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium bg-blue-50 text-blue-800 border border-blue-200"
-                          >
-                            <span>{sk}</span>
-                            <button
-                              type="button"
-                              disabled={sIdx === 0}
-                              onClick={() => moveSkillItem("technical", sIdx, "up")}
-                              className="text-gray-400 hover:text-blue-700 disabled:opacity-25"
-                              title="Move skill earlier"
-                            >
-                              ▲
-                            </button>
-                            <button
-                              type="button"
-                              disabled={sIdx === (data.skills?.technical?.length || 1) - 1}
-                              onClick={() => moveSkillItem("technical", sIdx, "down")}
-                              className="text-gray-400 hover:text-blue-700 disabled:opacity-25"
-                              title="Move skill later"
-                            >
-                              ▼
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => {
-                                const list = (data.skills?.technical || []).filter((_, i) => i !== sIdx);
-                                setData({ ...data, skills: { ...data.skills, technical: list } });
-                              }}
-                              className="text-gray-400 hover:text-red-500 font-bold ml-0.5"
-                              title="Remove skill"
-                            >
-                              ×
-                            </button>
-                          </span>
-                        ))}
-                      </div>
-                    )}
-
-                    <textarea
-                      className="w-full text-xs p-2 border border-gray-300 rounded-lg h-16"
-                      value={data.skills?.technical?.join(", ") || ""}
-                      onChange={(e) =>
-                        setData({
-                          ...data,
-                          skills: {
-                            ...data.skills,
-                            technical: e.target.value
-                              .split(",")
-                              .map((s) => s.trim())
-                              .filter(Boolean),
-                          },
-                        })
-                      }
-                      placeholder="Or edit comma-separated: Python, SQL, Tableau, Power BI..."
-                    />
-                  </div>
+                  <SkillCategoryEditor
+                    title="Technical Skills"
+                    categoryKey="technical"
+                    skillsList={data.skills?.technical || []}
+                    fontSize={data.skills?.technicalFontSize}
+                    defaultFontSize={getLineFontSizeVal("skillItems", 9.5)}
+                    onFontSizeChange={(val) =>
+                      setData({
+                        ...data,
+                        skills: { ...data.skills, technicalFontSize: val },
+                      })
+                    }
+                    onResetFontSize={() =>
+                      setData({
+                        ...data,
+                        skills: { ...data.skills, technicalFontSize: undefined },
+                      })
+                    }
+                    onChangeList={(newList) =>
+                      setData({
+                        ...data,
+                        skills: { ...data.skills, technical: newList },
+                      })
+                    }
+                    onMoveItem={(idx, dir) => moveSkillItem("technical", idx, dir)}
+                    theme="blue"
+                  />
 
                   {/* Tools & Software */}
-                  <div className="p-3 border border-gray-200 rounded-xl bg-gray-50/50 space-y-2">
-                    <div className="flex items-center justify-between">
-                      <label className="text-xs font-bold text-gray-700 uppercase">
-                        Tools & Software ({data.skills?.tools?.length || 0})
-                      </label>
-                      <div className="flex items-center gap-2">
-                        <LineFontSizeSelector
-                          compact
-                          value={data.skills?.toolsFontSize}
-                          fallback={getLineFontSizeVal("skillItems", 9.5)}
-                          onChange={(val) =>
-                            setData({
-                              ...data,
-                              skills: { ...data.skills, toolsFontSize: val },
-                            })
-                          }
-                          onReset={() =>
-                            setData({
-                              ...data,
-                              skills: { ...data.skills, toolsFontSize: undefined },
-                            })
-                          }
-                        />
-                        <span className="text-[10px] text-gray-400">Reorder with ▲ ▼</span>
-                      </div>
-                    </div>
-
-                    {data.skills?.tools && data.skills.tools.length > 0 && (
-                      <div className="flex flex-wrap gap-1.5 p-2 bg-white rounded-lg border border-gray-200">
-                        {data.skills.tools.map((sk, sIdx) => (
-                          <span
-                            key={sIdx}
-                            className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium bg-emerald-50 text-emerald-800 border border-emerald-200"
-                          >
-                            <span>{sk}</span>
-                            <button
-                              type="button"
-                              disabled={sIdx === 0}
-                              onClick={() => moveSkillItem("tools", sIdx, "up")}
-                              className="text-gray-400 hover:text-emerald-700 disabled:opacity-25"
-                              title="Move tool earlier"
-                            >
-                              ▲
-                            </button>
-                            <button
-                              type="button"
-                              disabled={sIdx === (data.skills?.tools?.length || 1) - 1}
-                              onClick={() => moveSkillItem("tools", sIdx, "down")}
-                              className="text-gray-400 hover:text-emerald-700 disabled:opacity-25"
-                              title="Move tool later"
-                            >
-                              ▼
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => {
-                                const list = (data.skills?.tools || []).filter((_, i) => i !== sIdx);
-                                setData({ ...data, skills: { ...data.skills, tools: list } });
-                              }}
-                              className="text-gray-400 hover:text-red-500 font-bold ml-0.5"
-                              title="Remove tool"
-                            >
-                              ×
-                            </button>
-                          </span>
-                        ))}
-                      </div>
-                    )}
-
-                    <textarea
-                      className="w-full text-xs p-2 border border-gray-300 rounded-lg h-16"
-                      value={data.skills?.tools?.join(", ") || ""}
-                      onChange={(e) =>
-                        setData({
-                          ...data,
-                          skills: {
-                            ...data.skills,
-                            tools: e.target.value
-                              .split(",")
-                              .map((s) => s.trim())
-                              .filter(Boolean),
-                          },
-                        })
-                      }
-                      placeholder="Or edit comma-separated: Git, Docker, JIRA, VS Code, AWS..."
-                    />
-                  </div>
+                  <SkillCategoryEditor
+                    title="Tools & Software"
+                    categoryKey="tools"
+                    skillsList={data.skills?.tools || []}
+                    fontSize={data.skills?.toolsFontSize}
+                    defaultFontSize={getLineFontSizeVal("skillItems", 9.5)}
+                    onFontSizeChange={(val) =>
+                      setData({
+                        ...data,
+                        skills: { ...data.skills, toolsFontSize: val },
+                      })
+                    }
+                    onResetFontSize={() =>
+                      setData({
+                        ...data,
+                        skills: { ...data.skills, toolsFontSize: undefined },
+                      })
+                    }
+                    onChangeList={(newList) =>
+                      setData({
+                        ...data,
+                        skills: { ...data.skills, tools: newList },
+                      })
+                    }
+                    onMoveItem={(idx, dir) => moveSkillItem("tools", idx, dir)}
+                    theme="emerald"
+                  />
 
                   {/* Core Concepts */}
-                  <div className="p-3 border border-gray-200 rounded-xl bg-gray-50/50 space-y-2">
-                    <div className="flex items-center justify-between">
-                      <label className="text-xs font-bold text-gray-700 uppercase">
-                        Methodologies & Concepts ({data.skills?.concepts?.length || 0})
-                      </label>
-                      <div className="flex items-center gap-2">
-                        <LineFontSizeSelector
-                          compact
-                          value={data.skills?.conceptsFontSize}
-                          fallback={getLineFontSizeVal("skillItems", 9.5)}
-                          onChange={(val) =>
-                            setData({
-                              ...data,
-                              skills: { ...data.skills, conceptsFontSize: val },
-                            })
-                          }
-                          onReset={() =>
-                            setData({
-                              ...data,
-                              skills: { ...data.skills, conceptsFontSize: undefined },
-                            })
-                          }
-                        />
-                        <span className="text-[10px] text-gray-400">Reorder with ▲ ▼</span>
-                      </div>
-                    </div>
+                  <SkillCategoryEditor
+                    title="Methodologies & Concepts"
+                    categoryKey="concepts"
+                    skillsList={data.skills?.concepts || []}
+                    fontSize={data.skills?.conceptsFontSize}
+                    defaultFontSize={getLineFontSizeVal("skillItems", 9.5)}
+                    onFontSizeChange={(val) =>
+                      setData({
+                        ...data,
+                        skills: { ...data.skills, conceptsFontSize: val },
+                      })
+                    }
+                    onResetFontSize={() =>
+                      setData({
+                        ...data,
+                        skills: { ...data.skills, conceptsFontSize: undefined },
+                      })
+                    }
+                    onChangeList={(newList) =>
+                      setData({
+                        ...data,
+                        skills: { ...data.skills, concepts: newList },
+                      })
+                    }
+                    onMoveItem={(idx, dir) => moveSkillItem("concepts", idx, dir)}
+                    theme="purple"
+                  />
 
-                    {data.skills?.concepts && data.skills.concepts.length > 0 && (
-                      <div className="flex flex-wrap gap-1.5 p-2 bg-white rounded-lg border border-gray-200">
-                        {data.skills.concepts.map((sk, sIdx) => (
-                          <span
-                            key={sIdx}
-                            className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium bg-purple-50 text-purple-800 border border-purple-200"
-                          >
-                            <span>{sk}</span>
-                            <button
-                              type="button"
-                              disabled={sIdx === 0}
-                              onClick={() => moveSkillItem("concepts", sIdx, "up")}
-                              className="text-gray-400 hover:text-purple-700 disabled:opacity-25"
-                              title="Move concept earlier"
-                            >
-                              ▲
-                            </button>
-                            <button
-                              type="button"
-                              disabled={sIdx === (data.skills?.concepts?.length || 1) - 1}
-                              onClick={() => moveSkillItem("concepts", sIdx, "down")}
-                              className="text-gray-400 hover:text-purple-700 disabled:opacity-25"
-                              title="Move concept later"
-                            >
-                              ▼
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => {
-                                const list = (data.skills?.concepts || []).filter((_, i) => i !== sIdx);
-                                setData({ ...data, skills: { ...data.skills, concepts: list } });
-                              }}
-                              className="text-gray-400 hover:text-red-500 font-bold ml-0.5"
-                              title="Remove concept"
-                            >
-                              ×
-                            </button>
-                          </span>
-                        ))}
-                      </div>
-                    )}
-
-                    <textarea
-                      className="w-full text-xs p-2 border border-gray-300 rounded-lg h-16"
-                      value={data.skills?.concepts?.join(", ") || ""}
-                      onChange={(e) =>
-                        setData({
-                          ...data,
-                          skills: {
-                            ...data.skills,
-                            concepts: e.target.value
-                              .split(",")
-                              .map((s) => s.trim())
-                              .filter(Boolean),
-                          },
-                        })
-                      }
-                      placeholder="Or edit comma-separated: Agile, System Design, CI/CD, ETL..."
-                    />
-                  </div>
+                  {/* Soft Skills */}
+                  <SkillCategoryEditor
+                    title="Soft Skills"
+                    categoryKey="soft"
+                    skillsList={data.skills?.soft || []}
+                    fontSize={data.skills?.softFontSize}
+                    defaultFontSize={getLineFontSizeVal("skillItems", 9.5)}
+                    onFontSizeChange={(val) =>
+                      setData({
+                        ...data,
+                        skills: { ...data.skills, softFontSize: val },
+                      })
+                    }
+                    onResetFontSize={() =>
+                      setData({
+                        ...data,
+                        skills: { ...data.skills, softFontSize: undefined },
+                      })
+                    }
+                    onChangeList={(newList) =>
+                      setData({
+                        ...data,
+                        skills: { ...data.skills, soft: newList },
+                      })
+                    }
+                    onMoveItem={(idx, dir) => moveSkillItem("soft", idx, dir)}
+                    theme="amber"
+                  />
                 </div>
               )}
 
@@ -4540,183 +5150,82 @@ export default function ResumeEditorPage({
                   </div>
 
                   {data.education?.map((edu, eduIdx) => (
-                    <div
+                    <EducationEntryEditor
                       key={edu.id || eduIdx}
-                      className="p-3 border border-gray-200 rounded-xl bg-gray-50/50 space-y-2 relative"
-                    >
-                      {/* Top Action Bar for Education Entry */}
-                      <div className="flex items-center justify-between pb-1.5 border-b border-gray-200">
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-100 text-blue-800">
-                            Degree #{eduIdx + 1}
-                          </span>
-                          <span className="text-xs font-bold text-gray-700 truncate max-w-[150px]">
-                            {edu.degree || "Untitled Degree"}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <button
-                            type="button"
-                            disabled={eduIdx === 0}
-                            onClick={() => moveEducationItem(eduIdx, "up")}
-                            className="p-1 rounded text-gray-500 hover:text-blue-600 hover:bg-white disabled:opacity-30 disabled:pointer-events-none transition-colors"
-                            title="Move Education Up"
-                          >
-                            <ArrowUp className="w-3.5 h-3.5" />
-                          </button>
-                          <button
-                            type="button"
-                            disabled={eduIdx === (data.education?.length || 1) - 1}
-                            onClick={() => moveEducationItem(eduIdx, "down")}
-                            className="p-1 rounded text-gray-500 hover:text-blue-600 hover:bg-white disabled:opacity-30 disabled:pointer-events-none transition-colors"
-                            title="Move Education Down"
-                          >
-                            <ArrowDown className="w-3.5 h-3.5" />
-                          </button>
-                          <button
-                            onClick={() => {
-                              const updated = data.education?.filter(
-                                (_, idx) => idx !== eduIdx
-                              );
-                              setData({ ...data, education: updated });
-                            }}
-                            className="p-1 rounded text-gray-400 hover:text-red-500 hover:bg-white transition-colors"
-                            title="Remove Education"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
-                      </div>
-
-                      <div>
-                        <div className="flex items-center justify-between mb-1">
-                          <label className="text-[10px] font-bold text-gray-500 uppercase">
-                            Degree
-                          </label>
-                          <LineFontSizeSelector
-                            compact
-                            value={edu.degreeFontSize}
-                            fallback={getLineFontSizeVal("degrees", 11)}
-                            onChange={(val) => {
-                              const updated = [...(data.education || [])];
-                              updated[eduIdx] = { ...updated[eduIdx], degreeFontSize: val };
-                              setData({ ...data, education: updated });
-                            }}
-                            onReset={() => {
-                              const updated = [...(data.education || [])];
-                              updated[eduIdx] = { ...updated[eduIdx], degreeFontSize: undefined };
-                              setData({ ...data, education: updated });
-                            }}
-                          />
-                        </div>
-                        <input
-                          className="w-full text-xs p-1.5 border border-gray-300 rounded font-bold"
-                          value={edu.degree || ""}
-                          onChange={(e) => {
-                            const updated = [...(data.education || [])];
-                            updated[eduIdx].degree = e.target.value;
-                            setData({ ...data, education: updated });
-                          }}
-                        />
-                      </div>
-
-                      <div>
-                        <div className="flex items-center justify-between mb-1">
-                          <label className="text-[10px] font-bold text-gray-500 uppercase">
-                            Institution / School
-                          </label>
-                          <LineFontSizeSelector
-                            compact
-                            value={edu.schoolFontSize}
-                            fallback={getLineFontSizeVal("institutions", 10)}
-                            onChange={(val) => {
-                              const updated = [...(data.education || [])];
-                              updated[eduIdx] = { ...updated[eduIdx], schoolFontSize: val };
-                              setData({ ...data, education: updated });
-                            }}
-                            onReset={() => {
-                              const updated = [...(data.education || [])];
-                              updated[eduIdx] = { ...updated[eduIdx], schoolFontSize: undefined };
-                              setData({ ...data, education: updated });
-                            }}
-                          />
-                        </div>
-                        <input
-                          className="w-full text-xs p-1.5 border border-gray-300 rounded"
-                          value={edu.school || ""}
-                          onChange={(e) => {
-                            const updated = [...(data.education || [])];
-                            updated[eduIdx].school = e.target.value;
-                            setData({ ...data, education: updated });
-                          }}
-                        />
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-2">
-                        <div>
-                          <div className="flex items-center justify-between mb-1">
-                            <label className="text-[10px] font-bold text-gray-500 uppercase">
-                              Dates
-                            </label>
-                            <LineFontSizeSelector
-                              compact
-                              value={edu.dateFontSize}
-                              fallback={getLineFontSizeVal("dates", 9)}
-                              onChange={(val) => {
-                                const updated = [...(data.education || [])];
-                                updated[eduIdx] = { ...updated[eduIdx], dateFontSize: val };
-                                setData({ ...data, education: updated });
-                              }}
-                              onReset={() => {
-                                const updated = [...(data.education || [])];
-                                updated[eduIdx] = { ...updated[eduIdx], dateFontSize: undefined };
-                                setData({ ...data, education: updated });
-                              }}
-                            />
-                          </div>
-                          <input
-                            className="w-full text-xs p-1.5 border border-gray-300 rounded"
-                            value={edu.date || ""}
-                            onChange={(e) => {
-                              const updated = [...(data.education || [])];
-                              updated[eduIdx].date = e.target.value;
-                              setData({ ...data, education: updated });
-                            }}
-                          />
-                        </div>
-                        <div>
-                          <div className="flex items-center justify-between mb-1">
-                            <label className="text-[10px] font-bold text-gray-500 uppercase">
-                              Score / GPA
-                            </label>
-                            <LineFontSizeSelector
-                              compact
-                              value={edu.scoreFontSize}
-                              fallback={getLineFontSizeVal("dates", 9)}
-                              onChange={(val) => {
-                                const updated = [...(data.education || [])];
-                                updated[eduIdx] = { ...updated[eduIdx], scoreFontSize: val };
-                                setData({ ...data, education: updated });
-                              }}
-                              onReset={() => {
-                                const updated = [...(data.education || [])];
-                                updated[eduIdx] = { ...updated[eduIdx], scoreFontSize: undefined };
-                                setData({ ...data, education: updated });
-                              }}
-                            />
-                          </div>
-                          <input
-                            className="w-full text-xs p-1.5 border border-gray-300 rounded"
-                            value={edu.score || ""}
-                            onChange={(e) => {
-                              const updated = [...(data.education || [])];
-                              updated[eduIdx].score = e.target.value;
-                              setData({ ...data, education: updated });
-                            }}
-                          />
-                        </div>
-                      </div>
-                    </div>
+                      edu={edu}
+                      eduIdx={eduIdx}
+                      total={data.education?.length || 1}
+                      onMoveUp={() => moveEducationItem(eduIdx, "up")}
+                      onMoveDown={() => moveEducationItem(eduIdx, "down")}
+                      onDelete={() => {
+                        const updated = data.education?.filter((_, idx) => idx !== eduIdx);
+                        setData({ ...data, education: updated });
+                      }}
+                      onUpdateDegree={(val) => {
+                        const updated = [...(data.education || [])];
+                        updated[eduIdx] = { ...updated[eduIdx], degree: val };
+                        setData({ ...data, education: updated });
+                      }}
+                      onUpdateSchool={(val) => {
+                        const updated = [...(data.education || [])];
+                        updated[eduIdx] = { ...updated[eduIdx], school: val };
+                        setData({ ...data, education: updated });
+                      }}
+                      onUpdateDate={(val) => {
+                        const updated = [...(data.education || [])];
+                        updated[eduIdx] = { ...updated[eduIdx], date: val };
+                        setData({ ...data, education: updated });
+                      }}
+                      onUpdateScore={(val) => {
+                        const updated = [...(data.education || [])];
+                        updated[eduIdx] = { ...updated[eduIdx], score: val };
+                        setData({ ...data, education: updated });
+                      }}
+                      onUpdateDegreeFontSize={(val) => {
+                        const updated = [...(data.education || [])];
+                        updated[eduIdx] = { ...updated[eduIdx], degreeFontSize: val };
+                        setData({ ...data, education: updated });
+                      }}
+                      onResetDegreeFontSize={() => {
+                        const updated = [...(data.education || [])];
+                        updated[eduIdx] = { ...updated[eduIdx], degreeFontSize: undefined };
+                        setData({ ...data, education: updated });
+                      }}
+                      onUpdateSchoolFontSize={(val) => {
+                        const updated = [...(data.education || [])];
+                        updated[eduIdx] = { ...updated[eduIdx], schoolFontSize: val };
+                        setData({ ...data, education: updated });
+                      }}
+                      onResetSchoolFontSize={() => {
+                        const updated = [...(data.education || [])];
+                        updated[eduIdx] = { ...updated[eduIdx], schoolFontSize: undefined };
+                        setData({ ...data, education: updated });
+                      }}
+                      onUpdateDateFontSize={(val) => {
+                        const updated = [...(data.education || [])];
+                        updated[eduIdx] = { ...updated[eduIdx], dateFontSize: val };
+                        setData({ ...data, education: updated });
+                      }}
+                      onResetDateFontSize={() => {
+                        const updated = [...(data.education || [])];
+                        updated[eduIdx] = { ...updated[eduIdx], dateFontSize: undefined };
+                        setData({ ...data, education: updated });
+                      }}
+                      onUpdateScoreFontSize={(val) => {
+                        const updated = [...(data.education || [])];
+                        updated[eduIdx] = { ...updated[eduIdx], scoreFontSize: val };
+                        setData({ ...data, education: updated });
+                      }}
+                      onResetScoreFontSize={() => {
+                        const updated = [...(data.education || [])];
+                        updated[eduIdx] = { ...updated[eduIdx], scoreFontSize: undefined };
+                        setData({ ...data, education: updated });
+                      }}
+                      defaultDegreeFontSize={getLineFontSizeVal("degrees", 11)}
+                      defaultSchoolFontSize={getLineFontSizeVal("institutions", 10)}
+                      defaultDateFontSize={getLineFontSizeVal("dates", 9)}
+                      defaultScoreFontSize={getLineFontSizeVal("dates", 9)}
+                    />
                   ))}
                 </div>
               )}
@@ -4979,151 +5488,68 @@ export default function ResumeEditorPage({
                   </div>
 
                   {data.certifications?.map((cert, certIdx) => (
-                    <div
+                    <CertificateEntryEditor
                       key={cert.id || certIdx}
-                      className="p-3 border border-gray-200 rounded-xl bg-gray-50/50 space-y-2 relative"
-                    >
-                      {/* Top Action Bar for Certification Entry */}
-                      <div className="flex items-center justify-between pb-1.5 border-b border-gray-200">
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-100 text-blue-800">
-                            Cert #{certIdx + 1}
-                          </span>
-                          <span className="text-xs font-bold text-gray-700 truncate max-w-[150px]">
-                            {cert.name || "Untitled Certificate"}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <button
-                            type="button"
-                            disabled={certIdx === 0}
-                            onClick={() => moveCertificationItem(certIdx, "up")}
-                            className="p-1 rounded text-gray-500 hover:text-blue-600 hover:bg-white disabled:opacity-30 disabled:pointer-events-none transition-colors"
-                            title="Move Certificate Up"
-                          >
-                            <ArrowUp className="w-3.5 h-3.5" />
-                          </button>
-                          <button
-                            type="button"
-                            disabled={certIdx === (data.certifications?.length || 1) - 1}
-                            onClick={() => moveCertificationItem(certIdx, "down")}
-                            className="p-1 rounded text-gray-500 hover:text-blue-600 hover:bg-white disabled:opacity-30 disabled:pointer-events-none transition-colors"
-                            title="Move Certificate Down"
-                          >
-                            <ArrowDown className="w-3.5 h-3.5" />
-                          </button>
-                          <button
-                            onClick={() => {
-                              const updated = data.certifications?.filter(
-                                (_, idx) => idx !== certIdx
-                              );
-                              setData({ ...data, certifications: updated });
-                            }}
-                            className="p-1 rounded text-gray-400 hover:text-red-500 hover:bg-white transition-colors"
-                            title="Remove Certificate"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
-                      </div>
-
-                      <div>
-                        <div className="flex items-center justify-between mb-1">
-                          <label className="text-[10px] font-bold text-gray-500 uppercase">
-                            Certificate Name
-                          </label>
-                          <LineFontSizeSelector
-                            compact
-                            value={cert.nameFontSize}
-                            fallback={getLineFontSizeVal("degrees", 10.5)}
-                            onChange={(val) => {
-                              const updated = [...(data.certifications || [])];
-                              updated[certIdx] = { ...updated[certIdx], nameFontSize: val };
-                              setData({ ...data, certifications: updated });
-                            }}
-                            onReset={() => {
-                              const updated = [...(data.certifications || [])];
-                              updated[certIdx] = { ...updated[certIdx], nameFontSize: undefined };
-                              setData({ ...data, certifications: updated });
-                            }}
-                          />
-                        </div>
-                        <input
-                          className="w-full text-xs p-1.5 border border-gray-300 rounded font-bold"
-                          value={cert.name || ""}
-                          onChange={(e) => {
-                            const updated = [...(data.certifications || [])];
-                            updated[certIdx].name = e.target.value;
-                            setData({ ...data, certifications: updated });
-                          }}
-                        />
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-2">
-                        <div>
-                          <div className="flex items-center justify-between mb-1">
-                            <label className="text-[10px] font-bold text-gray-500 uppercase">
-                              Issuer
-                            </label>
-                            <LineFontSizeSelector
-                              compact
-                              value={cert.issuerFontSize}
-                              fallback={getLineFontSizeVal("institutions", 9.5)}
-                              onChange={(val) => {
-                                const updated = [...(data.certifications || [])];
-                                updated[certIdx] = { ...updated[certIdx], issuerFontSize: val };
-                                setData({ ...data, certifications: updated });
-                              }}
-                              onReset={() => {
-                                const updated = [...(data.certifications || [])];
-                                updated[certIdx] = { ...updated[certIdx], issuerFontSize: undefined };
-                                setData({ ...data, certifications: updated });
-                              }}
-                            />
-                          </div>
-                          <input
-                            className="w-full text-xs p-1.5 border border-gray-300 rounded"
-                            value={cert.issuer || ""}
-                            onChange={(e) => {
-                              const updated = [...(data.certifications || [])];
-                              updated[certIdx].issuer = e.target.value;
-                              setData({ ...data, certifications: updated });
-                            }}
-                          />
-                        </div>
-                        <div>
-                          <div className="flex items-center justify-between mb-1">
-                            <label className="text-[10px] font-bold text-gray-500 uppercase">
-                              Date
-                            </label>
-                            <LineFontSizeSelector
-                              compact
-                              value={cert.dateFontSize}
-                              fallback={getLineFontSizeVal("dates", 9)}
-                              onChange={(val) => {
-                                const updated = [...(data.certifications || [])];
-                                updated[certIdx] = { ...updated[certIdx], dateFontSize: val };
-                                setData({ ...data, certifications: updated });
-                              }}
-                              onReset={() => {
-                                const updated = [...(data.certifications || [])];
-                                updated[certIdx] = { ...updated[certIdx], dateFontSize: undefined };
-                                setData({ ...data, certifications: updated });
-                              }}
-                            />
-                          </div>
-                          <input
-                            className="w-full text-xs p-1.5 border border-gray-300 rounded"
-                            value={cert.date || ""}
-                            onChange={(e) => {
-                              const updated = [...(data.certifications || [])];
-                              updated[certIdx].date = e.target.value;
-                              setData({ ...data, certifications: updated });
-                            }}
-                          />
-                        </div>
-                      </div>
-                    </div>
+                      cert={cert}
+                      certIdx={certIdx}
+                      total={data.certifications?.length || 1}
+                      onMoveUp={() => moveCertificationItem(certIdx, "up")}
+                      onMoveDown={() => moveCertificationItem(certIdx, "down")}
+                      onDelete={() => {
+                        const updated = data.certifications?.filter(
+                          (_, idx) => idx !== certIdx
+                        );
+                        setData({ ...data, certifications: updated });
+                      }}
+                      onUpdateName={(val) => {
+                        const updated = [...(data.certifications || [])];
+                        updated[certIdx] = { ...updated[certIdx], name: val };
+                        setData({ ...data, certifications: updated });
+                      }}
+                      onUpdateIssuer={(val) => {
+                        const updated = [...(data.certifications || [])];
+                        updated[certIdx] = { ...updated[certIdx], issuer: val };
+                        setData({ ...data, certifications: updated });
+                      }}
+                      onUpdateDate={(val) => {
+                        const updated = [...(data.certifications || [])];
+                        updated[certIdx] = { ...updated[certIdx], date: val };
+                        setData({ ...data, certifications: updated });
+                      }}
+                      onUpdateNameFontSize={(val) => {
+                        const updated = [...(data.certifications || [])];
+                        updated[certIdx] = { ...updated[certIdx], nameFontSize: val };
+                        setData({ ...data, certifications: updated });
+                      }}
+                      onResetNameFontSize={() => {
+                        const updated = [...(data.certifications || [])];
+                        updated[certIdx] = { ...updated[certIdx], nameFontSize: undefined };
+                        setData({ ...data, certifications: updated });
+                      }}
+                      onUpdateIssuerFontSize={(val) => {
+                        const updated = [...(data.certifications || [])];
+                        updated[certIdx] = { ...updated[certIdx], issuerFontSize: val };
+                        setData({ ...data, certifications: updated });
+                      }}
+                      onResetIssuerFontSize={() => {
+                        const updated = [...(data.certifications || [])];
+                        updated[certIdx] = { ...updated[certIdx], issuerFontSize: undefined };
+                        setData({ ...data, certifications: updated });
+                      }}
+                      onUpdateDateFontSize={(val) => {
+                        const updated = [...(data.certifications || [])];
+                        updated[certIdx] = { ...updated[certIdx], dateFontSize: val };
+                        setData({ ...data, certifications: updated });
+                      }}
+                      onResetDateFontSize={() => {
+                        const updated = [...(data.certifications || [])];
+                        updated[certIdx] = { ...updated[certIdx], dateFontSize: undefined };
+                        setData({ ...data, certifications: updated });
+                      }}
+                      defaultNameFontSize={getLineFontSizeVal("degrees", 10.5)}
+                      defaultIssuerFontSize={getLineFontSizeVal("institutions", 9.5)}
+                      defaultDateFontSize={getLineFontSizeVal("dates", 9)}
+                    />
                   ))}
                 </div>
               )}
@@ -5320,127 +5746,52 @@ export default function ResumeEditorPage({
                   </div>
 
                   {data.languages?.map((lang, langIdx) => (
-                    <div
+                    <LanguageEntryEditor
                       key={lang.id || langIdx}
-                      className="p-3 border border-gray-200 rounded-xl bg-gray-50/50 space-y-2 relative"
-                    >
-                      {/* Top Action Bar for Language Entry */}
-                      <div className="flex items-center justify-between pb-1.5 border-b border-gray-200">
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-100 text-blue-800">
-                            Language #{langIdx + 1}
-                          </span>
-                          <span className="text-xs font-bold text-gray-700 truncate max-w-[150px]">
-                            {lang.name || "Language"}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <button
-                            type="button"
-                            disabled={langIdx === 0}
-                            onClick={() => moveLanguageItem(langIdx, "up")}
-                            className="p-1 rounded text-gray-500 hover:text-blue-600 hover:bg-white disabled:opacity-30 disabled:pointer-events-none transition-colors"
-                            title="Move Language Up"
-                          >
-                            <ArrowUp className="w-3.5 h-3.5" />
-                          </button>
-                          <button
-                            type="button"
-                            disabled={langIdx === (data.languages?.length || 1) - 1}
-                            onClick={() => moveLanguageItem(langIdx, "down")}
-                            className="p-1 rounded text-gray-500 hover:text-blue-600 hover:bg-white disabled:opacity-30 disabled:pointer-events-none transition-colors"
-                            title="Move Language Down"
-                          >
-                            <ArrowDown className="w-3.5 h-3.5" />
-                          </button>
-                          <button
-                            onClick={() => {
-                              const updated = data.languages?.filter(
-                                (_, idx) => idx !== langIdx
-                              );
-                              setData({ ...data, languages: updated });
-                            }}
-                            className="p-1 rounded text-gray-400 hover:text-red-500 hover:bg-white transition-colors"
-                            title="Remove Language"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-2">
-                        <div>
-                          <div className="flex items-center justify-between mb-1">
-                            <label className="text-[10px] font-bold text-gray-500 uppercase">
-                              Language Name
-                            </label>
-                            <LineFontSizeSelector
-                              compact
-                              value={lang.nameFontSize}
-                              fallback={getLineFontSizeVal("skillItems", 9.5)}
-                              onChange={(val) => {
-                                const updated = [...(data.languages || [])];
-                                updated[langIdx] = { ...updated[langIdx], nameFontSize: val };
-                                setData({ ...data, languages: updated });
-                              }}
-                              onReset={() => {
-                                const updated = [...(data.languages || [])];
-                                updated[langIdx] = { ...updated[langIdx], nameFontSize: undefined };
-                                setData({ ...data, languages: updated });
-                              }}
-                            />
-                          </div>
-                          <input
-                            className="w-full text-xs p-1.5 border border-gray-300 rounded font-bold"
-                            value={lang.name || ""}
-                            onChange={(e) => {
-                              const updated = [...(data.languages || [])];
-                              updated[langIdx].name = e.target.value;
-                              setData({ ...data, languages: updated });
-                            }}
-                            placeholder="e.g. English, French, Spanish"
-                          />
-                        </div>
-                        <div>
-                          <div className="flex items-center justify-between mb-1">
-                            <label className="text-[10px] font-bold text-gray-500 uppercase">
-                              Proficiency
-                            </label>
-                            <LineFontSizeSelector
-                              compact
-                              value={lang.proficiencyFontSize}
-                              fallback={getLineFontSizeVal("descriptions", 9)}
-                              onChange={(val) => {
-                                const updated = [...(data.languages || [])];
-                                updated[langIdx] = { ...updated[langIdx], proficiencyFontSize: val };
-                                setData({ ...data, languages: updated });
-                              }}
-                              onReset={() => {
-                                const updated = [...(data.languages || [])];
-                                updated[langIdx] = { ...updated[langIdx], proficiencyFontSize: undefined };
-                                setData({ ...data, languages: updated });
-                              }}
-                            />
-                          </div>
-                          <select
-                            className="w-full text-xs p-1.5 border border-gray-300 rounded bg-white text-gray-700"
-                            value={lang.proficiency || "Full Professional Proficiency"}
-                            onChange={(e) => {
-                              const updated = [...(data.languages || [])];
-                              updated[langIdx].proficiency = e.target.value;
-                              setData({ ...data, languages: updated });
-                            }}
-                          >
-                            <option value="Native / Bilingual">Native / Bilingual</option>
-                            <option value="Full Professional Proficiency">Full Professional</option>
-                            <option value="Professional Working Proficiency">Professional Working</option>
-                            <option value="Fluent">Fluent</option>
-                            <option value="Intermediate">Intermediate</option>
-                            <option value="Elementary">Elementary</option>
-                          </select>
-                        </div>
-                      </div>
-                    </div>
+                      lang={lang}
+                      langIdx={langIdx}
+                      total={data.languages?.length || 1}
+                      onMoveUp={() => moveLanguageItem(langIdx, "up")}
+                      onMoveDown={() => moveLanguageItem(langIdx, "down")}
+                      onDelete={() => {
+                        const updated = data.languages?.filter(
+                          (_, idx) => idx !== langIdx
+                        );
+                        setData({ ...data, languages: updated });
+                      }}
+                      onUpdateName={(val) => {
+                        const updated = [...(data.languages || [])];
+                        updated[langIdx] = { ...updated[langIdx], name: val };
+                        setData({ ...data, languages: updated });
+                      }}
+                      onUpdateProficiency={(val) => {
+                        const updated = [...(data.languages || [])];
+                        updated[langIdx] = { ...updated[langIdx], proficiency: val };
+                        setData({ ...data, languages: updated });
+                      }}
+                      onUpdateNameFontSize={(val) => {
+                        const updated = [...(data.languages || [])];
+                        updated[langIdx] = { ...updated[langIdx], nameFontSize: val };
+                        setData({ ...data, languages: updated });
+                      }}
+                      onResetNameFontSize={() => {
+                        const updated = [...(data.languages || [])];
+                        updated[langIdx] = { ...updated[langIdx], nameFontSize: undefined };
+                        setData({ ...data, languages: updated });
+                      }}
+                      onUpdateProficiencyFontSize={(val) => {
+                        const updated = [...(data.languages || [])];
+                        updated[langIdx] = { ...updated[langIdx], proficiencyFontSize: val };
+                        setData({ ...data, languages: updated });
+                      }}
+                      onResetProficiencyFontSize={() => {
+                        const updated = [...(data.languages || [])];
+                        updated[langIdx] = { ...updated[langIdx], proficiencyFontSize: undefined };
+                        setData({ ...data, languages: updated });
+                      }}
+                      defaultNameFontSize={getLineFontSizeVal("skillItems", 9.5)}
+                      defaultProficiencyFontSize={getLineFontSizeVal("descriptions", 9)}
+                    />
                   ))}
                 </div>
               )}

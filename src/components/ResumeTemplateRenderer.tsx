@@ -798,7 +798,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                       >
                         Technical:
                       </strong>{" "}
-                      {technical.join(", ")}
+                      {renderFormattedText(technical.join(", "))}
                     </div>
                   ) : null}
                   {tools?.length ? (
@@ -816,7 +816,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                       >
                         Tools:
                       </strong>{" "}
-                      {tools.join(", ")}
+                      {renderFormattedText(tools.join(", "))}
                     </div>
                   ) : null}
                   {concepts?.length ? (
@@ -834,7 +834,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                       >
                         Concepts:
                       </strong>{" "}
-                      {concepts.join(", ")}
+                      {renderFormattedText(concepts.join(", "))}
                     </div>
                   ) : null}
                   {soft?.length ? (
@@ -851,7 +851,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                       >
                         Soft Skills:
                       </strong>{" "}
-                      {soft.join(", ")}
+                      {renderFormattedText(soft.join(", "))}
                     </div>
                   ) : null}
                 </div>
@@ -870,7 +870,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                       margin: "0 0 3px 0",
                     }}
                   >
-                    <strong>Technical Skills:</strong> {technical.join(", ")}
+                    <strong>Technical Skills:</strong> {renderFormattedText(technical.join(", "))}
                   </p>
                 ) : null}
                 {tools?.length ? (
@@ -880,7 +880,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                       margin: "0 0 3px 0",
                     }}
                   >
-                    <strong>Software & Tools:</strong> {tools.join(", ")}
+                    <strong>Software & Tools:</strong> {renderFormattedText(tools.join(", "))}
                   </p>
                 ) : null}
                 {concepts?.length ? (
@@ -890,7 +890,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                       margin: "0 0 3px 0",
                     }}
                   >
-                    <strong>Core Competencies:</strong> {concepts.join(", ")}
+                    <strong>Core Competencies:</strong> {renderFormattedText(concepts.join(", "))}
                   </p>
                 ) : null}
                 {soft?.length ? (
@@ -900,7 +900,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                       margin: "0",
                     }}
                   >
-                    <strong>Soft Skills:</strong> {soft.join(", ")}
+                    <strong>Soft Skills:</strong> {renderFormattedText(soft.join(", "))}
                   </p>
                 ) : null}
               </div>
@@ -1200,7 +1200,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                         <strong>{renderFormattedText(cert.name)}</strong>
                         {cert.issuer ? (
                           <span style={{ fontSize: `${certIssuerPt}pt` }}>
-                            {` — ${cert.issuer}`}
+                            {" — "}{renderFormattedText(cert.issuer)}
                           </span>
                         ) : ""}
                         {cert.date ? (
@@ -1274,10 +1274,10 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                   const langProfPt = getLinePt("descriptions", l.proficiencyFontSize, Math.max(8, secBodyPt - 0.5));
                   return (
                     <span key={li} style={{ fontSize: `${langNamePt}pt`, marginRight: "8px" }}>
-                      <strong>{l.name}</strong>
+                      <strong>{renderFormattedText(l.name)}</strong>
                       {l.proficiency && (
                         <span style={{ fontSize: `${langProfPt}pt`, color: subTextColor }}>
-                          {` (${l.proficiency})`}
+                          {" ("}{renderFormattedText(l.proficiency)}{")"}
                         </span>
                       )}
                       {li < data.languages!.length - 1 && " • "}
@@ -1354,9 +1354,9 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                   {data.education.map((edu, idx) => (
                     <div key={edu.id || idx}>
                       <div style={{ fontSize: "9.5pt", fontWeight: "700", color: "#0f172a", lineHeight: 1.25 }}>
-                        {edu.degree}
+                        {renderFormattedText(edu.degree)}
                       </div>
-                      <div style={{ fontSize: "8.5pt", color: "#334155" }}>{edu.school}</div>
+                      <div style={{ fontSize: "8.5pt", color: "#334155" }}>{renderFormattedText(edu.school)}</div>
                       {edu.date && <div style={{ fontSize: "8pt", color: "#64748b" }}>{edu.date}</div>}
                     </div>
                   ))}
@@ -1404,7 +1404,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                         letterSpacing: "0.2px",
                       }}
                     >
-                      {skill}
+                      {renderFormattedText(skill)}
                     </span>
                   ))}
                 </div>
@@ -1448,8 +1448,8 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                 <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
                   {data.certifications.map((cert, idx) => (
                     <div key={cert.id || idx}>
-                      <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{cert.name}</div>
-                      {cert.issuer && <div style={{ fontSize: "8pt", color: "#64748b" }}>{cert.issuer}</div>}
+                      <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{renderFormattedText(cert.name)}</div>
+                      {cert.issuer && <div style={{ fontSize: "8pt", color: "#64748b" }}>{renderFormattedText(cert.issuer)}</div>}
                     </div>
                   ))}
                 </div>
@@ -1463,8 +1463,8 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px 12px" }}>
                   {data.languages.map((l, idx) => (
                     <div key={idx}>
-                      <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{l.name}</div>
-                      <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{l.proficiency}</div>
+                      <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{renderFormattedText(l.name)}</div>
+                      <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{renderFormattedText(l.proficiency)}</div>
                     </div>
                   ))}
                 </div>
@@ -1781,9 +1781,9 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                     {data.education.map((edu, i) => (
                       <div key={i}>
                         <div style={{ fontSize: "8.5pt", fontWeight: "bold", color: "#ffffff" }}>
-                          {edu.degree} {edu.field ? `in ${edu.field}` : ""}
+                          {renderFormattedText(edu.degree)} {edu.field ? `in ${edu.field}` : ""}
                         </div>
-                        <div style={{ fontSize: "7.5pt", color: "#94a3b8" }}>{edu.school}</div>
+                        <div style={{ fontSize: "7.5pt", color: "#94a3b8" }}>{renderFormattedText(edu.school)}</div>
                         {edu.date && <div style={{ fontSize: "7pt", color: "#64748b" }}>{edu.date}</div>}
                       </div>
                     ))}
@@ -1799,11 +1799,11 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                     <div key={i}>
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
                         <span style={{ fontSize: "9.5pt", fontWeight: "bold", color: "#0f172a" }}>
-                          {edu.degree} {edu.field ? `in ${edu.field}` : ""}
+                          {renderFormattedText(edu.degree)} {edu.field ? `in ${edu.field}` : ""}
                         </span>
                         <span style={{ fontSize: "8pt", color: "#64748b" }}>{edu.date}</span>
                       </div>
-                      <div style={{ fontSize: "8.5pt", color: "#475569" }}>{edu.school}</div>
+                      <div style={{ fontSize: "8.5pt", color: "#475569" }}>{renderFormattedText(edu.school)}</div>
                     </div>
                   ))}
                 </div>
@@ -1821,7 +1821,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                       <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
                         {techSkills.map((sk, i) => (
                           <div key={i} style={{ fontSize: "8.5pt", color: "#cbd5e1", lineHeight: "1.3" }}>
-                            {sk}
+                            {renderFormattedText(sk)}
                           </div>
                         ))}
                       </div>
@@ -1845,7 +1845,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                               fontWeight: 500,
                             }}
                           >
-                            {sk}
+                            {renderFormattedText(sk)}
                           </div>
                         ))}
                       </div>
@@ -1861,7 +1861,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                   <div style={{ display: "flex", flexWrap: "wrap", gap: "5px" }}>
                     {techSkills.map((sk, i) => (
                       <span key={i} style={{ backgroundColor: "#f1f5f9", border: "1px solid #cbd5e1", borderRadius: "4px", padding: "3px 8px", fontSize: "8pt", color: "#0f172a", fontWeight: 600 }}>
-                        {sk}
+                        {renderFormattedText(sk)}
                       </span>
                     ))}
                   </div>
@@ -1870,7 +1870,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                   <div style={{ display: "flex", flexWrap: "wrap", gap: "4px", marginTop: "4px" }}>
                     {softSkills.map((sk, i) => (
                       <span key={i} style={{ backgroundColor: "#e0f2fe", border: "1px solid #bae6fd", borderRadius: "4px", padding: "3px 8px", fontSize: "8pt", color: "#0369a1", fontWeight: 500 }}>
-                        {sk}
+                        {renderFormattedText(sk)}
                       </span>
                     ))}
                   </div>
@@ -1923,10 +1923,10 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                     {data.certifications.map((cert, i) => (
                       <div key={i}>
                         <div style={{ fontSize: "8.5pt", fontWeight: "bold", color: "#ffffff" }}>
-                          {cert.name}
+                          {renderFormattedText(cert.name)}
                         </div>
                         <div style={{ fontSize: "7.5pt", color: "#94a3b8" }}>
-                          {cert.issuer} {cert.date ? `• ${cert.date}` : ""}
+                          {renderFormattedText(cert.issuer)} {cert.date ? `• ${cert.date}` : ""}
                         </div>
                       </div>
                     ))}
@@ -1941,10 +1941,10 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                   {data.certifications.map((cert, i) => (
                     <div key={i}>
                       <div style={{ fontSize: "9pt", fontWeight: "bold", color: "#0f172a" }}>
-                        {cert.name}
+                        {renderFormattedText(cert.name)}
                       </div>
                       <div style={{ fontSize: "8pt", color: "#64748b" }}>
-                        {cert.issuer} {cert.date ? `• ${cert.date}` : ""}
+                        {renderFormattedText(cert.issuer)} {cert.date ? `• ${cert.date}` : ""}
                       </div>
                     </div>
                   ))}
@@ -1992,9 +1992,9 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                   <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
                     {data.languages.map((lang, i) => (
                       <div key={i}>
-                        <div style={{ fontSize: "8.5pt", fontWeight: "bold", color: "#ffffff" }}>{lang.name}</div>
+                        <div style={{ fontSize: "8.5pt", fontWeight: "bold", color: "#ffffff" }}>{renderFormattedText(lang.name)}</div>
                         {lang.proficiency && (
-                          <div style={{ fontSize: "7.5pt", color: "#94a3b8" }}>{lang.proficiency}</div>
+                          <div style={{ fontSize: "7.5pt", color: "#94a3b8" }}>{renderFormattedText(lang.proficiency)}</div>
                         )}
                       </div>
                     ))}
@@ -2008,9 +2008,9 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px 12px" }}>
                   {data.languages.map((lang, i) => (
                     <div key={i}>
-                      <div style={{ fontSize: "9pt", fontWeight: "bold", color: "#0f172a" }}>{lang.name}</div>
+                      <div style={{ fontSize: "9pt", fontWeight: "bold", color: "#0f172a" }}>{renderFormattedText(lang.name)}</div>
                       {lang.proficiency && (
-                        <div style={{ fontSize: "8pt", color: "#64748b" }}>{lang.proficiency}</div>
+                        <div style={{ fontSize: "8pt", color: "#64748b" }}>{renderFormattedText(lang.proficiency)}</div>
                       )}
                     </div>
                   ))}
@@ -2278,7 +2278,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                         color: "#1e293b",
                       }}
                     >
-                      {sk}
+                      {renderFormattedText(sk)}
                     </span>
                   ))}
                 </div>
@@ -2320,14 +2320,14 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                     <div key={i}>
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
                         <span style={{ fontSize: "10pt", fontWeight: "700", color: "#0f172a" }}>
-                          {edu.degree} {edu.field ? `in ${edu.field}` : ""}
+                          {renderFormattedText(edu.degree)} {edu.field ? `in ${edu.field}` : ""}
                         </span>
                         <span style={{ fontSize: "8.5pt", fontWeight: "700", color: "#1f2937" }}>
                           {edu.date}
                         </span>
                       </div>
                       <div style={{ fontSize: "8.5pt", fontStyle: "italic", color: "#c84b31" }}>
-                        {edu.school} {edu.location ? `• ${edu.location}` : ""}
+                        {renderFormattedText(edu.school)} {edu.location ? `• ${edu.location}` : ""}
                       </div>
                     </div>
                   ))}
@@ -2359,8 +2359,8 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
                   {data.certifications.map((c, i) => (
                     <div key={i}>
-                      <div style={{ fontSize: "9pt", fontWeight: "700", color: "#0f172a" }}>{c.name}</div>
-                      <div style={{ fontSize: "8pt", color: "#64748b" }}>{c.issuer} {c.date ? `(${c.date})` : ""}</div>
+                      <div style={{ fontSize: "9pt", fontWeight: "700", color: "#0f172a" }}>{renderFormattedText(c.name)}</div>
+                      <div style={{ fontSize: "8pt", color: "#64748b" }}>{renderFormattedText(c.issuer)} {c.date ? `(${c.date})` : ""}</div>
                     </div>
                   ))}
                 </div>
@@ -2389,7 +2389,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                 <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
                   {data.languages.map((l, i) => (
                     <div key={i} style={{ fontSize: "8.5pt" }}>
-                      <strong style={{ color: "#0f172a" }}>{l.name}</strong> {l.proficiency ? <span style={{ color: "#64748b" }}>({l.proficiency})</span> : null}
+                      <strong style={{ color: "#0f172a" }}>{renderFormattedText(l.name)}</strong> {l.proficiency ? <span style={{ color: "#64748b" }}>({renderFormattedText(l.proficiency)})</span> : null}
                     </div>
                   ))}
                 </div>
@@ -2614,7 +2614,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                     <div style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
                       {techSkills.map((sk, i) => (
                         <span key={i} style={{ backgroundColor: "#f1f5f9", border: "1px solid #cbd5e1", borderRadius: "4px", padding: "2px 7px", fontSize: "8pt", color: "#334155" }}>
-                          {sk}
+                          {renderFormattedText(sk)}
                         </span>
                       ))}
                     </div>
@@ -2643,7 +2643,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                             fontWeight: 500,
                           }}
                         >
-                          {sk}
+                          {renderFormattedText(sk)}
                         </span>
                       ))}
                     </div>
@@ -2667,10 +2667,10 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                   {data.education.map((edu, i) => (
                     <div key={i}>
                       <div style={{ fontSize: "9pt", fontWeight: "bold", color: "#0f172a" }}>
-                        {edu.degree} {edu.field ? `in ${edu.field}` : ""}
+                        {renderFormattedText(edu.degree)} {edu.field ? `in ${edu.field}` : ""}
                       </div>
                       <div style={{ fontSize: "8pt", color: "#64748b" }}>
-                        {edu.school} {edu.date ? `• ${edu.date}` : ""}
+                        {renderFormattedText(edu.school)} {edu.date ? `• ${edu.date}` : ""}
                       </div>
                     </div>
                   ))}
@@ -2692,7 +2692,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                 <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
                   {data.languages.map((l, i) => (
                     <div key={i} style={{ fontSize: "8.5pt", color: "#334155" }}>
-                      <strong>{l.name}</strong> {l.proficiency ? `(${l.proficiency})` : ""}
+                      <strong>{renderFormattedText(l.name)}</strong> {l.proficiency ? <>({renderFormattedText(l.proficiency)})</> : ""}
                     </div>
                   ))}
                 </div>
@@ -2713,7 +2713,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                 <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
                   {data.certifications.map((c, i) => (
                     <div key={i} style={{ fontSize: "8.5pt", color: "#334155" }}>
-                      <strong>{c.name}</strong> {c.issuer ? `• ${c.issuer}` : ""}
+                      <strong>{renderFormattedText(c.name)}</strong> {c.issuer ? <>• {renderFormattedText(c.issuer)}</> : ""}
                     </div>
                   ))}
                 </div>
@@ -2955,8 +2955,8 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                 <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                   {data.education.map((edu, idx) => (
                     <div key={idx}>
-                      <div style={{ fontSize: "9.5pt", fontWeight: "700", color: "#0f172a" }}>{edu.degree}</div>
-                      <div style={{ fontSize: "8.5pt", color: "#334155" }}>{edu.school}</div>
+                      <div style={{ fontSize: "9.5pt", fontWeight: "700", color: "#0f172a" }}>{renderFormattedText(edu.degree)}</div>
+                      <div style={{ fontSize: "8.5pt", color: "#334155" }}>{renderFormattedText(edu.school)}</div>
                       {edu.date && <div style={{ fontSize: "8pt", color: "#64748b" }}>{edu.date}</div>}
                     </div>
                   ))}
@@ -3007,7 +3007,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                     <div style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
                       {allSkills.map((s, idx) => (
                         <span key={idx} style={{ backgroundColor: "#f3e8ff", color: "#4c1d95", padding: "2px 6px", borderRadius: "3px", fontSize: "7.5pt", fontWeight: 600 }}>
-                          {s}
+                          {renderFormattedText(s)}
                         </span>
                       ))}
                     </div>
@@ -3018,7 +3018,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                     {renderHeaderLine("SOFT SKILLS")}
                     <div style={{ display: "flex", flexDirection: "column", gap: "4px", fontSize: "8.5pt", color: "#334155" }}>
                       {softSkills.map((s, idx) => (
-                        <div key={idx}>{bulletChar === "accent-dot" ? "●" : bulletChar} {s}</div>
+                        <div key={idx}>{bulletChar === "accent-dot" ? "●" : bulletChar} {renderFormattedText(s)}</div>
                       ))}
                     </div>
                   </div>
@@ -3033,8 +3033,8 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                 <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
                   {data.languages.map((l, idx) => (
                     <div key={idx}>
-                      <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{l.name}</div>
-                      {l.proficiency && <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{l.proficiency}</div>}
+                      <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{renderFormattedText(l.name)}</div>
+                      {l.proficiency && <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{renderFormattedText(l.proficiency)}</div>}
                     </div>
                   ))}
                 </div>
@@ -3048,8 +3048,8 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                 <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
                   {data.certifications.map((c, idx) => (
                     <div key={idx}>
-                      <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{c.name}</div>
-                      {c.issuer && <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{c.issuer}</div>}
+                      <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{renderFormattedText(c.name)}</div>
+                      {c.issuer && <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{renderFormattedText(c.issuer)}</div>}
                     </div>
                   ))}
                 </div>
@@ -3312,7 +3312,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                             fontWeight: "600",
                           }}
                         >
-                          {s}
+                          {renderFormattedText(s)}
                         </span>
                       ))}
                     </div>
@@ -3334,7 +3334,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                             fontWeight: "600",
                           }}
                         >
-                          {s}
+                          {renderFormattedText(s)}
                         </span>
                       ))}
                     </div>
@@ -3349,8 +3349,8 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                 {renderGoldHeader("EDUCATION")}
                 {data.education.map((edu, idx) => (
                   <div key={idx} style={{ marginBottom: "6px" }}>
-                    <div style={{ fontSize: "9pt", fontWeight: "700", color: "#0f172a" }}>{edu.degree}</div>
-                    <div style={{ fontSize: "8.5pt", color: "#334155" }}>{edu.school}</div>
+                    <div style={{ fontSize: "9pt", fontWeight: "700", color: "#0f172a" }}>{renderFormattedText(edu.degree)}</div>
+                    <div style={{ fontSize: "8.5pt", color: "#334155" }}>{renderFormattedText(edu.school)}</div>
                     {edu.date && <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{edu.date}</div>}
                   </div>
                 ))}
@@ -3364,8 +3364,8 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                 <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
                   {data.certifications.map((c, idx) => (
                     <div key={idx}>
-                      <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{c.name}</div>
-                      {c.issuer && <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{c.issuer}</div>}
+                      <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{renderFormattedText(c.name)}</div>
+                      {c.issuer && <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{renderFormattedText(c.issuer)}</div>}
                     </div>
                   ))}
                 </div>
@@ -3389,7 +3389,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                           margin: "0 auto 3px auto",
                         }}
                       />
-                      <div style={{ fontSize: "7.5pt", fontWeight: "700", color: "#0f172a" }}>{l.name}</div>
+                      <div style={{ fontSize: "7.5pt", fontWeight: "700", color: "#0f172a" }}>{renderFormattedText(l.name)}</div>
                     </div>
                   ))}
                 </div>
@@ -3654,8 +3654,8 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                         backgroundColor: "#ffffff",
                       }}
                     />
-                    <div style={{ fontSize: "9.5pt", fontWeight: "700", color: "#0f172a" }}>{edu.degree}</div>
-                    <div style={{ fontSize: "8.5pt", color: "#334155" }}>{edu.school}</div>
+                    <div style={{ fontSize: "9.5pt", fontWeight: "700", color: "#0f172a" }}>{renderFormattedText(edu.degree)}</div>
+                    <div style={{ fontSize: "8.5pt", color: "#334155" }}>{renderFormattedText(edu.school)}</div>
                     {edu.date && <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{edu.date}</div>}
                   </div>
                 ))}
@@ -3685,7 +3685,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                 {renderSimpleHeader("SKILLS")}
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px", fontSize: "8pt", color: "#334155" }}>
                   {allSkills.map((s, idx) => (
-                    <div key={idx} style={{ padding: "2px 0" }}>{bulletChar === "accent-dot" ? "●" : bulletChar} {s}</div>
+                    <div key={idx} style={{ padding: "2px 0" }}>{bulletChar === "accent-dot" ? "●" : bulletChar} {renderFormattedText(s)}</div>
                   ))}
                 </div>
               </div>
@@ -3698,8 +3698,8 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                 <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
                   {data.certifications.map((c, idx) => (
                     <div key={idx}>
-                      <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{c.name}</div>
-                      {c.issuer && <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{c.issuer}</div>}
+                      <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{renderFormattedText(c.name)}</div>
+                      {c.issuer && <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{renderFormattedText(c.issuer)}</div>}
                     </div>
                   ))}
                 </div>
@@ -3713,8 +3713,8 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                 <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
                   {data.languages.map((l, idx) => (
                     <div key={idx} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                      <span style={{ fontSize: "8.5pt", color: "#0f172a", fontWeight: "600" }}>{l.name}</span>
-                      <span style={{ fontSize: "7.5pt", color: "#64748b" }}>{l.proficiency || ""}</span>
+                      <span style={{ fontSize: "8.5pt", color: "#0f172a", fontWeight: "600" }}>{renderFormattedText(l.name)}</span>
+                      <span style={{ fontSize: "7.5pt", color: "#64748b" }}>{renderFormattedText(l.proficiency || "")}</span>
                     </div>
                   ))}
                 </div>
@@ -3923,8 +3923,8 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                 {renderNickHeader("EDUCATION")}
                 {data.education.map((edu, idx) => (
                   <div key={idx} style={{ marginBottom: "6px" }}>
-                    <div style={{ fontSize: "9.5pt", fontWeight: "700", color: "#0f172a" }}>{edu.degree}</div>
-                    <div style={{ fontSize: "8.5pt", color: "#334155" }}>{edu.school}</div>
+                    <div style={{ fontSize: "9.5pt", fontWeight: "700", color: "#0f172a" }}>{renderFormattedText(edu.degree)}</div>
+                    <div style={{ fontSize: "8.5pt", color: "#334155" }}>{renderFormattedText(edu.school)}</div>
                     {edu.date && <div style={{ fontSize: "8pt", color: "#e06d53" }}>{edu.date}</div>}
                   </div>
                 ))}
@@ -3950,7 +3950,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                             fontWeight: "600",
                           }}
                         >
-                          {s}
+                          {renderFormattedText(s)}
                         </span>
                       ))}
                     </div>
@@ -3972,7 +3972,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                             fontWeight: "600",
                           }}
                         >
-                          {s}
+                          {renderFormattedText(s)}
                         </span>
                       ))}
                     </div>
@@ -4003,8 +4003,8 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                 <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
                   {data.certifications.map((c, idx) => (
                     <div key={idx}>
-                      <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{c.name}</div>
-                      {c.issuer && <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{c.issuer}</div>}
+                      <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{renderFormattedText(c.name)}</div>
+                      {c.issuer && <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{renderFormattedText(c.issuer)}</div>}
                     </div>
                   ))}
                 </div>
@@ -4033,7 +4033,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                 <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", fontSize: "8pt" }}>
                   {data.languages.map((l, idx) => (
                     <div key={idx}>
-                      <strong style={{ color: "#0f172a" }}>{l.name}</strong> {l.proficiency ? <span style={{ color: "#64748b" }}>({l.proficiency})</span> : null}
+                      <strong style={{ color: "#0f172a" }}>{renderFormattedText(l.name)}</strong> {l.proficiency ? <span style={{ color: "#64748b" }}>({renderFormattedText(l.proficiency)})</span> : null}
                     </div>
                   ))}
                 </div>
@@ -4234,8 +4234,8 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                 {renderBlueHeader("EDUCATION")}
                 {data.education.map((edu, idx) => (
                   <div key={idx} style={{ marginBottom: "6px" }}>
-                    <div style={{ fontSize: "9.5pt", fontWeight: "700", color: "#0f172a" }}>{edu.degree}</div>
-                    <div style={{ fontSize: "8.5pt", color: "#334155" }}>{edu.school}</div>
+                    <div style={{ fontSize: "9.5pt", fontWeight: "700", color: "#0f172a" }}>{renderFormattedText(edu.degree)}</div>
+                    <div style={{ fontSize: "8.5pt", color: "#334155" }}>{renderFormattedText(edu.school)}</div>
                     {edu.date && <div style={{ fontSize: "8pt", color: "#64748b" }}>{edu.date}</div>}
                   </div>
                 ))}
@@ -4251,7 +4251,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                     <div style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
                       {techSkills.map((sk, idx) => (
                         <span key={idx} style={{ backgroundColor: "#e2e8f0", color: "#1e3a5f", padding: "2px 7px", borderRadius: "3px", fontSize: "7.5pt", fontWeight: 600 }}>
-                          {sk}
+                          {renderFormattedText(sk)}
                         </span>
                       ))}
                     </div>
@@ -4273,7 +4273,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                             fontWeight: "600",
                           }}
                         >
-                          {s}
+                          {renderFormattedText(s)}
                         </span>
                       ))}
                     </div>
@@ -4306,8 +4306,8 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                 <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
                   {data.certifications.map((c, idx) => (
                     <div key={idx}>
-                      <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{c.name}</div>
-                      {c.issuer && <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{c.issuer}</div>}
+                      <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{renderFormattedText(c.name)}</div>
+                      {c.issuer && <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{renderFormattedText(c.issuer)}</div>}
                     </div>
                   ))}
                 </div>
@@ -4336,8 +4336,8 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                 <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
                   {data.languages.map((l, idx) => (
                     <div key={idx}>
-                      <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{l.name}</div>
-                      {l.proficiency && <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{l.proficiency}</div>}
+                      <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{renderFormattedText(l.name)}</div>
+                      {l.proficiency && <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{renderFormattedText(l.proficiency)}</div>}
                     </div>
                   ))}
                 </div>
@@ -4543,8 +4543,8 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                 <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
                   {data.education.map((edu, idx) => (
                     <div key={idx}>
-                      <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{edu.school}</div>
-                      <div style={{ fontSize: "8pt", color: "#334155" }}>{edu.degree}</div>
+                      <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{renderFormattedText(edu.school)}</div>
+                      <div style={{ fontSize: "8pt", color: "#334155" }}>{renderFormattedText(edu.degree)}</div>
                       {edu.date && <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{edu.date}</div>}
                     </div>
                   ))}
@@ -4569,7 +4569,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                         fontWeight: "600",
                       }}
                     >
-                      {s}
+                      {renderFormattedText(s)}
                     </span>
                   ))}
                 </div>
@@ -4600,8 +4600,8 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                 <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
                   {data.certifications.map((c, idx) => (
                     <div key={idx}>
-                      <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{c.name}</div>
-                      {c.issuer && <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{c.issuer}</div>}
+                      <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{renderFormattedText(c.name)}</div>
+                      {c.issuer && <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{renderFormattedText(c.issuer)}</div>}
                     </div>
                   ))}
                 </div>
@@ -4630,8 +4630,8 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px 12px" }}>
                   {data.languages.map((l, idx) => (
                     <div key={idx}>
-                      <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{l.name}</div>
-                      <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{l.proficiency}</div>
+                      <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{renderFormattedText(l.name)}</div>
+                      <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{renderFormattedText(l.proficiency)}</div>
                     </div>
                   ))}
                 </div>
@@ -4873,8 +4873,8 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                         backgroundColor: "#ffffff",
                       }}
                     />
-                    <div style={{ fontSize: "9.5pt", fontWeight: "700", color: "#0f172a" }}>{edu.degree}</div>
-                    <div style={{ fontSize: "8.5pt", color: "#334155" }}>{edu.school}</div>
+                    <div style={{ fontSize: "9.5pt", fontWeight: "700", color: "#0f172a" }}>{renderFormattedText(edu.degree)}</div>
+                    <div style={{ fontSize: "8.5pt", color: "#334155" }}>{renderFormattedText(edu.school)}</div>
                     {edu.date && <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{edu.date}</div>}
                   </div>
                 ))}
@@ -4887,7 +4887,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                 {renderMelissaHeader("GENERAL SKILLS")}
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "5px", fontSize: "8pt", color: "#334155" }}>
                   {allSkills.map((s, idx) => (
-                    <div key={idx} style={{ padding: "1px 0" }}>{bulletChar === "accent-dot" ? "●" : bulletChar} {s}</div>
+                    <div key={idx} style={{ padding: "1px 0" }}>{bulletChar === "accent-dot" ? "●" : bulletChar} {renderFormattedText(s)}</div>
                   ))}
                 </div>
               </div>
@@ -4915,8 +4915,8 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                 <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
                   {data.certifications.map((c, idx) => (
                     <div key={idx}>
-                      <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{c.name}</div>
-                      {c.issuer && <div style={{ fontSize: "7pt", color: "#64748b" }}>{c.issuer}</div>}
+                      <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{renderFormattedText(c.name)}</div>
+                      {c.issuer && <div style={{ fontSize: "7pt", color: "#64748b" }}>{renderFormattedText(c.issuer)}</div>}
                     </div>
                   ))}
                 </div>
@@ -4932,8 +4932,8 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                     <div key={idx} style={{ display: "flex", alignItems: "center", gap: "6px" }}>
                       <div style={{ width: 8, height: 8, borderRadius: "50%", backgroundColor: "#d4af37" }} />
                       <div>
-                        <div style={{ fontSize: "8pt", fontWeight: "700", color: "#0f172a" }}>{l.name}</div>
-                        {l.proficiency && <div style={{ fontSize: "7pt", color: "#64748b" }}>{l.proficiency}</div>}
+                        <div style={{ fontSize: "8pt", fontWeight: "700", color: "#0f172a" }}>{renderFormattedText(l.name)}</div>
+                        {l.proficiency && <div style={{ fontSize: "7pt", color: "#64748b" }}>{renderFormattedText(l.proficiency)}</div>}
                       </div>
                     </div>
                   ))}
@@ -5175,7 +5175,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                         fontWeight: "600",
                       }}
                     >
-                      {s}
+                      {renderFormattedText(s)}
                     </span>
                   ))}
                 </div>
@@ -5205,8 +5205,8 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                 {renderVeronicaHeader("EDUCATION", <GraduationCap style={{ width: 12, height: 12, color: "#ffffff" }} />)}
                 {data.education.map((edu, idx) => (
                   <div key={idx} style={{ marginBottom: "6px" }}>
-                    <div style={{ fontSize: "9.5pt", fontWeight: "700", color: "#0f172a" }}>{edu.degree}</div>
-                    <div style={{ fontSize: "8.5pt", color: "#334155" }}>{edu.school}</div>
+                    <div style={{ fontSize: "9.5pt", fontWeight: "700", color: "#0f172a" }}>{renderFormattedText(edu.degree)}</div>
+                    <div style={{ fontSize: "8.5pt", color: "#334155" }}>{renderFormattedText(edu.school)}</div>
                     {edu.date && <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{edu.date}</div>}
                   </div>
                 ))}
@@ -5237,8 +5237,8 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
                   {data.certifications.map((c, idx) => (
                     <div key={idx}>
-                      <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{c.name}</div>
-                      <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{c.issuer} {c.date ? `(${c.date})` : ""}</div>
+                      <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{renderFormattedText(c.name)}</div>
+                      <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{renderFormattedText(c.issuer)} {c.date ? `(${c.date})` : ""}</div>
                     </div>
                   ))}
                 </div>
@@ -5267,7 +5267,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                 <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
                   {data.languages.map((l, idx) => (
                     <div key={idx} style={{ fontSize: "8.5pt" }}>
-                      <strong style={{ color: "#0f172a" }}>{l.name}</strong> {l.proficiency ? <span style={{ color: "#64748b" }}>({l.proficiency})</span> : null}
+                      <strong style={{ color: "#0f172a" }}>{renderFormattedText(l.name)}</strong> {l.proficiency ? <span style={{ color: "#64748b" }}>({renderFormattedText(l.proficiency)})</span> : null}
                     </div>
                   ))}
                 </div>
@@ -5477,10 +5477,10 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                   {data.education.map((edu, i) => (
                     <div key={i}>
                       <div style={{ fontSize: "9.5pt", fontWeight: "bold", color: "#18181b" }}>
-                        {edu.degree} {edu.field ? `in ${edu.field}` : ""}
+                        {renderFormattedText(edu.degree)} {edu.field ? `in ${edu.field}` : ""}
                       </div>
                       <div style={{ fontSize: "8pt", color: "#71717a" }}>
-                        {edu.school} {edu.date ? `• ${edu.date}` : ""}
+                        {renderFormattedText(edu.school)} {edu.date ? `• ${edu.date}` : ""}
                       </div>
                     </div>
                   ))}
@@ -5512,7 +5512,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4px 8px" }}>
                   {allSkills.map((sk, i) => (
                     <div key={i} style={{ fontSize: "8pt", color: "#3f3f46", fontWeight: 500 }}>
-                      {bulletChar === "accent-dot" ? "●" : bulletChar} {sk}
+                      {bulletChar === "accent-dot" ? "●" : bulletChar} {renderFormattedText(sk)}
                     </div>
                   ))}
                 </div>
@@ -5526,9 +5526,9 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                 <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
                   {data.certifications.map((c, i) => (
                     <div key={i}>
-                      <div style={{ fontSize: "8.5pt", fontWeight: "bold", color: "#18181b" }}>{c.name}</div>
+                      <div style={{ fontSize: "8.5pt", fontWeight: "bold", color: "#18181b" }}>{renderFormattedText(c.name)}</div>
                       <div style={{ fontSize: "7.5pt", color: "#71717a" }}>
-                        {c.issuer} {c.date ? `(${c.date})` : ""}
+                        {renderFormattedText(c.issuer)} {c.date ? `(${c.date})` : ""}
                       </div>
                     </div>
                   ))}
@@ -5558,9 +5558,9 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4px 8px" }}>
                   {data.languages.map((l, i) => (
                     <div key={i}>
-                      <div style={{ fontSize: "8.5pt", fontWeight: "bold", color: "#18181b" }}>{l.name}</div>
+                      <div style={{ fontSize: "8.5pt", fontWeight: "bold", color: "#18181b" }}>{renderFormattedText(l.name)}</div>
                       {l.proficiency && (
-                        <div style={{ fontSize: "7.5pt", color: "#71717a" }}>{l.proficiency}</div>
+                        <div style={{ fontSize: "7.5pt", color: "#71717a" }}>{renderFormattedText(l.proficiency)}</div>
                       )}
                     </div>
                   ))}

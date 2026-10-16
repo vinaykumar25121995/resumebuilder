@@ -299,14 +299,11 @@ export async function generateResumeDocxBlob(
     children.push(
       new Paragraph({
         spacing: { before: 60, after: 140 },
-        children: [
-          new TextRun({
-            text: allSkills.join(" • "),
-            size: skillItemHalfPt,
-            font: fontName,
-            color: "1F2937",
-          }),
-        ],
+        children: createFormattedRuns(allSkills.join(" • "), {
+          size: skillItemHalfPt,
+          font: fontName,
+          color: "1F2937",
+        }),
       })
     );
   };
@@ -509,8 +506,7 @@ export async function generateResumeDocxBlob(
         new Paragraph({
           spacing: { before: 100, after: 40 },
           children: [
-            new TextRun({
-              text: edu.degree || "Degree",
+            ...createFormattedRuns(edu.degree || "Degree", {
               bold: true,
               size: degHalfPt,
               font: fontName,
@@ -530,8 +526,7 @@ export async function generateResumeDocxBlob(
         new Paragraph({
           spacing: { before: 0, after: 80 },
           children: [
-            new TextRun({
-              text: edu.school || "",
+            ...createFormattedRuns(edu.school || "", {
               italics: true,
               size: schHalfPt,
               font: fontName,
@@ -571,19 +566,19 @@ export async function generateResumeDocxBlob(
           bullet: { level: 0 },
           spacing: { before: 20, after: 40 },
           children: [
-            new TextRun({
-              text: cert.name || "Certification",
+            ...createFormattedRuns(cert.name || "Certification", {
               bold: true,
               size: certHalfPt,
               font: fontName,
               color: "111827",
             }),
-            new TextRun({
-              text: cert.issuer ? ` — ${cert.issuer}` : "",
-              size: issHalfPt,
-              font: fontName,
-              color: "4B5563",
-            }),
+            ...(cert.issuer
+              ? createFormattedRuns(` — ${cert.issuer}`, {
+                  size: issHalfPt,
+                  font: fontName,
+                  color: "4B5563",
+                })
+              : []),
             new TextRun({
               text: cert.date ? ` (${cert.date})` : "",
               size: dateHalfPt,
@@ -634,21 +629,57 @@ export async function generateResumeDocxBlob(
     const secHalfPt = getSecHalfPt("languages", 10);
     const langHalfPt = getLineHalfPt("languages", undefined, secHalfPt);
     children.push(createSectionHeading("Languages"));
+
+    const langRuns: TextRun[] = [];
+    data.languages.forEach((l, idx) => {
+      const formattedName = createFormattedRuns(l.name, {
+        bold: true,
+        size: langHalfPt,
+        font: fontName,
+        color: "1F2937",
+      });
+      langRuns.push(...formattedName);
+      if (l.proficiency) {
+        langRuns.push(
+          new TextRun({
+            text: " (",
+            size: Math.max(14, langHalfPt - 1),
+            font: fontName,
+            color: "6B7280",
+          })
+        );
+        langRuns.push(
+          ...createFormattedRuns(l.proficiency, {
+            size: Math.max(14, langHalfPt - 1),
+            font: fontName,
+            color: "6B7280",
+          })
+        );
+        langRuns.push(
+          new TextRun({
+            text: ")",
+            size: Math.max(14, langHalfPt - 1),
+            font: fontName,
+            color: "6B7280",
+          })
+        );
+      }
+      if (idx < data.languages!.length - 1) {
+        langRuns.push(
+          new TextRun({
+            text: " • ",
+            size: langHalfPt,
+            font: fontName,
+            color: "9CA3AF",
+          })
+        );
+      }
+    });
+
     children.push(
       new Paragraph({
         spacing: { before: 60, after: 120 },
-        children: [
-          new TextRun({
-            text: data.languages
-              .map(
-                (l) => `${l.name}${l.proficiency ? ` (${l.proficiency})` : ""}`
-              )
-              .join(" • "),
-            size: langHalfPt,
-            font: fontName,
-            color: "1F2937",
-          }),
-        ],
+        children: langRuns,
       })
     );
   };
