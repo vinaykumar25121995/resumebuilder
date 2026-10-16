@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, use } from "react";
+import { useState, useRef, useEffect, use, useCallback } from "react";
 import {
   Download,
   Sparkles,
@@ -49,6 +49,8 @@ import {
   List,
   Upload,
   Crop,
+  Undo2,
+  Redo2,
 } from "lucide-react";
 import ImageCropModal from "@/components/ImageCropModal";
 import Link from "next/link";
@@ -2499,6 +2501,159 @@ export default function ResumeEditorPage({
     }
   };
 
+  // ─── Undo & Redo History Management ───────────────────────────────────────
+  const historyRef = useRef<Array<{ data: ResumeData; templateId: string }>>([]);
+  const historyIndexRef = useRef<number>(-1);
+  const isPerformingUndoRedoRef = useRef<boolean>(false);
+  const lastHistoryPushTimeRef = useRef<number>(0);
+
+  const [canUndo, setCanUndo] = useState<boolean>(false);
+  const [canRedo, setCanRedo] = useState<boolean>(false);
+
+  // Undo Action
+  const handleUndo = useCallback(() => {
+    if (historyIndexRef.current <= 0) return;
+    const targetIndex = historyIndexRef.current - 1;
+    const targetEntry = historyRef.current[targetIndex];
+    if (!targetEntry) return;
+
+    isPerformingUndoRedoRef.current = true;
+    historyIndexRef.current = targetIndex;
+
+    const restoredData = JSON.parse(JSON.stringify(targetEntry.data));
+    setData(restoredData);
+    setTemplateId(targetEntry.templateId);
+
+    setCanUndo(targetIndex > 0);
+    setCanRedo(targetIndex < historyRef.current.length - 1);
+    notify("Undone ↺");
+  }, []);
+
+  // Redo Action
+  const handleRedo = useCallback(() => {
+    if (historyIndexRef.current >= historyRef.current.length - 1) return;
+    const targetIndex = historyIndexRef.current + 1;
+    const targetEntry = historyRef.current[targetIndex];
+    if (!targetEntry) return;
+
+    isPerformingUndoRedoRef.current = true;
+    historyIndexRef.current = targetIndex;
+
+    const restoredData = JSON.parse(JSON.stringify(targetEntry.data));
+    setData(restoredData);
+    setTemplateId(targetEntry.templateId);
+
+    setCanUndo(targetIndex > 0);
+    setCanRedo(targetIndex < historyRef.current.length - 1);
+    notify("Redone ↻");
+  }, []);
+
+  // Track state changes to record history
+  useEffect(() => {
+    if (!data || loading) return;
+
+    // Skip recording if this change is from an undo/redo restore
+    if (isPerformingUndoRedoRef.current) {
+      isPerformingUndoRedoRef.current = false;
+      return;
+    }
+
+    const currentEntry = historyRef.current[historyIndexRef.current];
+
+    // Initial entry after fetchResume
+    if (!currentEntry) {
+      historyRef.current = [{
+        data: JSON.parse(JSON.stringify(data)),
+        templateId,
+      }];
+      historyIndexRef.current = 0;
+      setCanUndo(false);
+      setCanRedo(false);
+      lastHistoryPushTimeRef.current = Date.now();
+      return;
+    }
+
+    // Compare with current entry to avoid duplicate pushes
+    const isSameTemplate = currentEntry.templateId === templateId;
+    const isSameData = JSON.stringify(currentEntry.data) === JSON.stringify(data);
+    if (isSameTemplate && isSameData) {
+      return;
+    }
+
+    const now = Date.now();
+    const elapsed = now - lastHistoryPushTimeRef.current;
+
+    // Check if this is a structural / discrete change
+    const isStructuralChange =
+      !isSameTemplate ||
+      currentEntry.data.experience?.length !== data.experience?.length ||
+      currentEntry.data.skills?.technical?.length !== data.skills?.technical?.length ||
+      currentEntry.data.projects?.length !== data.projects?.length ||
+      currentEntry.data.education?.length !== data.education?.length ||
+      currentEntry.data.certifications?.length !== data.certifications?.length ||
+      currentEntry.data.achievements?.length !== data.achievements?.length ||
+      currentEntry.data.languages?.length !== data.languages?.length ||
+      JSON.stringify(currentEntry.data.customStyles) !== JSON.stringify(data.customStyles);
+
+    // If fast continuous typing (<600ms) and NOT a structural change, group into current step
+    if (elapsed < 600 && !isStructuralChange && historyIndexRef.current > 0) {
+      historyRef.current[historyIndexRef.current] = {
+        data: JSON.parse(JSON.stringify(data)),
+        templateId,
+      };
+    } else {
+      // Create a new history step
+      const newHistory = historyRef.current.slice(0, historyIndexRef.current + 1);
+      newHistory.push({
+        data: JSON.parse(JSON.stringify(data)),
+        templateId,
+      });
+
+      // Keep maximum 60 steps in memory
+      if (newHistory.length > 60) {
+        newHistory.shift();
+      }
+
+      historyRef.current = newHistory;
+      historyIndexRef.current = newHistory.length - 1;
+    }
+
+    lastHistoryPushTimeRef.current = now;
+    setCanUndo(historyIndexRef.current > 0);
+    setCanRedo(historyIndexRef.current < historyRef.current.length - 1);
+  }, [data, templateId, loading]);
+
+  // Global Keyboard Shortcuts (Ctrl+Z / Cmd+Z for Undo, Ctrl+Y / Ctrl+Shift+Z / Cmd+Shift+Z for Redo)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const isMac = typeof navigator !== "undefined" && /Mac|iPod|iPhone|iPad/.test(navigator.platform);
+      const modKey = isMac ? e.metaKey : e.ctrlKey;
+
+      if (!modKey) return;
+
+      const target = e.target as HTMLElement | null;
+      const isInput = target && (target.tagName === "INPUT" || target.tagName === "TEXTAREA");
+
+      // Undo: Ctrl+Z
+      if (e.key.toLowerCase() === "z" && !e.shiftKey) {
+        if (!isInput) {
+          e.preventDefault();
+          handleUndo();
+        }
+      }
+      // Redo: Ctrl+Y or Ctrl+Shift+Z
+      else if (e.key.toLowerCase() === "y" || (e.key.toLowerCase() === "z" && e.shiftKey)) {
+        if (!isInput) {
+          e.preventDefault();
+          handleRedo();
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [handleUndo, handleRedo]);
+
   const currentTemplate = getTemplateById(templateId) || ALL_TEMPLATES[0];
 
   // Custom styles helper
@@ -3153,7 +3308,37 @@ export default function ResumeEditorPage({
             </div>
           </div>
 
-          <div className="flex items-center space-x-1 flex-shrink-0">
+          <div className="flex items-center space-x-1.5 flex-shrink-0">
+            {/* Undo & Redo History Controls */}
+            <div className="flex items-center bg-gray-100 rounded-lg p-0.5 border border-gray-200 mr-0.5">
+              <button
+                type="button"
+                onClick={handleUndo}
+                disabled={!canUndo}
+                className={`p-1.5 rounded-md transition-all ${
+                  canUndo
+                    ? "text-gray-700 hover:text-blue-600 hover:bg-white shadow-2xs"
+                    : "text-gray-300 cursor-not-allowed opacity-40"
+                }`}
+                title="Undo last change (Ctrl+Z)"
+              >
+                <Undo2 className="w-3.5 h-3.5" />
+              </button>
+              <button
+                type="button"
+                onClick={handleRedo}
+                disabled={!canRedo}
+                className={`p-1.5 rounded-md transition-all ${
+                  canRedo
+                    ? "text-gray-700 hover:text-blue-600 hover:bg-white shadow-2xs"
+                    : "text-gray-300 cursor-not-allowed opacity-40"
+                }`}
+                title="Redo undone change (Ctrl+Y)"
+              >
+                <Redo2 className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
             <button
               onClick={handleSyncWithProfile}
               disabled={syncing}
@@ -6147,23 +6332,58 @@ export default function ResumeEditorPage({
             </span>
           </div>
 
-          <button
-            type="button"
-            onClick={() => {
-              const next = !inlineEditActive;
-              setInlineEditActive(next);
-              notify(next ? "Direct Word-by-Word editing enabled! Click any text on the template to edit." : "Direct Word editing disabled.");
-            }}
-            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold shadow-sm transition-all border cursor-pointer ${
-              inlineEditActive
-                ? "bg-emerald-600 text-white border-emerald-700 ring-2 ring-emerald-300"
-                : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
-            }`}
-            title="Click to toggle direct on-page word editing"
-          >
-            <Paintbrush className="w-3.5 h-3.5" />
-            <span>{inlineEditActive ? "✏️ Word-by-Word Edit: ON" : "✏️ Enable Word Edit"}</span>
-          </button>
+          <div className="flex items-center gap-2">
+            {/* Quick Undo & Redo Controls */}
+            <div className="flex items-center bg-white/95 backdrop-blur px-1.5 py-1 rounded-full shadow-sm border border-gray-300 text-xs">
+              <button
+                type="button"
+                onClick={handleUndo}
+                disabled={!canUndo}
+                className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold transition-all ${
+                  canUndo
+                    ? "text-gray-700 hover:text-blue-600 hover:bg-gray-100"
+                    : "text-gray-300 cursor-not-allowed opacity-40"
+                }`}
+                title="Undo last change (Ctrl+Z)"
+              >
+                <Undo2 className="w-3.5 h-3.5" />
+                <span>Undo</span>
+              </button>
+              <span className="text-gray-300">|</span>
+              <button
+                type="button"
+                onClick={handleRedo}
+                disabled={!canRedo}
+                className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold transition-all ${
+                  canRedo
+                    ? "text-gray-700 hover:text-blue-600 hover:bg-gray-100"
+                    : "text-gray-300 cursor-not-allowed opacity-40"
+                }`}
+                title="Redo undone change (Ctrl+Y)"
+              >
+                <Redo2 className="w-3.5 h-3.5" />
+                <span>Redo</span>
+              </button>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => {
+                const next = !inlineEditActive;
+                setInlineEditActive(next);
+                notify(next ? "Direct Word-by-Word editing enabled! Click any text on the template to edit." : "Direct Word editing disabled.");
+              }}
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold shadow-sm transition-all border cursor-pointer ${
+                inlineEditActive
+                  ? "bg-emerald-600 text-white border-emerald-700 ring-2 ring-emerald-300"
+                  : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
+              }`}
+              title="Click to toggle direct on-page word editing"
+            >
+              <Paintbrush className="w-3.5 h-3.5" />
+              <span>{inlineEditActive ? "✏️ Word-by-Word Edit: ON" : "✏️ Enable Word Edit"}</span>
+            </button>
+          </div>
         </div>
 
         {inlineEditActive && (
