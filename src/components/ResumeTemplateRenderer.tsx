@@ -24,6 +24,24 @@ import {
   CheckCircle2,
 } from "lucide-react";
 
+function GithubIcon({ style, className }: { style?: React.CSSProperties; className?: string }) {
+  return (
+    <svg
+      style={style}
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4" />
+      <path d="M9 18c-4.51 2-5-2-7-2" />
+    </svg>
+  );
+}
+
 function LinkedinIcon({ style, className }: { style?: React.CSSProperties; className?: string }) {
   return (
     <svg
@@ -604,6 +622,9 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                 {data.personalInfo?.portfolio && (
                   <div>{data.personalInfo.portfolio}</div>
                 )}
+                {data.personalInfo?.customLinks && data.personalInfo.customLinks.map((cl, idx) => (
+                  <div key={idx}>{cl.label ? cl.label + ': ' : ''}{cl.url}</div>
+                ))}
               </div>
             ) : (
               contactLine && (
@@ -1264,6 +1285,8 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
       const location = data.personalInfo?.location;
       const portfolio = data.personalInfo?.portfolio;
       const linkedin = data.personalInfo?.linkedin;
+      const github = data.personalInfo?.github;
+      const customLinks = data.personalInfo?.customLinks || [];
       const photoUrl =
         data.personalInfo?.photoUrl ||
         "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&w=400&q=80";
@@ -1294,6 +1317,156 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
           </div>
         </div>
       );
+
+      const defaultMichelleSidebar = ["skills", "projects", "achievements", "certifications", "languages"];
+      const userSidebar = cs.sidebarSections && cs.sidebarSections.length > 0 ? cs.sidebarSections : defaultMichelleSidebar;
+      const sidebarSet = new Set(userSidebar);
+      const orderedSections = (cs.sectionOrder && cs.sectionOrder.length > 0 ? cs.sectionOrder : defaultSections).filter(id => !hidden.has(id));
+
+      const leftSections = orderedSections.filter(id => !sidebarSet.has(id) && id !== "summary");
+      const rightSections = orderedSections.filter(id => sidebarSet.has(id) && id !== "summary");
+
+      const renderMichelleSection = (secId: string) => {
+        switch (secId) {
+          case "education":
+            if (!data.education || data.education.length === 0) return null;
+            return (
+              <div key="education">
+                {renderDoubleUnderlineHeader("EDUCATION")}
+                <div style={{ display: "flex", flexDirection: "column", gap: "7px" }}>
+                  {data.education.map((edu, idx) => (
+                    <div key={edu.id || idx}>
+                      <div style={{ fontSize: "9.5pt", fontWeight: "700", color: "#0f172a", lineHeight: 1.25 }}>
+                        {edu.degree}
+                      </div>
+                      <div style={{ fontSize: "8.5pt", color: "#334155" }}>{edu.school}</div>
+                      {edu.date && <div style={{ fontSize: "8pt", color: "#64748b" }}>{edu.date}</div>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          case "experience":
+            if (!data.experience || data.experience.length === 0) return null;
+            return (
+              <div key="experience">
+                {renderDoubleUnderlineHeader("WORK EXPERIENCE")}
+                <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                  {data.experience.map((exp, idx) => (
+                    <div key={exp.id || idx}>
+                      <div style={{ fontSize: "9.5pt", fontWeight: "700", color: "#0f172a" }}>
+                        {exp.title}
+                      </div>
+                      <div style={{ fontSize: "8.5pt", color: "#334155" }}>{exp.company}</div>
+                      <div style={{ display: "flex", justifyContent: "space-between", fontSize: "8pt", color: "#64748b", margin: "1px 0 3px 0" }}>
+                        <span>{exp.date}</span>
+                        <span>{exp.location}</span>
+                      </div>
+                      {exp.bullets && exp.bullets.length > 0 && (
+                        <ul style={{ margin: "2px 0 0 0", paddingLeft: "14px" }}>
+                          {exp.bullets.map((b, bIdx) => (
+                            <li key={bIdx} style={{ fontSize: "8.5pt", color: "#334155", lineHeight: 1.4, marginBottom: "2px" }}>
+                              {renderFormattedText(b)}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          case "skills":
+            if (allSkills.length === 0) return null;
+            return (
+              <div key="skills">
+                {renderDoubleUnderlineHeader("AREAS OF EXPERTISE")}
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "5px" }}>
+                  {allSkills.map((skill, idx) => (
+                    <span
+                      key={idx}
+                      style={{
+                        backgroundColor: "#e59086",
+                        color: "#ffffff",
+                        padding: "3px 8px",
+                        borderRadius: "5px",
+                        fontSize: "8pt",
+                        fontWeight: "600",
+                        letterSpacing: "0.2px",
+                      }}
+                    >
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            );
+          case "projects":
+            if (!data.projects || data.projects.length === 0) return null;
+            return (
+              <div key="projects">
+                {renderDoubleUnderlineHeader("PERSONAL PROJECTS")}
+                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                  {data.projects.map((proj, idx) => (
+                    <div key={proj.id || idx}>
+                      <div style={{ fontSize: "9pt", fontWeight: "700", color: "#0f172a" }}>{proj.name}</div>
+                      <ul style={{ margin: "2px 0 0 0", paddingLeft: "14px" }}>
+                        <li style={{ fontSize: "8.5pt", color: "#334155", lineHeight: 1.4 }}>{proj.description}</li>
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          case "achievements":
+            if (!data.achievements || data.achievements.length === 0) return null;
+            return (
+              <div key="achievements">
+                {renderDoubleUnderlineHeader("ORGANIZATIONS & HONORS")}
+                <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
+                  {data.achievements.map((ach, idx) => (
+                    <div key={ach.id || idx}>
+                      <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{ach.title}</div>
+                      {ach.description && <div style={{ fontSize: "8pt", color: "#64748b" }}>{ach.description}</div>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          case "certifications":
+            if (!data.certifications || data.certifications.length === 0) return null;
+            return (
+              <div key="certifications">
+                {renderDoubleUnderlineHeader("CERTIFICATES")}
+                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                  {data.certifications.map((cert, idx) => (
+                    <div key={cert.id || idx}>
+                      <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{cert.name}</div>
+                      {cert.issuer && <div style={{ fontSize: "8pt", color: "#64748b" }}>{cert.issuer}</div>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          case "languages":
+            if (!data.languages || data.languages.length === 0) return null;
+            return (
+              <div key="languages">
+                {renderDoubleUnderlineHeader("LANGUAGES")}
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px 12px" }}>
+                  {data.languages.map((l, idx) => (
+                    <div key={idx}>
+                      <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{l.name}</div>
+                      <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{l.proficiency}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          default:
+            return null;
+        }
+      };
 
       return (
         <div
@@ -1340,7 +1513,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
               >
                 {data.personalInfo?.title || "Healthcare Industry Volunteer"}
               </p>
-              {data.summary && (
+              {data.summary && !hidden.has("summary") && (
                 <p
                   style={{
                     fontSize: "8.5pt",
@@ -1408,253 +1581,440 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                   <LinkedinIcon style={{ width: "12px", height: "12px", color: "#be675e", flexShrink: 0 }} />
                 </div>
               )}
+              {github && (
+                <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "8.5pt", color: "#334155" }}>
+                  <span>{github.replace(/^https?:\/\//, "")}</span>
+                  <GithubIcon style={{ width: "12px", height: "12px", color: "#be675e", flexShrink: 0 }} />
+                </div>
+              )}
               {portfolio && (
                 <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "8.5pt", color: "#334155" }}>
                   <span>{portfolio.replace(/^https?:\/\//, "")}</span>
                   <Globe style={{ width: "12px", height: "12px", color: "#be675e", flexShrink: 0 }} />
                 </div>
               )}
+              {customLinks.map((cl, i) => (
+                <div key={i} style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "8.5pt", color: "#334155" }}>
+                  <span><strong>{cl.label}:</strong> {cl.url.replace(/^https?:\/\//, "")}</span>
+                  <Globe style={{ width: "12px", height: "12px", color: "#be675e", flexShrink: 0 }} />
+                </div>
+              ))}
             </div>
           </div>
 
           {/* Body: 2-Column Layout */}
           <div style={{ display: "flex", gap: "24px", marginTop: "8px" }}>
-            {/* Left Column (52%): Education & Work Experience */}
-            <div style={{ flex: "1 1 52%", minWidth: 0 }}>
-              {/* EDUCATION */}
-              {data.education && data.education.length > 0 && (
-                <div>
-                  {renderDoubleUnderlineHeader("EDUCATION")}
-                  <div style={{ display: "flex", flexDirection: "column", gap: "7px" }}>
-                    {data.education.map((edu, idx) => (
-                      <div key={edu.id || idx}>
-                        <div style={{ fontSize: "9.5pt", fontWeight: "700", color: "#0f172a", lineHeight: 1.25 }}>
-                          {edu.degree}
-                        </div>
-                        <div style={{ fontSize: "8.5pt", color: "#334155" }}>
-                          {edu.school}
-                        </div>
-                        {edu.date && (
-                          <div style={{ fontSize: "8pt", color: "#64748b" }}>
-                            {edu.date}
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* WORK EXPERIENCE */}
-              {data.experience && data.experience.length > 0 && (
-                <div>
-                  {renderDoubleUnderlineHeader("WORK EXPERIENCE")}
-                  <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-                    {data.experience.map((exp, idx) => (
-                      <div key={exp.id || idx}>
-                        <div style={{ fontSize: "9.5pt", fontWeight: "700", color: "#0f172a" }}>
-                          {exp.title}
-                        </div>
-                        <div style={{ fontSize: "8.5pt", color: "#334155" }}>
-                          {exp.company}
-                        </div>
-                        <div
-                          style={{
-                            display: "flex",
-                            justifyContent: "space-between",
-                            fontSize: "8pt",
-                            color: "#64748b",
-                            margin: "1px 0 3px 0",
-                          }}
-                        >
-                          <span>{exp.date}</span>
-                          <span>{exp.location}</span>
-                        </div>
-                        <div
-                          style={{
-                            fontSize: "7.5pt",
-                            color: "#475569",
-                            fontStyle: "italic",
-                            marginBottom: "3px",
-                          }}
-                        >
-                          Clinical Care & Patient Interaction
-                        </div>
-                        {exp.bullets && exp.bullets.length > 0 && (
-                          <ul style={{ margin: "2px 0 0 0", paddingLeft: "14px" }}>
-                            {exp.bullets.map((b, bIdx) => (
-                              <li
-                                key={bIdx}
-                                style={{
-                                  fontSize: "8.5pt",
-                                  color: "#334155",
-                                  lineHeight: 1.4,
-                                  marginBottom: "2px",
-                                }}
-                              >
-                                {renderFormattedText(b)}
-                              </li>
-                            ))}
-                          </ul>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+            {/* Left Column (52%) */}
+            <div style={{ flex: "1 1 52%", minWidth: 0, display: "flex", flexDirection: "column", gap: "10px" }}>
+              {leftSections.map(secId => renderMichelleSection(secId))}
             </div>
 
-            {/* Right Column (48%): Areas of Expertise, Projects, Organizations, Certificates, Languages */}
-            <div style={{ flex: "1 1 48%", minWidth: 0 }}>
-              {/* AREAS OF EXPERTISE */}
-              <div>
-                {renderDoubleUnderlineHeader("AREAS OF EXPERTISE")}
-                <div style={{ display: "flex", flexWrap: "wrap", gap: "5px" }}>
-                  {(allSkills.length > 0
-                    ? allSkills.slice(0, 8)
-                    : [
-                        "Time Management",
-                        "Strong Interpersonal Skills",
-                        "Reception & Patient Fronting",
-                        "Records Maintenance",
-                        "First Aid & Patient Care",
-                        "Teamwork & Collaboration",
-                        "Inventory Management",
-                      ]
-                  ).map((skill, idx) => (
-                    <span
-                      key={idx}
-                      style={{
-                        backgroundColor: "#e59086",
-                        color: "#ffffff",
-                        padding: "3px 8px",
-                        borderRadius: "5px",
-                        fontSize: "8pt",
-                        fontWeight: "600",
-                        letterSpacing: "0.2px",
-                      }}
-                    >
-                      {skill}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              {/* PERSONAL PROJECTS */}
-              {data.projects && data.projects.length > 0 && (
-                <div>
-                  {renderDoubleUnderlineHeader("PERSONAL PROJECTS")}
-                  <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                    {data.projects.map((proj, idx) => (
-                      <div key={proj.id || idx}>
-                        <div style={{ fontSize: "9pt", fontWeight: "700", color: "#0f172a" }}>
-                          {proj.name}
-                        </div>
-                        <ul style={{ margin: "2px 0 0 0", paddingLeft: "14px" }}>
-                          <li style={{ fontSize: "8.5pt", color: "#334155", lineHeight: 1.4 }}>
-                            {proj.description}
-                          </li>
-                        </ul>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* ORGANIZATIONS */}
-              {data.achievements && data.achievements.length > 0 && (
-                <div>
-                  {renderDoubleUnderlineHeader("ORGANIZATIONS")}
-                  <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
-                    {data.achievements.map((ach, idx) => (
-                      <div key={ach.id || idx}>
-                        <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>
-                          {ach.title}
-                        </div>
-                        {ach.description && (
-                          <div style={{ fontSize: "8pt", color: "#64748b" }}>
-                            {ach.description}
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* CERTIFICATES */}
-              {data.certifications && data.certifications.length > 0 && (
-                <div>
-                  {renderDoubleUnderlineHeader("CERTIFICATES")}
-                  <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                    {data.certifications.map((cert, idx) => (
-                      <div key={cert.id || idx}>
-                        <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>
-                          {cert.name}
-                        </div>
-                        {cert.issuer && (
-                          <div style={{ fontSize: "8pt", color: "#64748b" }}>
-                            {cert.issuer}
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* LANGUAGES */}
-              {data.languages && data.languages.length > 0 && (
-                <div>
-                  {renderDoubleUnderlineHeader("LANGUAGES")}
-                  <div
-                    style={{
-                      display: "grid",
-                      gridTemplateColumns: "1fr 1fr",
-                      gap: "6px 12px",
-                    }}
-                  >
-                    {data.languages.map((lang, idx) => (
-                      <div key={lang.id || idx}>
-                        <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>
-                          {lang.name}
-                        </div>
-                        <div style={{ fontSize: "7.5pt", color: "#64748b" }}>
-                          {lang.proficiency}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+            {/* Right Column (48%) */}
+            <div style={{ flex: "1 1 48%", minWidth: 0, display: "flex", flexDirection: "column", gap: "10px" }}>
+              {rightSections.map(secId => renderMichelleSection(secId))}
             </div>
           </div>
         </div>
       );
     };
 
-    // 2. Catherine Barnett — 3D Character Animator
+    // 2. Cathy Barnett — Customer Support Lead
     const renderProCatherine = () => {
       const email = data.personalInfo?.email;
       const phone = data.personalInfo?.phone;
       const location = data.personalInfo?.location;
       const portfolio = data.personalInfo?.portfolio;
       const linkedin = data.personalInfo?.linkedin;
+      const github = data.personalInfo?.github;
+      const customLinks = data.personalInfo?.customLinks || [];
 
       const techSkills = [
         ...(data.skills?.technical || []),
         ...(data.skills?.tools || []),
         ...(data.skills?.concepts || []),
       ];
-      const softSkills = data.skills?.soft?.length
-        ? data.skills.soft
-        : [
-            "Attention to Detail",
-            "Collaboration",
-            "Time Management",
-            "Leadership",
-            "Problem Solving",
-          ];
+      // Only include soft skills if user actually provided them
+      const softSkills = data.skills?.soft || [];
+
+      const defaultCatherineSidebar = ["skills", "languages", "certifications"];
+      const userSidebar = cs.sidebarSections && cs.sidebarSections.length > 0 ? cs.sidebarSections : defaultCatherineSidebar;
+      const sidebarSet = new Set(userSidebar);
+      const orderedSections = (cs.sectionOrder && cs.sectionOrder.length > 0 ? cs.sectionOrder : defaultSections).filter(id => !hidden.has(id));
+
+      const sidebarSections = orderedSections.filter(id => sidebarSet.has(id));
+      const mainSections = orderedSections.filter(id => !sidebarSet.has(id));
+
+      const renderSidebarHeading = (title: string, icon: React.ReactNode) => (
+        <div style={{ marginBottom: "6px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "4px" }}>
+            <div
+              style={{
+                width: "18px",
+                height: "18px",
+                borderRadius: "50%",
+                backgroundColor: "rgba(255, 255, 255, 0.15)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0,
+              }}
+            >
+              {icon}
+            </div>
+            <span style={{ fontSize: "9.5pt", fontWeight: "bold", textTransform: "uppercase", letterSpacing: "1px", color: "#ffffff" }}>
+              {title}
+            </span>
+          </div>
+          <div style={{ height: "1px", backgroundColor: "rgba(255, 255, 255, 0.15)", marginBottom: "6px" }} />
+        </div>
+      );
+
+      const renderMainHeading = (title: string, icon: React.ReactNode) => (
+        <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "6px" }}>
+          <div
+            style={{
+              width: "16px",
+              height: "16px",
+              borderRadius: "50%",
+              border: "2px solid #0f172a",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
+            }}
+          >
+            {icon}
+          </div>
+          <span style={{ fontSize: "10.5pt", fontWeight: "bold", textTransform: "uppercase", letterSpacing: "1px", color: "#0f172a" }}>
+            {title}
+          </span>
+        </div>
+      );
+
+      const renderCatherineSection = (secId: string, isSidebar: boolean) => {
+        switch (secId) {
+          case "summary":
+            if (!data.summary || !data.summary.trim()) return null;
+            if (isSidebar) {
+              return (
+                <div key="summary">
+                  {renderSidebarHeading("Summary", <Sparkles style={{ width: "10px", height: "10px", color: "#38bdf8" }} />)}
+                  <p style={{ fontSize: "8pt", lineHeight: "1.45", color: "#cbd5e1", margin: 0 }}>
+                    {renderFormattedText(data.summary)}
+                  </p>
+                </div>
+              );
+            }
+            return (
+              <div key="summary" style={{ marginBottom: "8px" }}>
+                {renderMainHeading("Professional Summary", <Sparkles style={{ width: "8px", height: "8px", color: "#0f172a" }} />)}
+                <p style={{ fontSize: "8.5pt", lineHeight: "1.45", color: "#334155", margin: 0 }}>
+                  {renderFormattedText(data.summary)}
+                </p>
+              </div>
+            );
+
+          case "experience":
+            if (!data.experience || data.experience.length === 0) return null;
+            if (isSidebar) {
+              return (
+                <div key="experience">
+                  {renderSidebarHeading("Experience", <Briefcase style={{ width: "10px", height: "10px", color: "#38bdf8" }} />)}
+                  <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                    {data.experience.map((exp, i) => (
+                      <div key={i}>
+                        <div style={{ fontSize: "8.5pt", fontWeight: "bold", color: "#ffffff" }}>
+                          {renderFormattedText(exp.title || "")}
+                        </div>
+                        <div style={{ fontSize: "8pt", color: "#38bdf8" }}>{exp.company}</div>
+                        <div style={{ fontSize: "7.5pt", color: "#94a3b8" }}>{exp.date}</div>
+                        {renderBulletList(exp.bullets, false, "•", "7.5pt")}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            }
+            return (
+              <div key="experience">
+                {renderMainHeading("Work Experience", <Briefcase style={{ width: "8px", height: "8px", color: "#0f172a" }} />)}
+                <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                  {data.experience.map((exp, i) => (
+                    <div key={i}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+                        <span style={{ fontSize: "10pt", fontWeight: "bold", color: "#0f172a" }}>
+                          {renderFormattedText(exp.title || "")}
+                        </span>
+                        <span style={{ fontSize: "8pt", color: "#64748b", fontWeight: 500 }}>
+                          {exp.date}
+                        </span>
+                      </div>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+                        <span style={{ fontSize: "9pt", fontWeight: 600, color: "#0284c7" }}>
+                          {renderFormattedText(exp.company || "")}
+                        </span>
+                        {exp.location && (
+                          <span style={{ fontSize: "8pt", color: "#94a3b8" }}>{exp.location}</span>
+                        )}
+                      </div>
+                      {renderBulletList(exp.bullets, false, "•", "8.5pt")}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+
+          case "education":
+            if (!data.education || data.education.length === 0) return null;
+            if (isSidebar) {
+              return (
+                <div key="education">
+                  {renderSidebarHeading("Education", <GraduationCap style={{ width: "10px", height: "10px", color: "#38bdf8" }} />)}
+                  <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                    {data.education.map((edu, i) => (
+                      <div key={i}>
+                        <div style={{ fontSize: "8.5pt", fontWeight: "bold", color: "#ffffff" }}>
+                          {edu.degree} {edu.field ? `in ${edu.field}` : ""}
+                        </div>
+                        <div style={{ fontSize: "7.5pt", color: "#94a3b8" }}>{edu.school}</div>
+                        {edu.date && <div style={{ fontSize: "7pt", color: "#64748b" }}>{edu.date}</div>}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            }
+            return (
+              <div key="education">
+                {renderMainHeading("Education", <GraduationCap style={{ width: "8px", height: "8px", color: "#0f172a" }} />)}
+                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                  {data.education.map((edu, i) => (
+                    <div key={i}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+                        <span style={{ fontSize: "9.5pt", fontWeight: "bold", color: "#0f172a" }}>
+                          {edu.degree} {edu.field ? `in ${edu.field}` : ""}
+                        </span>
+                        <span style={{ fontSize: "8pt", color: "#64748b" }}>{edu.date}</span>
+                      </div>
+                      <div style={{ fontSize: "8.5pt", color: "#475569" }}>{edu.school}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+
+          case "skills":
+            if (techSkills.length === 0 && softSkills.length === 0) return null;
+            if (isSidebar) {
+              return (
+                <div key="skills" style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                  {techSkills.length > 0 && (
+                    <div>
+                      {renderSidebarHeading("Hard Skills", <Layers style={{ width: "10px", height: "10px", color: "#38bdf8" }} />)}
+                      <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                        {techSkills.map((sk, i) => (
+                          <div key={i} style={{ fontSize: "8.5pt", color: "#cbd5e1", lineHeight: "1.3" }}>
+                            {sk}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {softSkills.length > 0 && (
+                    <div>
+                      {renderSidebarHeading("Soft Skills", <Sparkles style={{ width: "10px", height: "10px", color: "#38bdf8" }} />)}
+                      <div style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
+                        {softSkills.map((sk, i) => (
+                          <div
+                            key={i}
+                            style={{
+                              backgroundColor: "rgba(255, 255, 255, 0.12)",
+                              border: "1px solid rgba(255, 255, 255, 0.2)",
+                              borderRadius: "5px",
+                              padding: "4px 8px",
+                              fontSize: "8pt",
+                              color: "#ffffff",
+                              textAlign: "center",
+                              fontWeight: 500,
+                            }}
+                          >
+                            {sk}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            }
+            return (
+              <div key="skills" style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                {renderMainHeading("Technical & Core Skills", <Layers style={{ width: "8px", height: "8px", color: "#0f172a" }} />)}
+                {techSkills.length > 0 && (
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: "5px" }}>
+                    {techSkills.map((sk, i) => (
+                      <span key={i} style={{ backgroundColor: "#f1f5f9", border: "1px solid #cbd5e1", borderRadius: "4px", padding: "3px 8px", fontSize: "8pt", color: "#0f172a", fontWeight: 600 }}>
+                        {sk}
+                      </span>
+                    ))}
+                  </div>
+                )}
+                {softSkills.length > 0 && (
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: "4px", marginTop: "4px" }}>
+                    {softSkills.map((sk, i) => (
+                      <span key={i} style={{ backgroundColor: "#e0f2fe", border: "1px solid #bae6fd", borderRadius: "4px", padding: "3px 8px", fontSize: "8pt", color: "#0369a1", fontWeight: 500 }}>
+                        {sk}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+
+          case "projects":
+            if (!data.projects || data.projects.length === 0) return null;
+            if (isSidebar) {
+              return (
+                <div key="projects">
+                  {renderSidebarHeading("Projects", <FolderGit2 style={{ width: "10px", height: "10px", color: "#38bdf8" }} />)}
+                  <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                    {data.projects.map((proj, i) => (
+                      <div key={i}>
+                        <div style={{ fontSize: "8.5pt", fontWeight: "bold", color: "#ffffff" }}>
+                          {proj.name} {proj.tech ? <span style={{ fontSize: "7.5pt", color: "#38bdf8" }}>({proj.tech})</span> : null}
+                        </div>
+                        {proj.description && <div style={{ fontSize: "7.5pt", color: "#94a3b8" }}>{proj.description}</div>}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            }
+            return (
+              <div key="projects">
+                {renderMainHeading("Key Projects", <FolderGit2 style={{ width: "8px", height: "8px", color: "#0f172a" }} />)}
+                <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                  {data.projects.map((proj, i) => (
+                    <div key={i}>
+                      <div style={{ fontSize: "9.5pt", fontWeight: "bold", color: "#0f172a" }}>
+                        {proj.name} {proj.tech ? <span style={{ fontSize: "8pt", color: "#0284c7" }}>({proj.tech})</span> : null}
+                      </div>
+                      {proj.description && <div style={{ fontSize: "8.5pt", color: "#334155" }}>{proj.description}</div>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+
+          case "certifications":
+            if (!data.certifications || data.certifications.length === 0) return null;
+            if (isSidebar) {
+              return (
+                <div key="certifications">
+                  {renderSidebarHeading("Certificates", <Award style={{ width: "10px", height: "10px", color: "#38bdf8" }} />)}
+                  <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
+                    {data.certifications.map((cert, i) => (
+                      <div key={i}>
+                        <div style={{ fontSize: "8.5pt", fontWeight: "bold", color: "#ffffff" }}>
+                          {cert.name}
+                        </div>
+                        <div style={{ fontSize: "7.5pt", color: "#94a3b8" }}>
+                          {cert.issuer} {cert.date ? `• ${cert.date}` : ""}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            }
+            return (
+              <div key="certifications">
+                {renderMainHeading("Certificates", <Award style={{ width: "8px", height: "8px", color: "#0f172a" }} />)}
+                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                  {data.certifications.map((cert, i) => (
+                    <div key={i}>
+                      <div style={{ fontSize: "9pt", fontWeight: "bold", color: "#0f172a" }}>
+                        {cert.name}
+                      </div>
+                      <div style={{ fontSize: "8pt", color: "#64748b" }}>
+                        {cert.issuer} {cert.date ? `• ${cert.date}` : ""}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+
+          case "achievements":
+            if (!data.achievements || data.achievements.length === 0) return null;
+            if (isSidebar) {
+              return (
+                <div key="achievements">
+                  {renderSidebarHeading("Achievements", <Sparkles style={{ width: "10px", height: "10px", color: "#38bdf8" }} />)}
+                  <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
+                    {data.achievements.map((ach, i) => (
+                      <div key={i}>
+                        <div style={{ fontSize: "8.5pt", fontWeight: "bold", color: "#ffffff" }}>{ach.title}</div>
+                        {ach.description && <div style={{ fontSize: "7.5pt", color: "#94a3b8" }}>{ach.description}</div>}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            }
+            return (
+              <div key="achievements">
+                {renderMainHeading("Achievements & Honors", <Sparkles style={{ width: "8px", height: "8px", color: "#0f172a" }} />)}
+                <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                  {data.achievements.map((ach, i) => (
+                    <div key={i}>
+                      <div style={{ fontSize: "9pt", fontWeight: "bold", color: "#0f172a" }}>{ach.title}</div>
+                      {ach.description && <div style={{ fontSize: "8pt", color: "#64748b" }}>{ach.description}</div>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+
+          case "languages":
+            if (!data.languages || data.languages.length === 0) return null;
+            if (isSidebar) {
+              return (
+                <div key="languages">
+                  {renderSidebarHeading("Languages", <Globe style={{ width: "10px", height: "10px", color: "#38bdf8" }} />)}
+                  <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                    {data.languages.map((lang, i) => (
+                      <div key={i}>
+                        <div style={{ fontSize: "8.5pt", fontWeight: "bold", color: "#ffffff" }}>{lang.name}</div>
+                        {lang.proficiency && (
+                          <div style={{ fontSize: "7.5pt", color: "#94a3b8" }}>{lang.proficiency}</div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            }
+            return (
+              <div key="languages">
+                {renderMainHeading("Languages", <Globe style={{ width: "8px", height: "8px", color: "#0f172a" }} />)}
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px 12px" }}>
+                  {data.languages.map((lang, i) => (
+                    <div key={i}>
+                      <div style={{ fontSize: "9pt", fontWeight: "bold", color: "#0f172a" }}>{lang.name}</div>
+                      {lang.proficiency && (
+                        <div style={{ fontSize: "8pt", color: "#64748b" }}>{lang.proficiency}</div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+
+          default:
+            return null;
+        }
+      };
 
       return (
         <div
@@ -1685,7 +2045,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
               boxSizing: "border-box",
               display: "flex",
               flexDirection: "column",
-              gap: "16px",
+              gap: "14px",
             }}
           >
             {/* Contact Pills */}
@@ -1761,7 +2121,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                   }}
                 >
                   <Globe style={{ width: "12px", height: "12px", color: "#38bdf8", flexShrink: 0 }} />
-                  <span>{portfolio}</span>
+                  <span>{portfolio.replace(/^https?:\/\//, "")}</span>
                 </div>
               )}
               {linkedin && (
@@ -1780,127 +2140,38 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                   }}
                 >
                   <LinkedinIcon style={{ width: "12px", height: "12px", color: "#38bdf8", flexShrink: 0 }} />
-                  <span>{linkedin}</span>
+                  <span>{linkedin.replace(/^https?:\/\//, "")}</span>
                 </div>
               )}
-              {data.personalInfo?.customLinks && data.personalInfo.customLinks.map((cl, i) => (
+              {github && (
+                <div
+                  style={{
+                    backgroundColor: "rgba(255, 255, 255, 0.08)",
+                    border: "1px solid rgba(255, 255, 255, 0.12)",
+                    borderRadius: "6px",
+                    padding: "6px 8px",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    fontSize: "8pt",
+                    color: "#f1f5f9",
+                    wordBreak: "break-all",
+                  }}
+                >
+                  <GithubIcon style={{ width: "12px", height: "12px", color: "#38bdf8", flexShrink: 0 }} />
+                  <span>{github.replace(/^https?:\/\//, "")}</span>
+                </div>
+              )}
+              {customLinks.map((cl, i) => (
                 <div key={i} style={{ backgroundColor: "rgba(255, 255, 255, 0.08)", border: "1px solid rgba(255, 255, 255, 0.12)", borderRadius: "6px", padding: "6px 8px", display: "flex", alignItems: "center", gap: "8px", fontSize: "8pt", color: "#f1f5f9", wordBreak: "break-all" }}>
                   <Globe style={{ width: "12px", height: "12px", color: "#38bdf8", flexShrink: 0 }} />
-                  <span><strong>{cl.label}:</strong> {cl.url}</span>
+                  <span><strong>{cl.label}:</strong> {cl.url.replace(/^https?:\/\//, "")}</span>
                 </div>
               ))}
             </div>
 
-            {/* HARD SKILLS */}
-            {techSkills.length > 0 && (
-              <div>
-                <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "4px" }}>
-                  <div
-                    style={{
-                      width: "18px",
-                      height: "18px",
-                      borderRadius: "50%",
-                      backgroundColor: "rgba(255, 255, 255, 0.15)",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <Layers style={{ width: "10px", height: "10px", color: "#38bdf8" }} />
-                  </div>
-                  <span style={{ fontSize: "9.5pt", fontWeight: "bold", textTransform: "uppercase", letterSpacing: "1px" }}>
-                    Hard Skills
-                  </span>
-                </div>
-                <div style={{ height: "1px", backgroundColor: "rgba(255, 255, 255, 0.15)", marginBottom: "8px" }} />
-                <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                  {techSkills.map((sk, i) => (
-                    <div key={i} style={{ fontSize: "8.5pt", color: "#cbd5e1", lineHeight: "1.3" }}>
-                      {sk}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* SOFT SKILLS */}
-            {softSkills.length > 0 && (
-              <div>
-                <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "4px" }}>
-                  <div
-                    style={{
-                      width: "18px",
-                      height: "18px",
-                      borderRadius: "50%",
-                      backgroundColor: "rgba(255, 255, 255, 0.15)",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <Sparkles style={{ width: "10px", height: "10px", color: "#38bdf8" }} />
-                  </div>
-                  <span style={{ fontSize: "9.5pt", fontWeight: "bold", textTransform: "uppercase", letterSpacing: "1px" }}>
-                    Soft Skills
-                  </span>
-                </div>
-                <div style={{ height: "1px", backgroundColor: "rgba(255, 255, 255, 0.15)", marginBottom: "8px" }} />
-                <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
-                  {softSkills.map((sk, i) => (
-                    <div
-                      key={i}
-                      style={{
-                        backgroundColor: "rgba(255, 255, 255, 0.12)",
-                        border: "1px solid rgba(255, 255, 255, 0.2)",
-                        borderRadius: "5px",
-                        padding: "4px 8px",
-                        fontSize: "8pt",
-                        color: "#ffffff",
-                        textAlign: "center",
-                        fontWeight: 500,
-                      }}
-                    >
-                      {sk}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* LANGUAGES */}
-            {data.languages && data.languages.length > 0 && (
-              <div>
-                <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "4px" }}>
-                  <div
-                    style={{
-                      width: "18px",
-                      height: "18px",
-                      borderRadius: "50%",
-                      backgroundColor: "rgba(255, 255, 255, 0.15)",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <Globe style={{ width: "10px", height: "10px", color: "#38bdf8" }} />
-                  </div>
-                  <span style={{ fontSize: "9.5pt", fontWeight: "bold", textTransform: "uppercase", letterSpacing: "1px" }}>
-                    Languages
-                  </span>
-                </div>
-                <div style={{ height: "1px", backgroundColor: "rgba(255, 255, 255, 0.15)", marginBottom: "8px" }} />
-                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                  {data.languages.map((lang, i) => (
-                    <div key={i}>
-                      <div style={{ fontSize: "8.5pt", fontWeight: "bold", color: "#ffffff" }}>{lang.name}</div>
-                      {lang.proficiency && (
-                        <div style={{ fontSize: "7.5pt", color: "#94a3b8" }}>{lang.proficiency}</div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+            {/* Dynamic Sidebar Sections */}
+            {sidebarSections.map(secId => renderCatherineSection(secId, true))}
           </div>
 
           {/* Right White Column */}
@@ -1940,204 +2211,24 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                   {data.personalInfo.title}
                 </div>
               )}
-              {data.summary && (
-                <div style={{ marginTop: "4px" }}>
-                  <div
-                    style={{
-                      fontSize: "8.5pt",
-                      fontWeight: "bold",
-                      textTransform: "uppercase",
-                      letterSpacing: "0.5px",
-                      color: "#0f172a",
-                      marginBottom: "3px",
-                    }}
-                  >
-                    Professional Summary
-                  </div>
-                  <p style={{ fontSize: "8.5pt", lineHeight: "1.45", color: "#334155", margin: 0 }}>
-                    {renderFormattedText(data.summary)}
-                  </p>
-                </div>
-              )}
             </div>
 
-            {/* Work Experience */}
-            {data.experience && data.experience.length > 0 && (
-              <div>
-                <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "6px" }}>
-                  <div
-                    style={{
-                      width: "16px",
-                      height: "16px",
-                      borderRadius: "50%",
-                      border: "2px solid #0f172a",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <div style={{ width: "6px", height: "6px", borderRadius: "50%", backgroundColor: "#0f172a" }} />
-                  </div>
-                  <span style={{ fontSize: "10.5pt", fontWeight: "bold", textTransform: "uppercase", letterSpacing: "1px", color: "#0f172a" }}>
-                    Work Experience
-                  </span>
-                </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-                  {data.experience.map((exp, i) => (
-                    <div key={i}>
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-                        <span style={{ fontSize: "10pt", fontWeight: "bold", color: "#0f172a" }}>
-                          {renderFormattedText(exp.title || "")}
-                        </span>
-                        <span style={{ fontSize: "8pt", color: "#64748b", fontWeight: 500 }}>
-                          {exp.date}
-                        </span>
-                      </div>
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-                        <span style={{ fontSize: "9pt", fontWeight: 600, color: "#0284c7" }}>
-                          {renderFormattedText(exp.company || "")}
-                        </span>
-                        {exp.location && (
-                          <span style={{ fontSize: "8pt", color: "#94a3b8" }}>{exp.location}</span>
-                        )}
-                      </div>
-                      {renderBulletList(exp.bullets, false, "•", "8.5pt")}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Certificates */}
-            {data.certifications && data.certifications.length > 0 && (
-              <div>
-                <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "6px" }}>
-                  <div
-                    style={{
-                      width: "16px",
-                      height: "16px",
-                      borderRadius: "50%",
-                      border: "2px solid #0f172a",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <Award style={{ width: "9px", height: "9px", color: "#0f172a" }} />
-                  </div>
-                  <span style={{ fontSize: "10.5pt", fontWeight: "bold", textTransform: "uppercase", letterSpacing: "1px", color: "#0f172a" }}>
-                    Certificates
-                  </span>
-                </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                  {data.certifications.map((cert, i) => (
-                    <div key={i}>
-                      <div style={{ fontSize: "9pt", fontWeight: "bold", color: "#0f172a" }}>
-                        {cert.name}
-                      </div>
-                      <div style={{ fontSize: "8pt", color: "#64748b" }}>
-                        {cert.issuer} {cert.date ? `• ${cert.date}` : ""}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Education */}
-            {data.education && data.education.length > 0 && (
-              <div>
-                <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "6px" }}>
-                  <div
-                    style={{
-                      width: "16px",
-                      height: "16px",
-                      borderRadius: "50%",
-                      border: "2px solid #0f172a",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <GraduationCap style={{ width: "9px", height: "9px", color: "#0f172a" }} />
-                  </div>
-                  <span style={{ fontSize: "10.5pt", fontWeight: "bold", textTransform: "uppercase", letterSpacing: "1px", color: "#0f172a" }}>
-                    Education
-                  </span>
-                </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                  {data.education.map((edu, i) => (
-                    <div key={i}>
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-                        <span style={{ fontSize: "9.5pt", fontWeight: "bold", color: "#0f172a" }}>
-                          {edu.degree} {edu.field ? `in ${edu.field}` : ""}
-                        </span>
-                        <span style={{ fontSize: "8pt", color: "#64748b" }}>{edu.date}</span>
-                      </div>
-                      <div style={{ fontSize: "8.5pt", color: "#475569" }}>{edu.school}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Projects */}
-            {data.projects && data.projects.length > 0 && (
-              <div>
-                <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "6px" }}>
-                  <div style={{ width: "16px", height: "16px", borderRadius: "50%", border: "2px solid #0f172a", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <FolderGit2 style={{ width: "9px", height: "9px", color: "#0f172a" }} />
-                  </div>
-                  <span style={{ fontSize: "10.5pt", fontWeight: "bold", textTransform: "uppercase", letterSpacing: "1px", color: "#0f172a" }}>
-                    Key Projects
-                  </span>
-                </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                  {data.projects.map((proj, i) => (
-                    <div key={i}>
-                      <div style={{ fontSize: "9.5pt", fontWeight: "bold", color: "#0f172a" }}>
-                        {proj.name} {proj.tech ? <span style={{ fontSize: "8pt", color: "#0284c7" }}>({proj.tech})</span> : null}
-                      </div>
-                      {proj.description && <div style={{ fontSize: "8.5pt", color: "#334155" }}>{proj.description}</div>}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Achievements */}
-            {data.achievements && data.achievements.length > 0 && (
-              <div>
-                <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "6px" }}>
-                  <div style={{ width: "16px", height: "16px", borderRadius: "50%", border: "2px solid #0f172a", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <Sparkles style={{ width: "9px", height: "9px", color: "#0f172a" }} />
-                  </div>
-                  <span style={{ fontSize: "10.5pt", fontWeight: "bold", textTransform: "uppercase", letterSpacing: "1px", color: "#0f172a" }}>
-                    Achievements & Honors
-                  </span>
-                </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                  {data.achievements.map((ach, i) => (
-                    <div key={i}>
-                      <div style={{ fontSize: "9pt", fontWeight: "bold", color: "#0f172a" }}>{ach.title}</div>
-                      {ach.description && <div style={{ fontSize: "8pt", color: "#64748b" }}>{ach.description}</div>}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+            {/* Dynamic Main Column Sections */}
+            {mainSections.map(secId => renderCatherineSection(secId, false))}
           </div>
         </div>
       );
     };
 
-    // 2. Chris Flims — Project Manager Remote
+    // 3. Chris Flims — Project Manager
     const renderProChrisFlims = () => {
       const email = data.personalInfo?.email;
       const phone = data.personalInfo?.phone;
       const location = data.personalInfo?.location;
       const portfolio = data.personalInfo?.portfolio;
       const linkedin = data.personalInfo?.linkedin;
+      const github = data.personalInfo?.github;
+      const customLinks = data.personalInfo?.customLinks || [];
 
       const allSkills = [
         ...(data.skills?.technical || []),
@@ -2156,6 +2247,151 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
           <div style={{ width: "5px", height: "5px", borderRadius: "50%", backgroundColor: "#cbd5e1", flexShrink: 0 }} />
         </div>
       );
+
+      const orderedSections = (cs.sectionOrder && cs.sectionOrder.length > 0 ? cs.sectionOrder : defaultSections).filter(id => !hidden.has(id));
+
+      const renderChrisSection = (secId: string) => {
+        switch (secId) {
+          case "skills":
+            if (allSkills.length === 0) return null;
+            return (
+              <div key="skills">
+                {renderDiamondHeader("Areas of Expertise")}
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", margin: "6px 0 10px 0" }}>
+                  {allSkills.map((sk, i) => (
+                    <span
+                      key={i}
+                      style={{
+                        backgroundColor: "#e2e8f0",
+                        border: "1px solid #94a3b8",
+                        borderRadius: "3px",
+                        padding: "3px 8px",
+                        fontSize: "8pt",
+                        fontWeight: 600,
+                        color: "#1e293b",
+                      }}
+                    >
+                      {sk}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            );
+          case "experience":
+            if (!data.experience || data.experience.length === 0) return null;
+            return (
+              <div key="experience">
+                {renderDiamondHeader("Work Experience")}
+                <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                  {data.experience.map((exp, i) => (
+                    <div key={i}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+                        <span style={{ fontSize: "10.5pt", fontWeight: "700", color: "#0f172a" }}>
+                          {renderFormattedText(exp.title || "")}
+                        </span>
+                        <span style={{ fontSize: "9pt", fontWeight: "700", color: "#1f2937" }}>
+                          {exp.date}
+                        </span>
+                      </div>
+                      <div style={{ fontSize: "8.5pt", fontStyle: "italic", color: "#c84b31", marginBottom: "3px" }}>
+                        {renderFormattedText(exp.company || "")}
+                        {exp.location ? ` - ${exp.location}` : ""}
+                      </div>
+                      {renderBulletList(exp.bullets, false, "•", "8.5pt")}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          case "education":
+            if (!data.education || data.education.length === 0) return null;
+            return (
+              <div key="education">
+                {renderDiamondHeader("Education")}
+                <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                  {data.education.map((edu, i) => (
+                    <div key={i}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+                        <span style={{ fontSize: "10pt", fontWeight: "700", color: "#0f172a" }}>
+                          {edu.degree} {edu.field ? `in ${edu.field}` : ""}
+                        </span>
+                        <span style={{ fontSize: "8.5pt", fontWeight: "700", color: "#1f2937" }}>
+                          {edu.date}
+                        </span>
+                      </div>
+                      <div style={{ fontSize: "8.5pt", fontStyle: "italic", color: "#c84b31" }}>
+                        {edu.school} {edu.location ? `• ${edu.location}` : ""}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          case "projects":
+            if (!data.projects || data.projects.length === 0) return null;
+            return (
+              <div key="projects">
+                {renderDiamondHeader("Key Projects")}
+                <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                  {data.projects.map((proj, i) => (
+                    <div key={i}>
+                      <div style={{ fontSize: "9.5pt", fontWeight: "700", color: "#0f172a" }}>
+                        {proj.name} {proj.tech ? <span style={{ fontSize: "8pt", fontStyle: "italic", color: "#c84b31" }}> | {proj.tech}</span> : null}
+                      </div>
+                      {proj.description && <div style={{ fontSize: "8.5pt", color: "#4b5563", lineHeight: 1.4 }}>{proj.description}</div>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          case "certifications":
+            if (!data.certifications || data.certifications.length === 0) return null;
+            return (
+              <div key="certifications">
+                {renderDiamondHeader("Certifications")}
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
+                  {data.certifications.map((c, i) => (
+                    <div key={i}>
+                      <div style={{ fontSize: "9pt", fontWeight: "700", color: "#0f172a" }}>{c.name}</div>
+                      <div style={{ fontSize: "8pt", color: "#64748b" }}>{c.issuer} {c.date ? `(${c.date})` : ""}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          case "achievements":
+            if (!data.achievements || data.achievements.length === 0) return null;
+            return (
+              <div key="achievements">
+                {renderDiamondHeader("Achievements & Honors")}
+                <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                  {data.achievements.map((ach, i) => (
+                    <div key={i}>
+                      <div style={{ fontSize: "9pt", fontWeight: "700", color: "#0f172a" }}>{ach.title}</div>
+                      {ach.description && <div style={{ fontSize: "8pt", color: "#4b5563" }}>{ach.description}</div>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          case "languages":
+            if (!data.languages || data.languages.length === 0) return null;
+            return (
+              <div key="languages">
+                {renderDiamondHeader("Languages")}
+                <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
+                  {data.languages.map((l, i) => (
+                    <div key={i} style={{ fontSize: "8.5pt" }}>
+                      <strong style={{ color: "#0f172a" }}>{l.name}</strong> {l.proficiency ? <span style={{ color: "#64748b" }}>({l.proficiency})</span> : null}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          default:
+            return null;
+        }
+      };
 
       return (
         <div
@@ -2217,18 +2453,6 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                 marginBottom: "8px",
               }}
             >
-              <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "8pt", color: "#374151" }}>
-                <Flag style={{ width: "12px", height: "12px", color: "#c84b31", flexShrink: 0 }} />
-                <span>Project Management</span>
-              </div>
-              <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "8pt", color: "#374151" }}>
-                <BarChart3 style={{ width: "12px", height: "12px", color: "#c84b31", flexShrink: 0 }} />
-                <span>Risk Analysis & Reporting</span>
-              </div>
-              <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "8pt", color: "#374151" }}>
-                <Shield style={{ width: "12px", height: "12px", color: "#c84b31", flexShrink: 0 }} />
-                <span>Cross-functional Governance</span>
-              </div>
               {email && (
                 <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "8pt", color: "#374151" }}>
                   <Mail style={{ width: "12px", height: "12px", color: "#c84b31", flexShrink: 0 }} />
@@ -2241,172 +2465,54 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                   <span>{phone}</span>
                 </div>
               )}
-              {portfolio && (
-                <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "8pt", color: "#374151" }}>
-                  <Globe style={{ width: "12px", height: "12px", color: "#c84b31", flexShrink: 0 }} />
-                  <span>{portfolio}</span>
-                </div>
-              )}
               {location && (
                 <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "8pt", color: "#374151" }}>
                   <MapPin style={{ width: "12px", height: "12px", color: "#c84b31", flexShrink: 0 }} />
                   <span>{location}</span>
                 </div>
               )}
-              {data.personalInfo?.customLinks && data.personalInfo.customLinks.map((cl, i) => (
+              {linkedin && (
+                <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "8pt", color: "#374151" }}>
+                  <LinkedinIcon style={{ width: "12px", height: "12px", color: "#c84b31", flexShrink: 0 }} />
+                  <span>{linkedin.replace(/^https?:\/\//, "")}</span>
+                </div>
+              )}
+              {github && (
+                <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "8pt", color: "#374151" }}>
+                  <GithubIcon style={{ width: "12px", height: "12px", color: "#c84b31", flexShrink: 0 }} />
+                  <span>{github.replace(/^https?:\/\//, "")}</span>
+                </div>
+              )}
+              {portfolio && (
+                <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "8pt", color: "#374151" }}>
+                  <Globe style={{ width: "12px", height: "12px", color: "#c84b31", flexShrink: 0 }} />
+                  <span>{portfolio.replace(/^https?:\/\//, "")}</span>
+                </div>
+              )}
+              {customLinks.map((cl, i) => (
                 <div key={i} style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "8pt", color: "#374151" }}>
                   <Globe style={{ width: "12px", height: "12px", color: "#c84b31", flexShrink: 0 }} />
-                  <span><strong>{cl.label}:</strong> {cl.url}</span>
+                  <span><strong>{cl.label}:</strong> {cl.url.replace(/^https?:\/\//, "")}</span>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* AREAS OF EXPERTISE */}
-          {allSkills.length > 0 && (
-            <div>
-              {renderDiamondHeader("Areas of Expertise")}
-              <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", margin: "6px 0 10px 0" }}>
-                {allSkills.map((sk, i) => (
-                  <span
-                    key={i}
-                    style={{
-                      backgroundColor: "#e2e8f0",
-                      border: "1px solid #94a3b8",
-                      borderRadius: "3px",
-                      padding: "3px 8px",
-                      fontSize: "8pt",
-                      fontWeight: 600,
-                      color: "#1e293b",
-                    }}
-                  >
-                    {sk}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* WORK EXPERIENCE */}
-          {data.experience && data.experience.length > 0 && (
-            <div>
-              {renderDiamondHeader("Work Experience")}
-              <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-                {data.experience.map((exp, i) => (
-                  <div key={i}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-                      <span style={{ fontSize: "10.5pt", fontWeight: "700", color: "#0f172a" }}>
-                        {renderFormattedText(exp.title || "")}
-                      </span>
-                      <span style={{ fontSize: "9pt", fontWeight: "700", color: "#1f2937" }}>
-                        {exp.date}
-                      </span>
-                    </div>
-                    <div style={{ fontSize: "8.5pt", fontStyle: "italic", color: "#c84b31", marginBottom: "3px" }}>
-                      {renderFormattedText(exp.company || "")}
-                      {exp.location ? ` - ${exp.location}` : ""}
-                    </div>
-                    {renderBulletList(exp.bullets, false, "•", "8.5pt")}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* EDUCATION */}
-          {data.education && data.education.length > 0 && (
-            <div>
-              {renderDiamondHeader("Education")}
-              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                {data.education.map((edu, i) => (
-                  <div key={i}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-                      <span style={{ fontSize: "10pt", fontWeight: "700", color: "#0f172a" }}>
-                        {edu.degree} {edu.field ? `in ${edu.field}` : ""}
-                      </span>
-                      <span style={{ fontSize: "8.5pt", fontWeight: "700", color: "#1f2937" }}>
-                        {edu.date}
-                      </span>
-                    </div>
-                    <div style={{ fontSize: "8.5pt", fontStyle: "italic", color: "#c84b31" }}>
-                      {edu.school} {edu.location ? `• ${edu.location}` : ""}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* KEY PROJECTS */}
-          {data.projects && data.projects.length > 0 && (
-            <div>
-              {renderDiamondHeader("Key Projects")}
-              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                {data.projects.map((proj, i) => (
-                  <div key={i}>
-                    <div style={{ fontSize: "9.5pt", fontWeight: "700", color: "#0f172a" }}>
-                      {proj.name} {proj.tech ? <span style={{ fontSize: "8pt", fontStyle: "italic", color: "#c84b31" }}> | {proj.tech}</span> : null}
-                    </div>
-                    {proj.description && <div style={{ fontSize: "8.5pt", color: "#4b5563", lineHeight: 1.4 }}>{proj.description}</div>}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* CERTIFICATIONS */}
-          {data.certifications && data.certifications.length > 0 && (
-            <div>
-              {renderDiamondHeader("Certifications")}
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
-                {data.certifications.map((c, i) => (
-                  <div key={i}>
-                    <div style={{ fontSize: "9pt", fontWeight: "700", color: "#0f172a" }}>{c.name}</div>
-                    <div style={{ fontSize: "8pt", color: "#64748b" }}>{c.issuer} {c.date ? `(${c.date})` : ""}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* ACHIEVEMENTS */}
-          {data.achievements && data.achievements.length > 0 && (
-            <div>
-              {renderDiamondHeader("Achievements & Honors")}
-              <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                {data.achievements.map((ach, i) => (
-                  <div key={i}>
-                    <div style={{ fontSize: "9pt", fontWeight: "700", color: "#0f172a" }}>{ach.title}</div>
-                    {ach.description && <div style={{ fontSize: "8pt", color: "#4b5563" }}>{ach.description}</div>}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* LANGUAGES */}
-          {data.languages && data.languages.length > 0 && (
-            <div>
-              {renderDiamondHeader("Languages")}
-              <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
-                {data.languages.map((l, i) => (
-                  <div key={i} style={{ fontSize: "8.5pt" }}>
-                    <strong style={{ color: "#0f172a" }}>{l.name}</strong> {l.proficiency ? <span style={{ color: "#64748b" }}>({l.proficiency})</span> : null}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+          {/* Dynamic Sections */}
+          {orderedSections.filter(id => id !== "summary").map(secId => renderChrisSection(secId))}
         </div>
       );
     };
 
-    // 3. Will Tribian — Theater & Creative Portfolio
+    // 4. Will Tribian — Theater & Creative Portfolio
     const renderProWillTribian = () => {
       const email = data.personalInfo?.email;
       const phone = data.personalInfo?.phone;
       const location = data.personalInfo?.location;
       const portfolio = data.personalInfo?.portfolio;
+      const linkedin = data.personalInfo?.linkedin;
+      const github = data.personalInfo?.github;
+      const customLinks = data.personalInfo?.customLinks || [];
       const photoUrl =
         data.personalInfo?.photoUrl ||
         "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=256&auto=format&fit=crop&q=80";
@@ -2416,9 +2522,223 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
         ...(data.skills?.tools || []),
         ...(data.skills?.concepts || []),
       ];
-      const softSkills = data.skills?.soft?.length
-        ? data.skills.soft
-        : ["Improvisation", "Vocal Expression", "Physicality", "Stage Presence", "Dialects"];
+      const softSkills = data.skills?.soft || [];
+
+      const defaultWillSidebar = ["skills", "education", "languages", "certifications", "achievements"];
+      const userSidebar = cs.sidebarSections && cs.sidebarSections.length > 0 ? cs.sidebarSections : defaultWillSidebar;
+      const sidebarSet = new Set(userSidebar);
+      const orderedSections = (cs.sectionOrder && cs.sectionOrder.length > 0 ? cs.sectionOrder : defaultSections).filter(id => !hidden.has(id));
+
+      const mainSections = orderedSections.filter(id => !sidebarSet.has(id) && id !== "summary");
+      const sidebarSections = orderedSections.filter(id => sidebarSet.has(id) && id !== "summary");
+
+      const renderWillSection = (secId: string, isSidebar: boolean) => {
+        switch (secId) {
+          case "experience":
+            if (!data.experience || data.experience.length === 0) return null;
+            return (
+              <div key="experience">
+                <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "6px" }}>
+                  <div style={{ width: "14px", height: "14px", borderRadius: "50%", backgroundColor: "#0891b2", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <Briefcase style={{ width: "8px", height: "8px", color: "#ffffff" }} />
+                  </div>
+                  <span style={{ fontSize: "10.5pt", fontWeight: "800", textTransform: "uppercase", letterSpacing: "1px", color: "#0f172a" }}>
+                    Work Experience
+                  </span>
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                  {data.experience.map((exp, i) => (
+                    <div key={i}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+                        <span style={{ fontSize: "9.5pt", fontWeight: "bold", color: "#0f172a" }}>
+                          {renderFormattedText(exp.title || "")}
+                        </span>
+                        <span style={{ fontSize: "8pt", color: "#64748b" }}>{exp.date}</span>
+                      </div>
+                      <div style={{ fontSize: "8.5pt", fontWeight: "600", color: "#0891b2", marginBottom: "3px" }}>
+                        {renderFormattedText(exp.company || "")}
+                        {exp.location ? ` • ${exp.location}` : ""}
+                      </div>
+                      {renderBulletList(exp.bullets, isSidebar, "•", "8.5pt")}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          case "projects":
+            if (!data.projects || data.projects.length === 0) return null;
+            return (
+              <div key="projects">
+                <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "6px" }}>
+                  <div style={{ width: "14px", height: "14px", borderRadius: "50%", backgroundColor: "#0891b2", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <Award style={{ width: "8px", height: "8px", color: "#ffffff" }} />
+                  </div>
+                  <span style={{ fontSize: "10.5pt", fontWeight: "800", textTransform: "uppercase", letterSpacing: "1px", color: "#0f172a" }}>
+                    Workshops & Projects
+                  </span>
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                  {data.projects.map((proj, i) => (
+                    <div key={i}>
+                      <div style={{ fontSize: "9pt", fontWeight: "bold", color: "#0f172a" }}>{proj.name}</div>
+                      {proj.description && (
+                        <div style={{ fontSize: "8pt", color: "#475569", lineHeight: "1.4" }}>{proj.description}</div>
+                      )}
+                      {proj.tech && (
+                        <div style={{ fontSize: "7.5pt", color: "#0891b2", fontStyle: "italic" }}>{proj.tech}</div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          case "skills":
+            if (techSkills.length === 0 && softSkills.length === 0) return null;
+            return (
+              <div key="skills" style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                {techSkills.length > 0 && (
+                  <div>
+                    <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "6px" }}>
+                      <div style={{ width: "14px", height: "14px", borderRadius: "50%", backgroundColor: "#0891b2", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        <Layers style={{ width: "8px", height: "8px", color: "#ffffff" }} />
+                      </div>
+                      <span style={{ fontSize: "10.5pt", fontWeight: "800", textTransform: "uppercase", letterSpacing: "1px", color: "#0f172a" }}>
+                        Hard Skills
+                      </span>
+                    </div>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
+                      {techSkills.map((sk, i) => (
+                        <span key={i} style={{ backgroundColor: "#f1f5f9", border: "1px solid #cbd5e1", borderRadius: "4px", padding: "2px 7px", fontSize: "8pt", color: "#334155" }}>
+                          {sk}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {softSkills.length > 0 && (
+                  <div>
+                    <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "6px" }}>
+                      <div style={{ width: "14px", height: "14px", borderRadius: "50%", backgroundColor: "#0891b2", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        <Sparkles style={{ width: "8px", height: "8px", color: "#ffffff" }} />
+                      </div>
+                      <span style={{ fontSize: "10.5pt", fontWeight: "800", textTransform: "uppercase", letterSpacing: "1px", color: "#0f172a" }}>
+                        Soft Skills
+                      </span>
+                    </div>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
+                      {softSkills.map((sk, i) => (
+                        <span
+                          key={i}
+                          style={{
+                            backgroundColor: "#e2e8f0",
+                            color: "#334155",
+                            borderRadius: "4px",
+                            padding: "3px 8px",
+                            fontSize: "8pt",
+                            fontWeight: 500,
+                          }}
+                        >
+                          {sk}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          case "education":
+            if (!data.education || data.education.length === 0) return null;
+            return (
+              <div key="education">
+                <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "6px" }}>
+                  <div style={{ width: "14px", height: "14px", borderRadius: "50%", backgroundColor: "#0891b2", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <GraduationCap style={{ width: "8px", height: "8px", color: "#ffffff" }} />
+                  </div>
+                  <span style={{ fontSize: "10.5pt", fontWeight: "800", textTransform: "uppercase", letterSpacing: "1px", color: "#0f172a" }}>
+                    Education
+                  </span>
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                  {data.education.map((edu, i) => (
+                    <div key={i}>
+                      <div style={{ fontSize: "9pt", fontWeight: "bold", color: "#0f172a" }}>
+                        {edu.degree} {edu.field ? `in ${edu.field}` : ""}
+                      </div>
+                      <div style={{ fontSize: "8pt", color: "#64748b" }}>
+                        {edu.school} {edu.date ? `• ${edu.date}` : ""}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          case "languages":
+            if (!data.languages || data.languages.length === 0) return null;
+            return (
+              <div key="languages">
+                <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "6px" }}>
+                  <div style={{ width: "14px", height: "14px", borderRadius: "50%", backgroundColor: "#0891b2", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <Globe style={{ width: "8px", height: "8px", color: "#ffffff" }} />
+                  </div>
+                  <span style={{ fontSize: "10.5pt", fontWeight: "800", textTransform: "uppercase", letterSpacing: "1px", color: "#0f172a" }}>
+                    Languages
+                  </span>
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                  {data.languages.map((l, i) => (
+                    <div key={i} style={{ fontSize: "8.5pt", color: "#334155" }}>
+                      <strong>{l.name}</strong> {l.proficiency ? `(${l.proficiency})` : ""}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          case "certifications":
+            if (!data.certifications || data.certifications.length === 0) return null;
+            return (
+              <div key="certifications">
+                <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "6px" }}>
+                  <div style={{ width: "14px", height: "14px", borderRadius: "50%", backgroundColor: "#0891b2", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <Award style={{ width: "8px", height: "8px", color: "#ffffff" }} />
+                  </div>
+                  <span style={{ fontSize: "10.5pt", fontWeight: "800", textTransform: "uppercase", letterSpacing: "1px", color: "#0f172a" }}>
+                    Certifications
+                  </span>
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                  {data.certifications.map((c, i) => (
+                    <div key={i} style={{ fontSize: "8.5pt", color: "#334155" }}>
+                      <strong>{c.name}</strong> {c.issuer ? `• ${c.issuer}` : ""}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          case "achievements":
+            if (!data.achievements || data.achievements.length === 0) return null;
+            return (
+              <div key="achievements">
+                <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "6px" }}>
+                  <div style={{ width: "14px", height: "14px", borderRadius: "50%", backgroundColor: "#0891b2", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <Sparkles style={{ width: "8px", height: "8px", color: "#ffffff" }} />
+                  </div>
+                  <span style={{ fontSize: "10.5pt", fontWeight: "800", textTransform: "uppercase", letterSpacing: "1px", color: "#0f172a" }}>
+                    Achievements
+                  </span>
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                  {data.achievements.map((ach, i) => (
+                    <div key={i} style={{ fontSize: "8.5pt", color: "#334155" }}>
+                      <strong>{ach.title}</strong> {ach.description ? `: ${ach.description}` : ""}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          default:
+            return null;
+        }
+      };
 
       return (
         <div
@@ -2498,7 +2818,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
             </div>
           </div>
 
-          {/* Full-Width Teal Banner */}
+          {/* Full-Width Teal Banner with Contact Icons */}
           <div
             style={{
               backgroundColor: "#0891b2",
@@ -2532,233 +2852,49 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                 <span>{location}</span>
               </div>
             )}
+            {linkedin && (
+              <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                <LinkedinIcon style={{ width: "11px", height: "11px", color: "#ffffff" }} />
+                <span>{linkedin.replace(/^https?:\/\//, "")}</span>
+              </div>
+            )}
+            {github && (
+              <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                <GithubIcon style={{ width: "11px", height: "11px", color: "#ffffff" }} />
+                <span>{github.replace(/^https?:\/\//, "")}</span>
+              </div>
+            )}
             {portfolio && (
               <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
                 <Globe style={{ width: "11px", height: "11px", color: "#ffffff" }} />
-                <span>{portfolio}</span>
+                <span>{portfolio.replace(/^https?:\/\//, "")}</span>
               </div>
             )}
-            {data.personalInfo?.customLinks && data.personalInfo.customLinks.map((cl, i) => (
+            {customLinks.map((cl, i) => (
               <div key={i} style={{ display: "flex", alignItems: "center", gap: "6px" }}>
                 <Globe style={{ width: "11px", height: "11px", color: "#ffffff" }} />
-                <span><strong>{cl.label}:</strong> {cl.url}</span>
+                <span><strong>{cl.label}:</strong> {cl.url.replace(/^https?:\/\//, "")}</span>
               </div>
             ))}
           </div>
 
-          {/* 2-Column Lower Body */}
+          {/* Dynamic 2-Column Lower Body */}
           <div style={{ display: "flex", gap: "18px" }}>
             {/* Left Column (~58%) */}
             <div style={{ flex: "1 1 58%", display: "flex", flexDirection: "column", gap: "12px" }}>
-              {/* WORK EXPERIENCE */}
-              {data.experience && data.experience.length > 0 && (
-                <div>
-                  <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "6px" }}>
-                    <div style={{ width: "14px", height: "14px", borderRadius: "50%", backgroundColor: "#0891b2", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      <Briefcase style={{ width: "8px", height: "8px", color: "#ffffff" }} />
-                    </div>
-                    <span style={{ fontSize: "10.5pt", fontWeight: "800", textTransform: "uppercase", letterSpacing: "1px", color: "#0f172a" }}>
-                      Work Experience
-                    </span>
-                  </div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-                    {data.experience.map((exp, i) => (
-                      <div key={i}>
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-                          <span style={{ fontSize: "9.5pt", fontWeight: "bold", color: "#0f172a" }}>
-                            {renderFormattedText(exp.title || "")}
-                          </span>
-                          <span style={{ fontSize: "8pt", color: "#64748b" }}>{exp.date}</span>
-                        </div>
-                        <div style={{ fontSize: "8.5pt", fontWeight: "600", color: "#0891b2", marginBottom: "3px" }}>
-                          {renderFormattedText(exp.company || "")}
-                          {exp.location ? ` • ${exp.location}` : ""}
-                        </div>
-                        {renderBulletList(exp.bullets, false, "•", "8.5pt")}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* WORKSHOPS & TRAINING CAMPS / PROJECTS */}
-              {data.projects && data.projects.length > 0 && (
-                <div>
-                  <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "6px" }}>
-                    <div style={{ width: "14px", height: "14px", borderRadius: "50%", backgroundColor: "#0891b2", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      <Award style={{ width: "8px", height: "8px", color: "#ffffff" }} />
-                    </div>
-                    <span style={{ fontSize: "10.5pt", fontWeight: "800", textTransform: "uppercase", letterSpacing: "1px", color: "#0f172a" }}>
-                      Workshops & Projects
-                    </span>
-                  </div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                    {data.projects.map((proj, i) => (
-                      <div key={i}>
-                        <div style={{ fontSize: "9pt", fontWeight: "bold", color: "#0f172a" }}>{proj.name}</div>
-                        {proj.description && (
-                          <div style={{ fontSize: "8pt", color: "#475569", lineHeight: "1.4" }}>{proj.description}</div>
-                        )}
-                        {proj.tech && (
-                          <div style={{ fontSize: "7.5pt", color: "#0891b2", fontStyle: "italic" }}>{proj.tech}</div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+              {mainSections.map(secId => renderWillSection(secId, false))}
             </div>
 
             {/* Right Column (~42%) */}
             <div style={{ flex: "1 1 42%", display: "flex", flexDirection: "column", gap: "12px" }}>
-              {/* HARD SKILLS */}
-              {techSkills.length > 0 && (
-                <div>
-                  <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "6px" }}>
-                    <div style={{ width: "14px", height: "14px", borderRadius: "50%", backgroundColor: "#0891b2", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      <Layers style={{ width: "8px", height: "8px", color: "#ffffff" }} />
-                    </div>
-                    <span style={{ fontSize: "10.5pt", fontWeight: "800", textTransform: "uppercase", letterSpacing: "1px", color: "#0f172a" }}>
-                      Hard Skills
-                    </span>
-                  </div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                    {techSkills.map((sk, i) => (
-                      <div key={i} style={{ fontSize: "8.5pt", color: "#334155" }}>
-                        {sk}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* SOFT SKILLS */}
-              {softSkills.length > 0 && (
-                <div>
-                  <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "6px" }}>
-                    <div style={{ width: "14px", height: "14px", borderRadius: "50%", backgroundColor: "#0891b2", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      <Sparkles style={{ width: "8px", height: "8px", color: "#ffffff" }} />
-                    </div>
-                    <span style={{ fontSize: "10.5pt", fontWeight: "800", textTransform: "uppercase", letterSpacing: "1px", color: "#0f172a" }}>
-                      Soft Skills
-                    </span>
-                  </div>
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
-                    {softSkills.map((sk, i) => (
-                      <span
-                        key={i}
-                        style={{
-                          backgroundColor: "#e2e8f0",
-                          color: "#334155",
-                          borderRadius: "4px",
-                          padding: "3px 8px",
-                          fontSize: "8pt",
-                          fontWeight: 500,
-                        }}
-                      >
-                        {sk}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* EDUCATION */}
-              {data.education && data.education.length > 0 && (
-                <div>
-                  <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "6px" }}>
-                    <div style={{ width: "14px", height: "14px", borderRadius: "50%", backgroundColor: "#0891b2", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      <GraduationCap style={{ width: "8px", height: "8px", color: "#ffffff" }} />
-                    </div>
-                    <span style={{ fontSize: "10.5pt", fontWeight: "800", textTransform: "uppercase", letterSpacing: "1px", color: "#0f172a" }}>
-                      Education
-                    </span>
-                  </div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                    {data.education.map((edu, i) => (
-                      <div key={i}>
-                        <div style={{ fontSize: "9pt", fontWeight: "bold", color: "#0f172a" }}>
-                          {edu.degree} {edu.field ? `in ${edu.field}` : ""}
-                        </div>
-                        <div style={{ fontSize: "8pt", color: "#64748b" }}>
-                          {edu.school} {edu.date ? `• ${edu.date}` : ""}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* LANGUAGES */}
-              {data.languages && data.languages.length > 0 && (
-                <div>
-                  <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "6px" }}>
-                    <div style={{ width: "14px", height: "14px", borderRadius: "50%", backgroundColor: "#0891b2", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      <Globe style={{ width: "8px", height: "8px", color: "#ffffff" }} />
-                    </div>
-                    <span style={{ fontSize: "10.5pt", fontWeight: "800", textTransform: "uppercase", letterSpacing: "1px", color: "#0f172a" }}>
-                      Languages
-                    </span>
-                  </div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                    {data.languages.map((l, i) => (
-                      <div key={i} style={{ fontSize: "8.5pt", color: "#334155" }}>
-                        <strong>{l.name}</strong> {l.proficiency ? `(${l.proficiency})` : ""}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* CERTIFICATIONS */}
-              {data.certifications && data.certifications.length > 0 && (
-                <div>
-                  <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "6px" }}>
-                    <div style={{ width: "14px", height: "14px", borderRadius: "50%", backgroundColor: "#0891b2", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      <Award style={{ width: "8px", height: "8px", color: "#ffffff" }} />
-                    </div>
-                    <span style={{ fontSize: "10.5pt", fontWeight: "800", textTransform: "uppercase", letterSpacing: "1px", color: "#0f172a" }}>
-                      Certifications
-                    </span>
-                  </div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                    {data.certifications.map((c, i) => (
-                      <div key={i} style={{ fontSize: "8.5pt", color: "#334155" }}>
-                        <strong>{c.name}</strong> {c.issuer ? `• ${c.issuer}` : ""}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* ACHIEVEMENTS */}
-              {data.achievements && data.achievements.length > 0 && (
-                <div>
-                  <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "6px" }}>
-                    <div style={{ width: "14px", height: "14px", borderRadius: "50%", backgroundColor: "#0891b2", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      <Sparkles style={{ width: "8px", height: "8px", color: "#ffffff" }} />
-                    </div>
-                    <span style={{ fontSize: "10.5pt", fontWeight: "800", textTransform: "uppercase", letterSpacing: "1px", color: "#0f172a" }}>
-                      Achievements
-                    </span>
-                  </div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                    {data.achievements.map((ach, i) => (
-                      <div key={i} style={{ fontSize: "8.5pt", color: "#334155" }}>
-                        <strong>{ach.title}</strong> {ach.description ? `: ${ach.description}` : ""}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+              {sidebarSections.map(secId => renderWillSection(secId, true))}
             </div>
           </div>
         </div>
       );
     };
 
-
-    // 6. Claire Russel — Computer Science Student
+    // 5. Claire Russel — Computer Science Student
     const renderProClaire = () => {
       const email = data.personalInfo?.email;
       const phone = data.personalInfo?.phone;
@@ -2766,13 +2902,17 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
       const portfolio = data.personalInfo?.portfolio;
       const linkedin = data.personalInfo?.linkedin;
       const github = data.personalInfo?.github;
+      const customLinks = data.personalInfo?.customLinks || [];
       const photoUrl =
         data.personalInfo?.photoUrl ||
         "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80";
 
-      const softSkills = data.skills?.soft?.length
-        ? data.skills.soft
-        : ["Global Thinking", "Leadership", "Creativity", "Teamwork", "Adaptability"];
+      const allSkills = [
+        ...(data.skills?.technical || []),
+        ...(data.skills?.tools || []),
+        ...(data.skills?.concepts || []),
+      ];
+      const softSkills = data.skills?.soft || [];
 
       const renderHeaderLine = (title: string) => (
         <div style={{ marginTop: "14px", marginBottom: "8px" }}>
@@ -2791,6 +2931,152 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
           </div>
         </div>
       );
+
+      const defaultClaireSidebar = ["skills", "languages", "certifications", "achievements"];
+      const userSidebar = cs.sidebarSections && cs.sidebarSections.length > 0 ? cs.sidebarSections : defaultClaireSidebar;
+      const sidebarSet = new Set(userSidebar);
+      const orderedSections = (cs.sectionOrder && cs.sectionOrder.length > 0 ? cs.sectionOrder : defaultSections).filter(id => !hidden.has(id));
+
+      const sidebarSections = orderedSections.filter(id => sidebarSet.has(id) && id !== "summary");
+      const mainSections = orderedSections.filter(id => !sidebarSet.has(id) && id !== "summary");
+
+      const renderClaireSection = (secId: string, isSidebar: boolean) => {
+        switch (secId) {
+          case "education":
+            if (!data.education || data.education.length === 0) return null;
+            return (
+              <div key="education">
+                {renderHeaderLine("EDUCATION")}
+                <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                  {data.education.map((edu, idx) => (
+                    <div key={idx}>
+                      <div style={{ fontSize: "9.5pt", fontWeight: "700", color: "#0f172a" }}>{edu.degree}</div>
+                      <div style={{ fontSize: "8.5pt", color: "#334155" }}>{edu.school}</div>
+                      {edu.date && <div style={{ fontSize: "8pt", color: "#64748b" }}>{edu.date}</div>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          case "experience":
+            if (!data.experience || data.experience.length === 0) return null;
+            return (
+              <div key="experience">
+                {renderHeaderLine("WORK EXPERIENCE")}
+                <div style={{ display: "flex", flexDirection: "column", gap: "9px" }}>
+                  {data.experience.map((exp, idx) => (
+                    <div key={idx}>
+                      <div style={{ fontSize: "9.5pt", fontWeight: "700", color: "#0f172a" }}>{exp.title}</div>
+                      <div style={{ fontSize: "8.5pt", color: "#4c1d95", fontWeight: "600" }}>{exp.company}</div>
+                      {exp.date && <div style={{ fontSize: "8pt", color: "#64748b", margin: "1px 0" }}>{exp.date}</div>}
+                      {exp.bullets && exp.bullets.length > 0 && (
+                        <ul style={{ margin: "2px 0 0 0", paddingLeft: "14px" }}>
+                          {exp.bullets.map((b, bIdx) => (
+                            <li key={bIdx} style={{ fontSize: "8.5pt", color: "#334155", lineHeight: 1.4, marginBottom: "2px" }}>
+                              {renderFormattedText(b)}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          case "projects":
+            if (!data.projects || data.projects.length === 0) return null;
+            return (
+              <div key="projects">
+                {renderHeaderLine("KEY PROJECTS")}
+                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                  {data.projects.map((proj, idx) => (
+                    <div key={idx}>
+                      <div style={{ fontSize: "9pt", fontWeight: "700", color: "#0f172a" }}>
+                        {proj.name} {proj.tech ? <span style={{ fontSize: "8pt", color: "#4c1d95" }}>({proj.tech})</span> : null}
+                      </div>
+                      {proj.description && <div style={{ fontSize: "8pt", color: "#334155" }}>{proj.description}</div>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          case "skills":
+            if (allSkills.length === 0 && softSkills.length === 0) return null;
+            return (
+              <div key="skills" style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                {allSkills.length > 0 && (
+                  <div>
+                    {renderHeaderLine("TECHNICAL SKILLS")}
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
+                      {allSkills.map((s, idx) => (
+                        <span key={idx} style={{ backgroundColor: "#f3e8ff", color: "#4c1d95", padding: "2px 6px", borderRadius: "3px", fontSize: "7.5pt", fontWeight: 600 }}>
+                          {s}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {softSkills.length > 0 && (
+                  <div>
+                    {renderHeaderLine("SOFT SKILLS")}
+                    <div style={{ display: "flex", flexDirection: "column", gap: "4px", fontSize: "8.5pt", color: "#334155" }}>
+                      {softSkills.map((s, idx) => (
+                        <div key={idx}>• {s}</div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          case "languages":
+            if (!data.languages || data.languages.length === 0) return null;
+            return (
+              <div key="languages">
+                {renderHeaderLine("LANGUAGES")}
+                <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
+                  {data.languages.map((l, idx) => (
+                    <div key={idx}>
+                      <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{l.name}</div>
+                      {l.proficiency && <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{l.proficiency}</div>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          case "certifications":
+            if (!data.certifications || data.certifications.length === 0) return null;
+            return (
+              <div key="certifications">
+                {renderHeaderLine("CERTIFICATES")}
+                <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                  {data.certifications.map((c, idx) => (
+                    <div key={idx}>
+                      <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{c.name}</div>
+                      {c.issuer && <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{c.issuer}</div>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          case "achievements":
+            if (!data.achievements || data.achievements.length === 0) return null;
+            return (
+              <div key="achievements">
+                {renderHeaderLine("ORGANIZATIONS & HONORS")}
+                <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                  {data.achievements.map((ach, idx) => (
+                    <div key={idx}>
+                      <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{ach.title}</div>
+                      {ach.description && <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{ach.description}</div>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          default:
+            return null;
+        }
+      };
 
       return (
         <div
@@ -2853,7 +3139,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
             </div>
           </div>
 
-          {/* Body: 2-Column (Left 28%, Right 72%) */}
+          {/* Body: 2-Column (Left Sidebar / Right Main) */}
           <div style={{ display: "flex", gap: "20px" }}>
             {/* Left Sidebar */}
             <div style={{ flex: "0 0 28%", borderRight: "1px solid #e2e8f0", paddingRight: "16px" }}>
@@ -2894,7 +3180,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                 {github && (
                   <div style={{ display: "flex", alignItems: "center", gap: "6px", wordBreak: "break-all" }}>
                     <div style={{ width: 16, height: 16, backgroundColor: "#4c1d95", borderRadius: 2, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                      <Globe style={{ width: 10, height: 10, color: "#ffffff" }} />
+                      <GithubIcon style={{ width: 10, height: 10, color: "#ffffff" }} />
                     </div>
                     <span>{github.replace(/^https?:\/\//, "")}</span>
                   </div>
@@ -2902,12 +3188,12 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                 {portfolio && (
                   <div style={{ display: "flex", alignItems: "center", gap: "6px", wordBreak: "break-all" }}>
                     <div style={{ width: 16, height: 16, backgroundColor: "#4c1d95", borderRadius: 2, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                      <Sparkles style={{ width: 10, height: 10, color: "#ffffff" }} />
+                      <Globe style={{ width: 10, height: 10, color: "#ffffff" }} />
                     </div>
                     <span>{portfolio.replace(/^https?:\/\//, "")}</span>
                   </div>
                 )}
-                {data.personalInfo?.customLinks && data.personalInfo.customLinks.map((cl, idx) => (
+                {customLinks.map((cl, idx) => (
                   <div key={idx} style={{ display: "flex", alignItems: "center", gap: "6px", wordBreak: "break-all" }}>
                     <div style={{ width: 16, height: 16, backgroundColor: "#4c1d95", borderRadius: 2, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                       <Globe style={{ width: 10, height: 10, color: "#ffffff" }} />
@@ -2917,189 +3203,28 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                 ))}
               </div>
 
-              {/* SOFT SKILLS */}
-              <div style={{ marginTop: "14px" }}>
-                <div style={{ fontSize: "9.5pt", fontWeight: "800", textTransform: "uppercase", color: "#1e1b4b", borderBottom: "1.5px solid #4c1d95", paddingBottom: "2px", marginBottom: "6px" }}>
-                  SOFT SKILLS
-                </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: "4px", fontSize: "8.5pt", color: "#334155" }}>
-                  {softSkills.map((s, idx) => (
-                    <div key={idx}>{s}</div>
-                  ))}
-                </div>
-              </div>
-
-              {/* LANGUAGES */}
-              {data.languages && data.languages.length > 0 && (
-                <div style={{ marginTop: "14px" }}>
-                  <div style={{ fontSize: "9.5pt", fontWeight: "800", textTransform: "uppercase", color: "#1e1b4b", borderBottom: "1.5px solid #4c1d95", paddingBottom: "2px", marginBottom: "6px" }}>
-                    LANGUAGES
-                  </div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                    {data.languages.map((l, idx) => (
-                      <div key={idx}>
-                        <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{l.name}</div>
-                        <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{l.proficiency}</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* INTERESTS */}
-              <div style={{ marginTop: "14px" }}>
-                <div style={{ fontSize: "9.5pt", fontWeight: "800", textTransform: "uppercase", color: "#1e1b4b", borderBottom: "1.5px solid #4c1d95", paddingBottom: "2px", marginBottom: "6px" }}>
-                  INTERESTS
-                </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
-                  {["Emerging Technologies", "Algorithms and Competitive Programming", "Outdoor Activities and Photography"].map((item, idx) => (
-                    <div
-                      key={idx}
-                      style={{
-                        border: "1px solid #94a3b8",
-                        borderRadius: "4px",
-                        padding: "3px 6px",
-                        fontSize: "7.5pt",
-                        color: "#334155",
-                        lineHeight: 1.25,
-                      }}
-                    >
-                      {item}
-                    </div>
-                  ))}
-                </div>
-              </div>
+              {/* Dynamic Sidebar Sections */}
+              {sidebarSections.map(secId => renderClaireSection(secId, true))}
             </div>
 
             {/* Right Main Column */}
             <div style={{ flex: 1 }}>
-              {/* EDUCATION */}
-              {data.education && data.education.length > 0 && (
-                <div>
-                  {renderHeaderLine("EDUCATION")}
-                  <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                    {data.education.map((edu, idx) => (
-                      <div key={idx}>
-                        <div style={{ fontSize: "9.5pt", fontWeight: "700", color: "#0f172a" }}>{edu.degree}</div>
-                        <div style={{ fontSize: "8.5pt", color: "#334155" }}>{edu.school}</div>
-                        {edu.date && <div style={{ fontSize: "8pt", color: "#64748b" }}>{edu.date}</div>}
-                        {edu.bullets && edu.bullets.length > 0 && (
-                          <div style={{ marginTop: "4px" }}>
-                            <div style={{ fontSize: "8pt", fontWeight: "600", color: "#475569" }}>Advised Coursework & Core Focus:</div>
-                            <ul style={{ margin: "2px 0 0 0", paddingLeft: "14px", fontSize: "8pt", color: "#334155" }}>
-                              {edu.bullets.map((b, bIdx) => (
-                                <li key={bIdx}>{b}</li>
-                              ))}
-                            </ul>
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* VOLUNTEER / WORK EXPERIENCE */}
-              {data.experience && data.experience.length > 0 && (
-                <div>
-                  {renderHeaderLine("VOLUNTEER & TECHNICAL EXPERIENCE")}
-                  <div style={{ display: "flex", flexDirection: "column", gap: "9px" }}>
-                    {data.experience.map((exp, idx) => (
-                      <div key={idx}>
-                        <div style={{ fontSize: "9.5pt", fontWeight: "700", color: "#0f172a" }}>{exp.title}</div>
-                        <div style={{ fontSize: "8.5pt", color: "#4c1d95", fontWeight: "600" }}>{exp.company}</div>
-                        {exp.date && <div style={{ fontSize: "8pt", color: "#64748b", margin: "1px 0" }}>{exp.date}</div>}
-                        {exp.bullets && exp.bullets.length > 0 && (
-                          <ul style={{ margin: "2px 0 0 0", paddingLeft: "14px" }}>
-                            {exp.bullets.map((b, bIdx) => (
-                              <li key={bIdx} style={{ fontSize: "8.5pt", color: "#334155", lineHeight: 1.4, marginBottom: "2px" }}>
-                                {renderFormattedText(b)}
-                              </li>
-                            ))}
-                          </ul>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* KEY PROJECTS */}
-              {data.projects && data.projects.length > 0 && (
-                <div>
-                  {renderHeaderLine("KEY PROJECTS")}
-                  <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                    {data.projects.map((proj, idx) => (
-                      <div key={idx}>
-                        <div style={{ fontSize: "9pt", fontWeight: "700", color: "#0f172a" }}>
-                          {proj.name} {proj.tech ? <span style={{ fontSize: "8pt", color: "#8da9c4" }}>({proj.tech})</span> : null}
-                        </div>
-                        {proj.description && <div style={{ fontSize: "8pt", color: "#334155" }}>{proj.description}</div>}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* ORGANIZATIONS */}
-              {data.achievements && data.achievements.length > 0 && (
-                <div>
-                  {renderHeaderLine("ORGANIZATIONS")}
-                  <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                    {data.achievements.map((ach, idx) => (
-                      <div key={idx}>
-                        <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{ach.title}</div>
-                        {ach.description && <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{ach.description}</div>}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* CERTIFICATES */}
-              {data.certifications && data.certifications.length > 0 && (
-                <div>
-                  {renderHeaderLine("CERTIFICATES")}
-                  <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                    {data.certifications.map((c, idx) => (
-                      <div key={idx}>
-                        <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{c.name}</div>
-                        {c.issuer && <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{c.issuer}</div>}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* PROJECTS */}
-              {data.projects && data.projects.length > 0 && (
-                <div>
-                  {renderHeaderLine("PROJECTS")}
-                  <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                    {data.projects.map((proj, idx) => (
-                      <div key={idx}>
-                        <div style={{ fontSize: "9pt", fontWeight: "700", color: "#0f172a" }}>
-                          {proj.name} {proj.tech ? <span style={{ fontSize: "8pt", color: "#4c1d95" }}>({proj.tech})</span> : null}
-                        </div>
-                        {proj.description && <div style={{ fontSize: "8pt", color: "#334155" }}>{proj.description}</div>}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+              {mainSections.map(secId => renderClaireSection(secId, false))}
             </div>
           </div>
         </div>
       );
     };
 
-    // 7. Jessica Blakely — Game Designer
+    // 6. Jessica Blakely — Game Designer
     const renderProJessica = () => {
       const email = data.personalInfo?.email;
       const phone = data.personalInfo?.phone;
       const location = data.personalInfo?.location;
       const portfolio = data.personalInfo?.portfolio;
       const linkedin = data.personalInfo?.linkedin;
+      const github = data.personalInfo?.github;
+      const customLinks = data.personalInfo?.customLinks || [];
       const photoUrl =
         data.personalInfo?.photoUrl ||
         "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=400&q=80";
@@ -3108,9 +3233,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
         ...(data.skills?.technical || []),
         ...(data.skills?.tools || []),
       ];
-      const softSkills = data.skills?.soft?.length
-        ? data.skills.soft
-        : ["Teamwork", "Pioneering", "Creative Writing", "Player Psychology", "Deadline Driven"];
+      const softSkills = data.skills?.soft || [];
 
       const renderGoldHeader = (title: string) => (
         <div style={{ marginTop: "14px", marginBottom: "7px" }}>
@@ -3127,6 +3250,181 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
           </div>
         </div>
       );
+
+      const defaultJessicaSidebar = ["skills", "education", "languages", "achievements"];
+      const userSidebar = cs.sidebarSections && cs.sidebarSections.length > 0 ? cs.sidebarSections : defaultJessicaSidebar;
+      const sidebarSet = new Set(userSidebar);
+      const orderedSections = (cs.sectionOrder && cs.sectionOrder.length > 0 ? cs.sectionOrder : defaultSections).filter(id => !hidden.has(id));
+
+      const mainSections = orderedSections.filter(id => !sidebarSet.has(id) && id !== "summary");
+      const sidebarSections = orderedSections.filter(id => sidebarSet.has(id) && id !== "summary");
+
+      const renderJessicaSection = (secId: string, isSidebar: boolean) => {
+        switch (secId) {
+          case "experience":
+            if (!data.experience || data.experience.length === 0) return null;
+            return (
+              <div key="experience">
+                {renderGoldHeader("WORK EXPERIENCE")}
+                <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                  {data.experience.map((exp, idx) => (
+                    <div key={idx}>
+                      <div style={{ fontSize: "9.5pt", fontWeight: "700", color: "#0f172a" }}>{exp.title}</div>
+                      <div style={{ fontSize: "8.5pt", color: "#334155", fontWeight: "600" }}>{exp.company}</div>
+                      {exp.date && <div style={{ fontSize: "8pt", color: "#b8860b", margin: "1px 0" }}>{exp.date}</div>}
+                      {exp.bullets && exp.bullets.length > 0 && (
+                        <ul style={{ margin: "2px 0 0 0", paddingLeft: "14px" }}>
+                          {exp.bullets.map((b, bIdx) => (
+                            <li key={bIdx} style={{ fontSize: "8.5pt", color: "#334155", lineHeight: 1.4, marginBottom: "2px" }}>
+                              {renderFormattedText(b)}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          case "projects":
+            if (!data.projects || data.projects.length === 0) return null;
+            return (
+              <div key="projects">
+                {renderGoldHeader("PROJECTS")}
+                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                  {data.projects.map((proj, idx) => (
+                    <div key={idx}>
+                      <div style={{ fontSize: "9pt", fontWeight: "700", color: "#0f172a" }}>
+                        {proj.name} {proj.tech ? <span style={{ fontSize: "8pt", color: "#b8860b" }}>({proj.tech})</span> : null}
+                      </div>
+                      {proj.description && <div style={{ fontSize: "8pt", color: "#334155" }}>{proj.description}</div>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          case "skills":
+            if (hardSkills.length === 0 && softSkills.length === 0) return null;
+            return (
+              <div key="skills" style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                {hardSkills.length > 0 && (
+                  <div>
+                    {renderGoldHeader("HARD SKILLS")}
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
+                      {hardSkills.map((s, idx) => (
+                        <span
+                          key={idx}
+                          style={{
+                            backgroundColor: "#1e293b",
+                            color: "#ffffff",
+                            padding: "3px 8px",
+                            borderRadius: "4px",
+                            fontSize: "7.5pt",
+                            fontWeight: "600",
+                          }}
+                        >
+                          {s}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {softSkills.length > 0 && (
+                  <div>
+                    {renderGoldHeader("SOFT SKILLS")}
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
+                      {softSkills.map((s, idx) => (
+                        <span
+                          key={idx}
+                          style={{
+                            backgroundColor: "#1e293b",
+                            color: "#ffffff",
+                            padding: "3px 8px",
+                            borderRadius: "4px",
+                            fontSize: "7.5pt",
+                            fontWeight: "600",
+                          }}
+                        >
+                          {s}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          case "education":
+            if (!data.education || data.education.length === 0) return null;
+            return (
+              <div key="education">
+                {renderGoldHeader("EDUCATION")}
+                {data.education.map((edu, idx) => (
+                  <div key={idx} style={{ marginBottom: "6px" }}>
+                    <div style={{ fontSize: "9pt", fontWeight: "700", color: "#0f172a" }}>{edu.degree}</div>
+                    <div style={{ fontSize: "8.5pt", color: "#334155" }}>{edu.school}</div>
+                    {edu.date && <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{edu.date}</div>}
+                  </div>
+                ))}
+              </div>
+            );
+          case "certifications":
+            if (!data.certifications || data.certifications.length === 0) return null;
+            return (
+              <div key="certifications">
+                {renderGoldHeader("CERTIFICATES")}
+                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                  {data.certifications.map((c, idx) => (
+                    <div key={idx}>
+                      <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{c.name}</div>
+                      {c.issuer && <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{c.issuer}</div>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          case "languages":
+            if (!data.languages || data.languages.length === 0) return null;
+            return (
+              <div key="languages">
+                {renderGoldHeader("LANGUAGES")}
+                <div style={{ display: "flex", gap: "16px", marginTop: "4px", flexWrap: "wrap" }}>
+                  {data.languages.map((l, idx) => (
+                    <div key={idx} style={{ textAlign: "center" }}>
+                      <div
+                        style={{
+                          width: "36px",
+                          height: "26px",
+                          backgroundColor: "#1e293b",
+                          borderRadius: "4px",
+                          borderTop: "4px solid #d4af37",
+                          margin: "0 auto 3px auto",
+                        }}
+                      />
+                      <div style={{ fontSize: "7.5pt", fontWeight: "700", color: "#0f172a" }}>{l.name}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          case "achievements":
+            if (!data.achievements || data.achievements.length === 0) return null;
+            return (
+              <div key="achievements">
+                {renderGoldHeader("AWARDS & HONORS")}
+                <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
+                  {data.achievements.map((ach, idx) => (
+                    <div key={idx}>
+                      <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{ach.title}</div>
+                      {ach.description && <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{ach.description}</div>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          default:
+            return null;
+        }
+      };
 
       return (
         <div
@@ -3218,181 +3516,68 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                   <span>{location}</span>
                 </div>
               )}
-              {portfolio && (
-                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                  <Globe style={{ width: 12, height: 12, color: "#d4af37" }} />
-                  <span>{portfolio.replace(/^https?:\/\//, "")}</span>
-                </div>
-              )}
               {linkedin && (
                 <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
                   <LinkedinIcon style={{ width: 12, height: 12, color: "#d4af37" }} />
                   <span>{linkedin.replace(/^https?:\/\//, "")}</span>
                 </div>
               )}
+              {github && (
+                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                  <GithubIcon style={{ width: 12, height: 12, color: "#d4af37" }} />
+                  <span>{github.replace(/^https?:\/\//, "")}</span>
+                </div>
+              )}
+              {portfolio && (
+                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                  <Globe style={{ width: 12, height: 12, color: "#d4af37" }} />
+                  <span>{portfolio.replace(/^https?:\/\//, "")}</span>
+                </div>
+              )}
+              {customLinks.map((cl, i) => (
+                <div key={i} style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                  <Globe style={{ width: 12, height: 12, color: "#d4af37" }} />
+                  <span><strong>{cl.label}:</strong> {cl.url.replace(/^https?:\/\//, "")}</span>
+                </div>
+              ))}
             </div>
           </div>
 
-          {/* Body: 2 Columns */}
+          {/* Dynamic 2 Columns */}
           <div style={{ padding: "8mm 16mm 14mm 16mm", display: "flex", gap: "24px" }}>
-            {/* Left Column (55%): Experience & Certificates */}
+            {/* Left Column (55%) */}
             <div style={{ flex: "1 1 55%" }}>
-              {data.experience && data.experience.length > 0 && (
-                <div>
-                  {renderGoldHeader("WORK EXPERIENCE")}
-                  <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-                    {data.experience.map((exp, idx) => (
-                      <div key={idx}>
-                        <div style={{ fontSize: "9.5pt", fontWeight: "700", color: "#0f172a" }}>{exp.title}</div>
-                        <div style={{ fontSize: "8.5pt", color: "#334155", fontWeight: "600" }}>{exp.company}</div>
-                        {exp.date && <div style={{ fontSize: "8pt", color: "#b8860b", margin: "1px 0" }}>{exp.date}</div>}
-                        {exp.bullets && exp.bullets.length > 0 && (
-                          <ul style={{ margin: "2px 0 0 0", paddingLeft: "14px" }}>
-                            {exp.bullets.map((b, bIdx) => (
-                              <li key={bIdx} style={{ fontSize: "8.5pt", color: "#334155", lineHeight: 1.4, marginBottom: "2px" }}>
-                                {renderFormattedText(b)}
-                              </li>
-                            ))}
-                          </ul>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {data.certifications && data.certifications.length > 0 && (
-                <div>
-                  {renderGoldHeader("CERTIFICATES")}
-                  <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                    {data.certifications.map((c, idx) => (
-                      <div key={idx}>
-                        <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{c.name}</div>
-                        {c.issuer && <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{c.issuer}</div>}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+              {mainSections.map(secId => renderJessicaSection(secId, false))}
             </div>
 
-            {/* Right Column (45%): Skills, Education, Awards, Languages */}
+            {/* Right Column (45%) */}
             <div style={{ flex: "1 1 45%" }}>
-              {/* HARD SKILLS */}
-              <div>
-                {renderGoldHeader("HARD SKILLS")}
-                <div style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
-                  {(hardSkills.length > 0
-                    ? hardSkills.slice(0, 10)
-                    : ["Unreal Engine", "Blueprints", "Game Systems", "Map Drafting", "Level Testing", "3D Blocking", "Level Design"]
-                  ).map((s, idx) => (
-                    <span
-                      key={idx}
-                      style={{
-                        backgroundColor: "#1e293b",
-                        color: "#ffffff",
-                        padding: "3px 8px",
-                        borderRadius: "4px",
-                        fontSize: "7.5pt",
-                        fontWeight: "600",
-                      }}
-                    >
-                      {s}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              {/* SOFT SKILLS */}
-              <div>
-                {renderGoldHeader("SOFT SKILLS")}
-                <div style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
-                  {softSkills.map((s, idx) => (
-                    <span
-                      key={idx}
-                      style={{
-                        backgroundColor: "#1e293b",
-                        color: "#ffffff",
-                        padding: "3px 8px",
-                        borderRadius: "4px",
-                        fontSize: "7.5pt",
-                        fontWeight: "600",
-                      }}
-                    >
-                      {s}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              {/* EDUCATION */}
-              {data.education && data.education.length > 0 && (
-                <div>
-                  {renderGoldHeader("EDUCATION")}
-                  {data.education.map((edu, idx) => (
-                    <div key={idx}>
-                      <div style={{ fontSize: "9pt", fontWeight: "700", color: "#0f172a" }}>{edu.degree}</div>
-                      <div style={{ fontSize: "8.5pt", color: "#334155" }}>{edu.school}</div>
-                      {edu.date && <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{edu.date}</div>}
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {/* AWARDS */}
-              {data.achievements && data.achievements.length > 0 && (
-                <div>
-                  {renderGoldHeader("AWARDS")}
-                  <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
-                    {data.achievements.map((ach, idx) => (
-                      <div key={idx}>
-                        <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{ach.title}</div>
-                        {ach.description && <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{ach.description}</div>}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* LANGUAGES */}
-              {data.languages && data.languages.length > 0 && (
-                <div>
-                  {renderGoldHeader("LANGUAGES")}
-                  <div style={{ display: "flex", gap: "16px", marginTop: "4px" }}>
-                    {data.languages.map((l, idx) => (
-                      <div key={idx} style={{ textAlign: "center" }}>
-                        <div
-                          style={{
-                            width: "36px",
-                            height: "26px",
-                            backgroundColor: "#1e293b",
-                            borderRadius: "4px",
-                            borderTop: "4px solid #d4af37",
-                            margin: "0 auto 3px auto",
-                          }}
-                        />
-                        <div style={{ fontSize: "7.5pt", fontWeight: "700", color: "#0f172a" }}>{l.name}</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+              {sidebarSections.map(secId => renderJessicaSection(secId, true))}
             </div>
           </div>
         </div>
       );
     };
 
-    // 8. Adam Stotch — Realtor
+    // 7. Adam Stotch — Realtor
     const renderProAdam = () => {
       const email = data.personalInfo?.email;
       const phone = data.personalInfo?.phone;
       const location = data.personalInfo?.location;
       const portfolio = data.personalInfo?.portfolio;
       const linkedin = data.personalInfo?.linkedin;
+      const github = data.personalInfo?.github;
+      const customLinks = data.personalInfo?.customLinks || [];
       const photoUrl =
         data.personalInfo?.photoUrl ||
         "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80";
+
+      const allSkills = [
+        ...(data.skills?.technical || []),
+        ...(data.skills?.tools || []),
+        ...(data.skills?.concepts || []),
+        ...(data.skills?.soft || []),
+      ];
 
       const renderSimpleHeader = (title: string) => (
         <div style={{ marginTop: "14px", marginBottom: "8px" }}>
@@ -3411,6 +3596,170 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
           </div>
         </div>
       );
+
+      const defaultAdamSidebar = ["skills", "certifications", "languages", "achievements"];
+      const userSidebar = cs.sidebarSections && cs.sidebarSections.length > 0 ? cs.sidebarSections : defaultAdamSidebar;
+      const sidebarSet = new Set(userSidebar);
+      const orderedSections = (cs.sectionOrder && cs.sectionOrder.length > 0 ? cs.sectionOrder : defaultSections).filter(id => !hidden.has(id));
+
+      const mainSections = orderedSections.filter(id => !sidebarSet.has(id) && id !== "summary");
+      const sidebarSections = orderedSections.filter(id => sidebarSet.has(id) && id !== "summary");
+
+      const renderAdamSection = (secId: string, isSidebar: boolean) => {
+        switch (secId) {
+          case "experience":
+            if (!data.experience || data.experience.length === 0) return null;
+            return (
+              <div key="experience">
+                {renderSimpleHeader("WORK EXPERIENCE")}
+                <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                  {data.experience.map((exp, idx) => (
+                    <div key={idx} style={{ position: "relative", paddingLeft: "18px" }}>
+                      <div
+                        style={{
+                          position: "absolute",
+                          left: 0,
+                          top: "3px",
+                          width: "9px",
+                          height: "9px",
+                          borderRadius: "50%",
+                          border: "2px solid #0f172a",
+                          backgroundColor: "#ffffff",
+                        }}
+                      />
+                      <div
+                        style={{
+                          position: "absolute",
+                          left: "4px",
+                          top: "14px",
+                          bottom: "-8px",
+                          width: "1.5px",
+                          backgroundColor: "#cbd5e1",
+                        }}
+                      />
+                      <div style={{ fontSize: "9.5pt", fontWeight: "700", color: "#0f172a" }}>{exp.title}</div>
+                      <div style={{ fontSize: "8.5pt", color: "#334155", fontWeight: "600" }}>{exp.company}</div>
+                      {exp.date && <div style={{ fontSize: "7.5pt", color: "#64748b", margin: "1px 0" }}>{exp.date}</div>}
+                      {exp.bullets && exp.bullets.length > 0 && (
+                        <div style={{ borderLeft: "2px solid #94a3b8", paddingLeft: "8px", marginTop: "4px" }}>
+                          <ul style={{ margin: 0, paddingLeft: "12px" }}>
+                            {exp.bullets.map((b, bIdx) => (
+                              <li key={bIdx} style={{ fontSize: "8.5pt", color: "#334155", lineHeight: 1.4, marginBottom: "2px" }}>
+                                {renderFormattedText(b)}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          case "education":
+            if (!data.education || data.education.length === 0) return null;
+            return (
+              <div key="education">
+                {renderSimpleHeader("EDUCATION")}
+                {data.education.map((edu, idx) => (
+                  <div key={idx} style={{ position: "relative", paddingLeft: "18px", marginBottom: "6px" }}>
+                    <div
+                      style={{
+                        position: "absolute",
+                        left: 0,
+                        top: "3px",
+                        width: "9px",
+                        height: "9px",
+                        borderRadius: "50%",
+                        border: "2px solid #0f172a",
+                        backgroundColor: "#ffffff",
+                      }}
+                    />
+                    <div style={{ fontSize: "9.5pt", fontWeight: "700", color: "#0f172a" }}>{edu.degree}</div>
+                    <div style={{ fontSize: "8.5pt", color: "#334155" }}>{edu.school}</div>
+                    {edu.date && <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{edu.date}</div>}
+                  </div>
+                ))}
+              </div>
+            );
+          case "projects":
+            if (!data.projects || data.projects.length === 0) return null;
+            return (
+              <div key="projects">
+                {renderSimpleHeader("KEY PROJECTS")}
+                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                  {data.projects.map((proj, idx) => (
+                    <div key={idx}>
+                      <div style={{ fontSize: "9pt", fontWeight: "700", color: "#0f172a" }}>
+                        {proj.name} {proj.tech ? <span style={{ fontSize: "8pt", color: "#64748b" }}>({proj.tech})</span> : null}
+                      </div>
+                      {proj.description && <div style={{ fontSize: "8pt", color: "#334155" }}>{proj.description}</div>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          case "skills":
+            if (allSkills.length === 0) return null;
+            return (
+              <div key="skills">
+                {renderSimpleHeader("SKILLS")}
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px", fontSize: "8pt", color: "#334155" }}>
+                  {allSkills.map((s, idx) => (
+                    <div key={idx} style={{ padding: "2px 0" }}>• {s}</div>
+                  ))}
+                </div>
+              </div>
+            );
+          case "certifications":
+            if (!data.certifications || data.certifications.length === 0) return null;
+            return (
+              <div key="certifications">
+                {renderSimpleHeader("CERTIFICATES")}
+                <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
+                  {data.certifications.map((c, idx) => (
+                    <div key={idx}>
+                      <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{c.name}</div>
+                      {c.issuer && <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{c.issuer}</div>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          case "languages":
+            if (!data.languages || data.languages.length === 0) return null;
+            return (
+              <div key="languages">
+                {renderSimpleHeader("LANGUAGES")}
+                <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
+                  {data.languages.map((l, idx) => (
+                    <div key={idx} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <span style={{ fontSize: "8.5pt", color: "#0f172a", fontWeight: "600" }}>{l.name}</span>
+                      <span style={{ fontSize: "7.5pt", color: "#64748b" }}>{l.proficiency || ""}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          case "achievements":
+            if (!data.achievements || data.achievements.length === 0) return null;
+            return (
+              <div key="achievements">
+                {renderSimpleHeader("MEMBERSHIPS & HONORS")}
+                <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                  {data.achievements.map((ach, idx) => (
+                    <div key={idx}>
+                      <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{ach.title}</div>
+                      {ach.description && <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{ach.description}</div>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          default:
+            return null;
+        }
+      };
 
       return (
         <div
@@ -3480,12 +3829,24 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                   <LinkedinIcon style={{ width: 12, height: 12, color: "#0f172a" }} />
                 </div>
               )}
+              {github && (
+                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                  <span>{github.replace(/^https?:\/\//, "")}</span>
+                  <GithubIcon style={{ width: 12, height: 12, color: "#0f172a" }} />
+                </div>
+              )}
               {portfolio && (
                 <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
                   <span>{portfolio.replace(/^https?:\/\//, "")}</span>
                   <Globe style={{ width: 12, height: 12, color: "#0f172a" }} />
                 </div>
               )}
+              {customLinks.map((cl, i) => (
+                <div key={i} style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                  <span><strong>{cl.label}:</strong> {cl.url.replace(/^https?:\/\//, "")}</span>
+                  <Globe style={{ width: 12, height: 12, color: "#0f172a" }} />
+                </div>
+              ))}
             </div>
           </div>
 
@@ -3496,205 +3857,31 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
             </p>
           )}
 
-          {/* 2 Columns */}
+          {/* Dynamic 2 Columns */}
           <div style={{ display: "flex", gap: "24px", marginTop: "8px" }}>
-            {/* Left Column (55%): Experience with Timeline Node Glyphs & Inset Brackets */}
+            {/* Left Column (55%) */}
             <div style={{ flex: "1 1 55%" }}>
-              {data.experience && data.experience.length > 0 && (
-                <div>
-                  {renderSimpleHeader("WORK EXPERIENCE")}
-                  <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-                    {data.experience.map((exp, idx) => (
-                      <div key={idx} style={{ position: "relative", paddingLeft: "18px" }}>
-                        {/* Circle node & vertical line */}
-                        <div
-                          style={{
-                            position: "absolute",
-                            left: 0,
-                            top: "3px",
-                            width: "9px",
-                            height: "9px",
-                            borderRadius: "50%",
-                            border: "2px solid #0f172a",
-                            backgroundColor: "#ffffff",
-                          }}
-                        />
-                        <div
-                          style={{
-                            position: "absolute",
-                            left: "4px",
-                            top: "14px",
-                            bottom: "-8px",
-                            width: "1.5px",
-                            backgroundColor: "#cbd5e1",
-                          }}
-                        />
-
-                        <div style={{ fontSize: "9.5pt", fontWeight: "700", color: "#0f172a" }}>{exp.title}</div>
-                        <div style={{ fontSize: "8.5pt", color: "#334155", fontWeight: "600" }}>{exp.company}</div>
-                        {exp.date && <div style={{ fontSize: "7.5pt", color: "#64748b", margin: "1px 0" }}>{exp.date}</div>}
-
-                        {/* Inset bracket container */}
-                        {exp.bullets && exp.bullets.length > 0 && (
-                          <div
-                            style={{
-                              borderLeft: "2px solid #94a3b8",
-                              paddingLeft: "8px",
-                              marginTop: "4px",
-                            }}
-                          >
-                            <ul style={{ margin: 0, paddingLeft: "12px" }}>
-                              {exp.bullets.map((b, bIdx) => (
-                                <li key={bIdx} style={{ fontSize: "8.5pt", color: "#334155", lineHeight: 1.4, marginBottom: "2px" }}>
-                                  {renderFormattedText(b)}
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* EDUCATION */}
-              {data.education && data.education.length > 0 && (
-                <div style={{ marginTop: "12px" }}>
-                  {renderSimpleHeader("EDUCATION")}
-                  {data.education.map((edu, idx) => (
-                    <div key={idx} style={{ position: "relative", paddingLeft: "18px" }}>
-                      <div
-                        style={{
-                          position: "absolute",
-                          left: 0,
-                          top: "3px",
-                          width: "9px",
-                          height: "9px",
-                          borderRadius: "50%",
-                          border: "2px solid #0f172a",
-                          backgroundColor: "#ffffff",
-                        }}
-                      />
-                      <div style={{ fontSize: "9.5pt", fontWeight: "700", color: "#0f172a" }}>{edu.degree}</div>
-                      <div style={{ fontSize: "8.5pt", color: "#334155" }}>{edu.school}</div>
-                      {edu.date && <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{edu.date}</div>}
-                    </div>
-                  ))}
-                </div>
-              )}
+              {mainSections.map(secId => renderAdamSection(secId, false))}
             </div>
 
-            {/* Right Column (45%): Skills Grid, Certifications, Memberships, Languages (Dots), Interests */}
+            {/* Right Column (45%) */}
             <div style={{ flex: "1 1 45%" }}>
-              {/* SKILLS */}
-              <div>
-                {renderSimpleHeader("SKILLS")}
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px", fontSize: "8pt", color: "#334155" }}>
-                  {[
-                    "Market & Price Analysis", "Property Management",
-                    "Property Manager Software", "MLS Database",
-                    "Negotiation", "Written & Oral Comm.",
-                    "Organization", "Networking"
-                  ].map((s, idx) => (
-                    <div key={idx} style={{ padding: "2px 0" }}>{s}</div>
-                  ))}
-                </div>
-              </div>
-
-              {/* CERTIFICATES */}
-              {data.certifications && data.certifications.length > 0 && (
-                <div>
-                  {renderSimpleHeader("CERTIFICATES")}
-                  <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
-                    {data.certifications.map((c, idx) => (
-                      <div key={idx}>
-                        <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{c.name}</div>
-                        {c.issuer && <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{c.issuer}</div>}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* MEMBERSHIPS */}
-              {data.achievements && data.achievements.length > 0 && (
-                <div>
-                  {renderSimpleHeader("MEMBERSHIPS")}
-                  <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                    {data.achievements.map((ach, idx) => (
-                      <div key={idx}>
-                        <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{ach.title}</div>
-                        {ach.description && <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{ach.description}</div>}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* LANGUAGES: Dot Rating Matrix */}
-              {data.languages && data.languages.length > 0 && (
-                <div>
-                  {renderSimpleHeader("LANGUAGES")}
-                  <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
-                    {data.languages.map((l, idx) => (
-                      <div key={idx} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                        <span style={{ fontSize: "8.5pt", color: "#0f172a", fontWeight: "600" }}>{l.name}</span>
-                        <div style={{ display: "flex", gap: "4px" }}>
-                          {[1, 2, 3, 4, 5].map((dot) => {
-                            const isFilled = dot <= (l.name === "English" || l.name === "Spanish" ? 5 : l.name === "French" ? 4 : 3);
-                            return (
-                              <div
-                                key={dot}
-                                style={{
-                                  width: "7px",
-                                  height: "7px",
-                                  borderRadius: "50%",
-                                  backgroundColor: isFilled ? "#475569" : "#cbd5e1",
-                                }}
-                              />
-                            );
-                          })}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* INTERESTS & HOBBIES */}
-              <div style={{ marginTop: "12px" }}>
-                {renderSimpleHeader("INTERESTS & HOBBIES")}
-                <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
-                  {["Photography", "Community Involvement", "Learning Languages", "Blogging"].map((item, idx) => (
-                    <span
-                      key={idx}
-                      style={{
-                        border: "1px solid #94a3b8",
-                        borderRadius: "12px",
-                        padding: "3px 8px",
-                        fontSize: "7.5pt",
-                        color: "#334155",
-                      }}
-                    >
-                      {item}
-                    </span>
-                  ))}
-                </div>
-              </div>
+              {sidebarSections.map(secId => renderAdamSection(secId, true))}
             </div>
           </div>
         </div>
       );
     };
 
-    // 9. Nick Koe — Event Photographer
+    // 8. Nick Koe — Event Photographer
     const renderProNick = () => {
       const email = data.personalInfo?.email;
       const phone = data.personalInfo?.phone;
       const location = data.personalInfo?.location;
       const portfolio = data.personalInfo?.portfolio;
       const linkedin = data.personalInfo?.linkedin;
+      const github = data.personalInfo?.github;
+      const customLinks = data.personalInfo?.customLinks || [];
       const photoUrl =
         data.personalInfo?.photoUrl ||
         "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=400&q=80";
@@ -3703,9 +3890,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
         ...(data.skills?.technical || []),
         ...(data.skills?.tools || []),
       ];
-      const softSkills = data.skills?.soft?.length
-        ? data.skills.soft
-        : ["Creativity", "Attention to Detail", "Adaptability"];
+      const softSkills = data.skills?.soft || [];
 
       const renderNickHeader = (title: string) => (
         <div style={{ marginTop: "14px", marginBottom: "8px" }}>
@@ -3722,6 +3907,175 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
           </div>
         </div>
       );
+
+      const defaultNickSidebar = ["skills", "certifications", "languages", "achievements"];
+      const userSidebar = cs.sidebarSections && cs.sidebarSections.length > 0 ? cs.sidebarSections : defaultNickSidebar;
+      const sidebarSet = new Set(userSidebar);
+      const orderedSections = (cs.sectionOrder && cs.sectionOrder.length > 0 ? cs.sectionOrder : defaultSections).filter(id => !hidden.has(id));
+
+      const mainSections = orderedSections.filter(id => !sidebarSet.has(id) && id !== "summary");
+      const sidebarSections = orderedSections.filter(id => sidebarSet.has(id) && id !== "summary");
+
+      const renderNickSection = (secId: string, isSidebar: boolean) => {
+        switch (secId) {
+          case "experience":
+            if (!data.experience || data.experience.length === 0) return null;
+            return (
+              <div key="experience">
+                {renderNickHeader("WORK EXPERIENCE")}
+                <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                  {data.experience.map((exp, idx) => (
+                    <div key={idx}>
+                      <div style={{ fontSize: "9.5pt", fontWeight: "700", color: "#0f172a" }}>{exp.title}</div>
+                      <div style={{ fontSize: "8.5pt", color: "#334155", fontWeight: "600" }}>{exp.company}</div>
+                      <div style={{ fontSize: "8pt", color: "#e06d53", fontWeight: "600", margin: "1px 0" }}>
+                        {exp.date} {exp.location ? `• ${exp.location}` : ""}
+                      </div>
+                      {exp.bullets && exp.bullets.length > 0 && (
+                        <ul style={{ margin: "2px 0 0 0", paddingLeft: "14px" }}>
+                          {exp.bullets.map((b, bIdx) => (
+                            <li key={bIdx} style={{ fontSize: "8.5pt", color: "#334155", lineHeight: 1.4, marginBottom: "2px" }}>
+                              {renderFormattedText(b)}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          case "education":
+            if (!data.education || data.education.length === 0) return null;
+            return (
+              <div key="education">
+                {renderNickHeader("EDUCATION")}
+                {data.education.map((edu, idx) => (
+                  <div key={idx} style={{ marginBottom: "6px" }}>
+                    <div style={{ fontSize: "9.5pt", fontWeight: "700", color: "#0f172a" }}>{edu.degree}</div>
+                    <div style={{ fontSize: "8.5pt", color: "#334155" }}>{edu.school}</div>
+                    {edu.date && <div style={{ fontSize: "8pt", color: "#e06d53" }}>{edu.date}</div>}
+                  </div>
+                ))}
+              </div>
+            );
+          case "skills":
+            if (hardSkills.length === 0 && softSkills.length === 0) return null;
+            return (
+              <div key="skills" style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                {hardSkills.length > 0 && (
+                  <div>
+                    {renderNickHeader("HARD SKILLS")}
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
+                      {hardSkills.map((s, idx) => (
+                        <span
+                          key={idx}
+                          style={{
+                            backgroundColor: "#8da9c4",
+                            color: "#ffffff",
+                            padding: "3px 8px",
+                            borderRadius: "4px",
+                            fontSize: "7.5pt",
+                            fontWeight: "600",
+                          }}
+                        >
+                          {s}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {softSkills.length > 0 && (
+                  <div>
+                    {renderNickHeader("SOFT SKILLS")}
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
+                      {softSkills.map((s, idx) => (
+                        <span
+                          key={idx}
+                          style={{
+                            backgroundColor: "#8da9c4",
+                            color: "#ffffff",
+                            padding: "3px 8px",
+                            borderRadius: "4px",
+                            fontSize: "7.5pt",
+                            fontWeight: "600",
+                          }}
+                        >
+                          {s}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          case "projects":
+            if (!data.projects || data.projects.length === 0) return null;
+            return (
+              <div key="projects">
+                {renderNickHeader("PORTFOLIO & PROJECTS")}
+                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                  {data.projects.map((p, idx) => (
+                    <div key={idx}>
+                      <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{p.name}</div>
+                      {p.description && (
+                        <ul style={{ margin: "2px 0 0 0", paddingLeft: "14px" }}>
+                          <li style={{ fontSize: "8pt", color: "#334155", lineHeight: 1.35 }}>{p.description}</li>
+                        </ul>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          case "certifications":
+            if (!data.certifications || data.certifications.length === 0) return null;
+            return (
+              <div key="certifications">
+                {renderNickHeader("CERTIFICATES")}
+                <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
+                  {data.certifications.map((c, idx) => (
+                    <div key={idx}>
+                      <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{c.name}</div>
+                      {c.issuer && <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{c.issuer}</div>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          case "achievements":
+            if (!data.achievements || data.achievements.length === 0) return null;
+            return (
+              <div key="achievements">
+                {renderNickHeader("ACHIEVEMENTS")}
+                <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                  {data.achievements.map((ach, idx) => (
+                    <div key={idx}>
+                      <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{ach.title}</div>
+                      {ach.description && <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{ach.description}</div>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          case "languages":
+            if (!data.languages || data.languages.length === 0) return null;
+            return (
+              <div key="languages">
+                {renderNickHeader("LANGUAGES")}
+                <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", fontSize: "8pt" }}>
+                  {data.languages.map((l, idx) => (
+                    <div key={idx}>
+                      <strong style={{ color: "#0f172a" }}>{l.name}</strong> {l.proficiency ? <span style={{ color: "#64748b" }}>({l.proficiency})</span> : null}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          default:
+            return null;
+        }
+      };
 
       return (
         <div
@@ -3799,192 +4153,67 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                   <MapPin style={{ width: 12, height: 12, color: "#4a6b82" }} />
                 </div>
               )}
-              {portfolio && (
-                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                  <span>{portfolio.replace(/^https?:\/\//, "")}</span>
-                  <Globe style={{ width: 12, height: 12, color: "#4a6b82" }} />
-                </div>
-              )}
               {linkedin && (
                 <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
                   <span>{linkedin.replace(/^https?:\/\//, "")}</span>
                   <LinkedinIcon style={{ width: 12, height: 12, color: "#4a6b82" }} />
                 </div>
               )}
+              {github && (
+                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                  <span>{github.replace(/^https?:\/\//, "")}</span>
+                  <GithubIcon style={{ width: 12, height: 12, color: "#4a6b82" }} />
+                </div>
+              )}
+              {portfolio && (
+                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                  <span>{portfolio.replace(/^https?:\/\//, "")}</span>
+                  <Globe style={{ width: 12, height: 12, color: "#4a6b82" }} />
+                </div>
+              )}
+              {customLinks.map((cl, i) => (
+                <div key={i} style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                  <span><strong>{cl.label}:</strong> {cl.url.replace(/^https?:\/\//, "")}</span>
+                  <Globe style={{ width: 12, height: 12, color: "#4a6b82" }} />
+                </div>
+              ))}
             </div>
           </div>
 
           <div style={{ borderBottom: "1px solid #cbd5e1", margin: "12px 0 10px 8px" }} />
 
-          {/* 2-Column Body */}
+          {/* Dynamic 2-Column Body */}
           <div style={{ display: "flex", gap: "24px", paddingLeft: "8px" }}>
             {/* Left Column (55%) */}
             <div style={{ flex: "1 1 55%" }}>
-              {data.experience && data.experience.length > 0 && (
-                <div>
-                  {renderNickHeader("WORK EXPERIENCE")}
-                  <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-                    {data.experience.map((exp, idx) => (
-                      <div key={idx}>
-                        <div style={{ fontSize: "9.5pt", fontWeight: "700", color: "#0f172a" }}>{exp.title}</div>
-                        <div style={{ fontSize: "8.5pt", color: "#334155", fontWeight: "600" }}>{exp.company}</div>
-                        <div style={{ fontSize: "8pt", color: "#e06d53", fontWeight: "600", margin: "1px 0" }}>
-                          {exp.date} {exp.location ? `• ${exp.location}` : ""}
-                        </div>
-                        {exp.bullets && exp.bullets.length > 0 && (
-                          <ul style={{ margin: "2px 0 0 0", paddingLeft: "14px" }}>
-                            {exp.bullets.map((b, bIdx) => (
-                              <li key={bIdx} style={{ fontSize: "8.5pt", color: "#334155", lineHeight: 1.4, marginBottom: "2px" }}>
-                                {renderFormattedText(b)}
-                              </li>
-                            ))}
-                          </ul>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {data.education && data.education.length > 0 && (
-                <div style={{ marginTop: "12px" }}>
-                  {renderNickHeader("EDUCATION")}
-                  {data.education.map((edu, idx) => (
-                    <div key={idx}>
-                      <div style={{ fontSize: "9.5pt", fontWeight: "700", color: "#0f172a" }}>{edu.degree}</div>
-                      <div style={{ fontSize: "8.5pt", color: "#334155" }}>{edu.school}</div>
-                      {edu.date && <div style={{ fontSize: "8pt", color: "#e06d53" }}>{edu.date}</div>}
-                    </div>
-                  ))}
-                </div>
-              )}
+              {mainSections.map(secId => renderNickSection(secId, false))}
             </div>
 
             {/* Right Column (45%) */}
             <div style={{ flex: "1 1 45%" }}>
-              {/* HARD SKILLS */}
-              <div>
-                {renderNickHeader("HARD SKILLS")}
-                <div style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
-                  {(hardSkills.length > 0
-                    ? hardSkills.slice(0, 9)
-                    : ["Composition", "Lighting", "Photo Editing", "Color Correction", "Candid Photography", "Adobe Photoshop", "Adobe Lightroom", "Capture One Pro"]
-                  ).map((s, idx) => (
-                    <span
-                      key={idx}
-                      style={{
-                        backgroundColor: "#8da9c4",
-                        color: "#ffffff",
-                        padding: "3px 8px",
-                        borderRadius: "4px",
-                        fontSize: "7.5pt",
-                        fontWeight: "600",
-                      }}
-                    >
-                      {s}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              {/* SOFT SKILLS */}
-              <div>
-                {renderNickHeader("SOFT SKILLS")}
-                <div style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
-                  {softSkills.map((s, idx) => (
-                    <span
-                      key={idx}
-                      style={{
-                        backgroundColor: "#8da9c4",
-                        color: "#ffffff",
-                        padding: "3px 8px",
-                        borderRadius: "4px",
-                        fontSize: "7.5pt",
-                        fontWeight: "600",
-                      }}
-                    >
-                      {s}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              {/* PORTFOLIO / PROJECTS */}
-              {data.projects && data.projects.length > 0 && (
-                <div>
-                  {renderNickHeader("PORTFOLIO")}
-                  <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                    {data.projects.map((p, idx) => (
-                      <div key={idx}>
-                        <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{p.name}</div>
-                        <ul style={{ margin: "2px 0 0 0", paddingLeft: "14px" }}>
-                          <li style={{ fontSize: "8pt", color: "#334155", lineHeight: 1.35 }}>{p.description}</li>
-                        </ul>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* CERTIFICATES */}
-              {data.certifications && data.certifications.length > 0 && (
-                <div>
-                  {renderNickHeader("CERTIFICATES")}
-                  <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
-                    {data.certifications.map((c, idx) => (
-                      <div key={idx}>
-                        <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{c.name}</div>
-                        {c.issuer && <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{c.issuer}</div>}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* ACHIEVEMENTS */}
-              {data.achievements && data.achievements.length > 0 && (
-                <div>
-                  {renderNickHeader("ACHIEVEMENTS")}
-                  <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                    {data.achievements.map((ach, idx) => (
-                      <div key={idx}>
-                        <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{ach.title}</div>
-                        {ach.description && <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{ach.description}</div>}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* LANGUAGES */}
-              {data.languages && data.languages.length > 0 && (
-                <div>
-                  {renderNickHeader("LANGUAGES")}
-                  <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", fontSize: "8pt" }}>
-                    {data.languages.map((l, idx) => (
-                      <div key={idx}>
-                        <strong style={{ color: "#0f172a" }}>{l.name}</strong> {l.proficiency ? <span style={{ color: "#64748b" }}>({l.proficiency})</span> : null}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+              {sidebarSections.map(secId => renderNickSection(secId, true))}
             </div>
           </div>
         </div>
       );
     };
 
-    // 10. Lisa Neumann — Mechanical Engineer
+    // 9. Lisa Neumann — Mechanical Engineer
     const renderProLisa = () => {
       const email = data.personalInfo?.email;
       const phone = data.personalInfo?.phone;
       const location = data.personalInfo?.location;
+      const portfolio = data.personalInfo?.portfolio;
       const linkedin = data.personalInfo?.linkedin;
+      const github = data.personalInfo?.github;
+      const customLinks = data.personalInfo?.customLinks || [];
 
-      const softSkills = data.skills?.soft?.length
-        ? data.skills.soft
-        : ["Time Management", "Mathematics", "Technical Documentation", "Leadership", "Communication", "Project Management"];
+      const techSkills = [
+        ...(data.skills?.technical || []),
+        ...(data.skills?.tools || []),
+        ...(data.skills?.concepts || []),
+      ];
+      const softSkills = data.skills?.soft || [];
 
       const renderBlueHeader = (title: string) => (
         <div style={{ marginTop: "14px", marginBottom: "7px" }}>
@@ -4003,6 +4232,162 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
           </div>
         </div>
       );
+
+      const defaultLisaSidebar = ["skills", "certifications", "languages", "achievements"];
+      const userSidebar = cs.sidebarSections && cs.sidebarSections.length > 0 ? cs.sidebarSections : defaultLisaSidebar;
+      const sidebarSet = new Set(userSidebar);
+      const orderedSections = (cs.sectionOrder && cs.sectionOrder.length > 0 ? cs.sectionOrder : defaultSections).filter(id => !hidden.has(id));
+
+      const mainSections = orderedSections.filter(id => !sidebarSet.has(id) && id !== "summary");
+      const sidebarSections = orderedSections.filter(id => sidebarSet.has(id) && id !== "summary");
+
+      const renderLisaSection = (secId: string, isSidebar: boolean) => {
+        switch (secId) {
+          case "experience":
+            if (!data.experience || data.experience.length === 0) return null;
+            return (
+              <div key="experience">
+                {renderBlueHeader("WORK EXPERIENCE")}
+                <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                  {data.experience.map((exp, idx) => (
+                    <div key={idx}>
+                      <div style={{ fontSize: "9.5pt", fontWeight: "700", color: "#0f172a" }}>{exp.title}</div>
+                      <div style={{ fontSize: "8.5pt", color: "#1e3a5f", fontWeight: "600" }}>{exp.company}</div>
+                      {exp.date && <div style={{ fontSize: "8pt", color: "#64748b", margin: "1px 0" }}>{exp.date}</div>}
+                      {exp.bullets && exp.bullets.length > 0 && (
+                        <ul style={{ margin: "2px 0 0 0", paddingLeft: "14px" }}>
+                          {exp.bullets.map((b, bIdx) => (
+                            <li key={bIdx} style={{ fontSize: "8.5pt", color: "#334155", lineHeight: 1.4, marginBottom: "2px" }}>
+                              {renderFormattedText(b)}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          case "education":
+            if (!data.education || data.education.length === 0) return null;
+            return (
+              <div key="education">
+                {renderBlueHeader("EDUCATION")}
+                {data.education.map((edu, idx) => (
+                  <div key={idx} style={{ marginBottom: "6px" }}>
+                    <div style={{ fontSize: "9.5pt", fontWeight: "700", color: "#0f172a" }}>{edu.degree}</div>
+                    <div style={{ fontSize: "8.5pt", color: "#334155" }}>{edu.school}</div>
+                    {edu.date && <div style={{ fontSize: "8pt", color: "#64748b" }}>{edu.date}</div>}
+                  </div>
+                ))}
+              </div>
+            );
+          case "skills":
+            if (techSkills.length === 0 && softSkills.length === 0) return null;
+            return (
+              <div key="skills" style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                {techSkills.length > 0 && (
+                  <div>
+                    {renderBlueHeader("TECHNICAL SKILLS")}
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
+                      {techSkills.map((sk, idx) => (
+                        <span key={idx} style={{ backgroundColor: "#e2e8f0", color: "#1e3a5f", padding: "2px 7px", borderRadius: "3px", fontSize: "7.5pt", fontWeight: 600 }}>
+                          {sk}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {softSkills.length > 0 && (
+                  <div>
+                    {renderBlueHeader("GENERAL SKILLS")}
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
+                      {softSkills.map((s, idx) => (
+                        <span
+                          key={idx}
+                          style={{
+                            backgroundColor: "#7f9db9",
+                            color: "#ffffff",
+                            padding: "3px 8px",
+                            borderRadius: "4px",
+                            fontSize: "7.5pt",
+                            fontWeight: "600",
+                          }}
+                        >
+                          {s}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          case "projects":
+            if (!data.projects || data.projects.length === 0) return null;
+            return (
+              <div key="projects">
+                {renderBlueHeader("PROJECTS")}
+                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                  {data.projects.map((proj, idx) => (
+                    <div key={idx}>
+                      <div style={{ fontSize: "9pt", fontWeight: "700", color: "#0f172a" }}>
+                        {proj.name} {proj.tech ? <span style={{ fontSize: "8pt", color: "#1e3a5f" }}>({proj.tech})</span> : null}
+                      </div>
+                      {proj.description && <div style={{ fontSize: "8pt", color: "#334155" }}>{proj.description}</div>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          case "certifications":
+            if (!data.certifications || data.certifications.length === 0) return null;
+            return (
+              <div key="certifications">
+                {renderBlueHeader("CERTIFICATES")}
+                <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
+                  {data.certifications.map((c, idx) => (
+                    <div key={idx}>
+                      <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{c.name}</div>
+                      {c.issuer && <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{c.issuer}</div>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          case "achievements":
+            if (!data.achievements || data.achievements.length === 0) return null;
+            return (
+              <div key="achievements">
+                {renderBlueHeader("ACHIEVEMENTS")}
+                <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                  {data.achievements.map((ach, idx) => (
+                    <div key={idx}>
+                      <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{ach.title}</div>
+                      {ach.description && <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{ach.description}</div>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          case "languages":
+            if (!data.languages || data.languages.length === 0) return null;
+            return (
+              <div key="languages">
+                {renderBlueHeader("LANGUAGES")}
+                <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                  {data.languages.map((l, idx) => (
+                    <div key={idx}>
+                      <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{l.name}</div>
+                      {l.proficiency && <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{l.proficiency}</div>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          default:
+            return null;
+        }
+      };
 
       return (
         <div
@@ -4048,6 +4433,8 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
+              flexWrap: "wrap",
+              gap: "8px",
               fontSize: "8pt",
               marginBottom: "12px",
             }}
@@ -4076,159 +4463,57 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                 <span>{linkedin.replace(/^https?:\/\//, "")}</span>
               </div>
             )}
+            {github && (
+              <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                <GithubIcon style={{ width: 12, height: 12, color: "#93c5fd" }} />
+                <span>{github.replace(/^https?:\/\//, "")}</span>
+              </div>
+            )}
+            {portfolio && (
+              <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                <Globe style={{ width: 12, height: 12, color: "#93c5fd" }} />
+                <span>{portfolio.replace(/^https?:\/\//, "")}</span>
+              </div>
+            )}
+            {customLinks.map((cl, i) => (
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                <Globe style={{ width: 12, height: 12, color: "#93c5fd" }} />
+                <span><strong>{cl.label}:</strong> {cl.url.replace(/^https?:\/\//, "")}</span>
+              </div>
+            ))}
           </div>
 
-          {/* 2-Column Body */}
+          {/* Dynamic 2-Column Body */}
           <div style={{ display: "flex", gap: "24px" }}>
-            {/* Left Column (55%): Experience & Education */}
+            {/* Left Column (55%) */}
             <div style={{ flex: "1 1 55%" }}>
-              {data.experience && data.experience.length > 0 && (
-                <div>
-                  {renderBlueHeader("WORK EXPERIENCE")}
-                  <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-                    {data.experience.map((exp, idx) => (
-                      <div key={idx}>
-                        <div style={{ fontSize: "9.5pt", fontWeight: "700", color: "#0f172a" }}>{exp.title}</div>
-                        <div style={{ fontSize: "8.5pt", color: "#1e3a5f", fontWeight: "600" }}>{exp.company}</div>
-                        {exp.date && <div style={{ fontSize: "8pt", color: "#64748b", margin: "1px 0" }}>{exp.date}</div>}
-                        {exp.bullets && exp.bullets.length > 0 && (
-                          <ul style={{ margin: "2px 0 0 0", paddingLeft: "14px" }}>
-                            {exp.bullets.map((b, bIdx) => (
-                              <li key={bIdx} style={{ fontSize: "8.5pt", color: "#334155", lineHeight: 1.4, marginBottom: "2px" }}>
-                                {renderFormattedText(b)}
-                              </li>
-                            ))}
-                          </ul>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {data.education && data.education.length > 0 && (
-                <div style={{ marginTop: "12px" }}>
-                  {renderBlueHeader("EDUCATION")}
-                  {data.education.map((edu, idx) => (
-                    <div key={idx}>
-                      <div style={{ fontSize: "9.5pt", fontWeight: "700", color: "#0f172a" }}>{edu.degree}</div>
-                      <div style={{ fontSize: "8.5pt", color: "#334155" }}>{edu.school}</div>
-                      {edu.date && <div style={{ fontSize: "8pt", color: "#64748b" }}>{edu.date}</div>}
-                    </div>
-                  ))}
-                </div>
-              )}
+              {mainSections.map(secId => renderLisaSection(secId, false))}
             </div>
 
-            {/* Right Column (45%): Technical Skills, General Skills, Certifications, Languages */}
+            {/* Right Column (45%) */}
             <div style={{ flex: "1 1 45%" }}>
-              {/* TECHNICAL SKILLS */}
-              <div>
-                {renderBlueHeader("TECHNICAL SKILLS")}
-                <div style={{ display: "flex", flexDirection: "column", gap: "6px", fontSize: "8pt" }}>
-                  <div>
-                    <div style={{ fontWeight: "700", color: "#0f172a" }}>Computer-aided Design</div>
-                    <div style={{ color: "#475569" }}>Autodesk Revit, BIM, Energy Modeling Programs, AutoCAD</div>
-                  </div>
-                  <div>
-                    <div style={{ fontWeight: "700", color: "#0f172a" }}>Computing</div>
-                    <div style={{ color: "#475569" }}>MS Office Advanced, Intermediate Python & MATLAB</div>
-                  </div>
-                  <div>
-                    <div style={{ fontWeight: "700", color: "#0f172a" }}>Legal & Codes</div>
-                    <div style={{ color: "#475569" }}>City of Philadelphia Building Codes, ASHRAE Standards</div>
-                  </div>
-                  <div>
-                    <div style={{ fontWeight: "700", color: "#0f172a" }}>Project Management</div>
-                    <div style={{ color: "#475569" }}>Scrum, Agile Methodology, Master Tech, Trello</div>
-                  </div>
-                </div>
-              </div>
-
-              {/* GENERAL SKILLS */}
-              <div style={{ marginTop: "12px" }}>
-                {renderBlueHeader("GENERAL SKILLS")}
-                <div style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
-                  {softSkills.map((s, idx) => (
-                    <span
-                      key={idx}
-                      style={{
-                        backgroundColor: "#7f9db9",
-                        color: "#ffffff",
-                        padding: "3px 8px",
-                        borderRadius: "4px",
-                        fontSize: "7.5pt",
-                        fontWeight: "600",
-                      }}
-                    >
-                      {s}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              {/* CERTIFICATES */}
-              {data.certifications && data.certifications.length > 0 && (
-                <div style={{ marginTop: "12px" }}>
-                  {renderBlueHeader("CERTIFICATES")}
-                  <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
-                    {data.certifications.map((c, idx) => (
-                      <div key={idx}>
-                        <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{c.name}</div>
-                        {c.issuer && <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{c.issuer}</div>}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* ACHIEVEMENTS */}
-              {data.achievements && data.achievements.length > 0 && (
-                <div style={{ marginTop: "12px" }}>
-                  {renderBlueHeader("ACHIEVEMENTS")}
-                  <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                    {data.achievements.map((ach, idx) => (
-                      <div key={idx}>
-                        <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{ach.title}</div>
-                        {ach.description && <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{ach.description}</div>}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* LANGUAGES */}
-              {data.languages && data.languages.length > 0 && (
-                <div style={{ marginTop: "12px" }}>
-                  {renderBlueHeader("LANGUAGES")}
-                  <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                    {data.languages.map((l, idx) => (
-                      <div key={idx}>
-                        <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{l.name}</div>
-                        <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{l.proficiency}</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+              {sidebarSections.map(secId => renderLisaSection(secId, true))}
             </div>
           </div>
         </div>
       );
     };
 
-
-    // 11. Ivana Johnson — HR Professional
+    // 10. Ivana Johnson — HR Professional
     const renderProIvana = () => {
       const email = data.personalInfo?.email;
       const phone = data.personalInfo?.phone;
       const location = data.personalInfo?.location;
       const portfolio = data.personalInfo?.portfolio;
       const linkedin = data.personalInfo?.linkedin;
+      const github = data.personalInfo?.github;
+      const customLinks = data.personalInfo?.customLinks || [];
 
       const hardSkills = [
         ...(data.skills?.technical || []),
         ...(data.skills?.tools || []),
+        ...(data.skills?.concepts || []),
+        ...(data.skills?.soft || []),
       ];
 
       const renderIvanaHeader = (title: string, icon: React.ReactNode) => (
@@ -4260,6 +4545,151 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
           </span>
         </div>
       );
+
+      const defaultIvanaSidebar = ["skills", "certifications", "education", "languages", "achievements"];
+      const userSidebar = cs.sidebarSections && cs.sidebarSections.length > 0 ? cs.sidebarSections : defaultIvanaSidebar;
+      const sidebarSet = new Set(userSidebar);
+      const orderedSections = (cs.sectionOrder && cs.sectionOrder.length > 0 ? cs.sectionOrder : defaultSections).filter(id => !hidden.has(id));
+
+      const mainSections = orderedSections.filter(id => !sidebarSet.has(id) && id !== "summary");
+      const sidebarSections = orderedSections.filter(id => sidebarSet.has(id) && id !== "summary");
+
+      const renderIvanaSection = (secId: string, isSidebar: boolean) => {
+        switch (secId) {
+          case "experience":
+            if (!data.experience || data.experience.length === 0) return null;
+            return (
+              <div key="experience">
+                {renderIvanaHeader("WORK EXPERIENCE", <Briefcase style={{ width: 12, height: 12, color: "#ffffff" }} />)}
+                <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                  {data.experience.map((exp, idx) => (
+                    <div key={idx}>
+                      <div style={{ fontSize: "9.5pt", fontWeight: "700", color: "#0f172a" }}>{exp.title}</div>
+                      <div style={{ fontSize: "8.5pt", color: "#174375", fontWeight: "600" }}>{exp.company}</div>
+                      <div style={{ display: "flex", justifyContent: "space-between", fontSize: "7.5pt", color: "#64748b", margin: "1px 0" }}>
+                        <span>{exp.date}</span>
+                        <span>{exp.location}</span>
+                      </div>
+                      {exp.bullets && exp.bullets.length > 0 && (
+                        <ul style={{ margin: "2px 0 0 0", paddingLeft: "14px" }}>
+                          {exp.bullets.map((b, bIdx) => (
+                            <li key={bIdx} style={{ fontSize: "8.5pt", color: "#334155", lineHeight: 1.4, marginBottom: "2px" }}>
+                              {renderFormattedText(b)}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          case "education":
+            if (!data.education || data.education.length === 0) return null;
+            return (
+              <div key="education">
+                {renderIvanaHeader("EDUCATION", <GraduationCap style={{ width: 12, height: 12, color: "#ffffff" }} />)}
+                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                  {data.education.map((edu, idx) => (
+                    <div key={idx}>
+                      <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{edu.school}</div>
+                      <div style={{ fontSize: "8pt", color: "#334155" }}>{edu.degree}</div>
+                      {edu.date && <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{edu.date}</div>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          case "skills":
+            if (hardSkills.length === 0) return null;
+            return (
+              <div key="skills">
+                {renderIvanaHeader("SKILLS & COMPETENCIES", <Sparkles style={{ width: 12, height: 12, color: "#ffffff" }} />)}
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
+                  {hardSkills.map((s, idx) => (
+                    <span
+                      key={idx}
+                      style={{
+                        backgroundColor: "#8da9c4",
+                        color: "#ffffff",
+                        padding: "3px 8px",
+                        borderRadius: "4px",
+                        fontSize: "7.5pt",
+                        fontWeight: "600",
+                      }}
+                    >
+                      {s}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            );
+          case "projects":
+            if (!data.projects || data.projects.length === 0) return null;
+            return (
+              <div key="projects">
+                {renderIvanaHeader("KEY PROJECTS", <FolderGit2 style={{ width: 12, height: 12, color: "#ffffff" }} />)}
+                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                  {data.projects.map((proj, idx) => (
+                    <div key={idx}>
+                      <div style={{ fontSize: "9pt", fontWeight: "700", color: "#0f172a" }}>
+                        {proj.name} {proj.tech ? <span style={{ fontSize: "8pt", color: "#174375" }}>({proj.tech})</span> : null}
+                      </div>
+                      {proj.description && <div style={{ fontSize: "8pt", color: "#334155" }}>{proj.description}</div>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          case "certifications":
+            if (!data.certifications || data.certifications.length === 0) return null;
+            return (
+              <div key="certifications">
+                {renderIvanaHeader("CERTIFICATES", <Award style={{ width: 12, height: 12, color: "#ffffff" }} />)}
+                <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
+                  {data.certifications.map((c, idx) => (
+                    <div key={idx}>
+                      <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{c.name}</div>
+                      {c.issuer && <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{c.issuer}</div>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          case "achievements":
+            if (!data.achievements || data.achievements.length === 0) return null;
+            return (
+              <div key="achievements">
+                {renderIvanaHeader("COURSES & TRAINING", <Bookmark style={{ width: 12, height: 12, color: "#ffffff" }} />)}
+                <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
+                  {data.achievements.map((ach, idx) => (
+                    <div key={idx}>
+                      <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{ach.title}</div>
+                      {ach.description && <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{ach.description}</div>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          case "languages":
+            if (!data.languages || data.languages.length === 0) return null;
+            return (
+              <div key="languages">
+                {renderIvanaHeader("LANGUAGES", <Globe style={{ width: 12, height: 12, color: "#ffffff" }} />)}
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px 12px" }}>
+                  {data.languages.map((l, idx) => (
+                    <div key={idx}>
+                      <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{l.name}</div>
+                      <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{l.proficiency}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          default:
+            return null;
+        }
+      };
 
       return (
         <div
@@ -4334,150 +4764,62 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                   <LinkedinIcon style={{ width: 12, height: 12, color: "#93c5fd" }} />
                 </div>
               )}
+              {github && (
+                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                  <span>{github.replace(/^https?:\/\//, "")}</span>
+                  <GithubIcon style={{ width: 12, height: 12, color: "#93c5fd" }} />
+                </div>
+              )}
               {portfolio && (
                 <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
                   <span>{portfolio.replace(/^https?:\/\//, "")}</span>
                   <Globe style={{ width: 12, height: 12, color: "#93c5fd" }} />
                 </div>
               )}
+              {customLinks.map((cl, idx) => (
+                <div key={idx} style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                  <span><strong>{cl.label}:</strong> {cl.url.replace(/^https?:\/\//, "")}</span>
+                  <Globe style={{ width: 12, height: 12, color: "#93c5fd" }} />
+                </div>
+              ))}
             </div>
           </div>
 
-          {/* 2-Column Body */}
+          {/* Dynamic 2-Column Body */}
           <div style={{ display: "flex", gap: "24px" }}>
-            {/* Left Column (55%): Work Experience */}
+            {/* Left Column (55%) */}
             <div style={{ flex: "1 1 55%" }}>
-              {data.experience && data.experience.length > 0 && (
-                <div>
-                  {renderIvanaHeader("WORK EXPERIENCE", <Briefcase style={{ width: 12, height: 12, color: "#ffffff" }} />)}
-                  <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-                    {data.experience.map((exp, idx) => (
-                      <div key={idx}>
-                        <div style={{ fontSize: "9.5pt", fontWeight: "700", color: "#0f172a" }}>{exp.title}</div>
-                        <div style={{ fontSize: "8.5pt", color: "#174375", fontWeight: "600" }}>{exp.company}</div>
-                        <div style={{ display: "flex", justifyContent: "space-between", fontSize: "7.5pt", color: "#64748b", margin: "1px 0" }}>
-                          <span>{exp.date}</span>
-                          <span>{exp.location}</span>
-                        </div>
-                        {exp.bullets && exp.bullets.length > 0 && (
-                          <ul style={{ margin: "2px 0 0 0", paddingLeft: "14px" }}>
-                            {exp.bullets.map((b, bIdx) => (
-                              <li key={bIdx} style={{ fontSize: "8.5pt", color: "#334155", lineHeight: 1.4, marginBottom: "2px" }}>
-                                {renderFormattedText(b)}
-                              </li>
-                            ))}
-                          </ul>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+              {mainSections.map(secId => renderIvanaSection(secId, false))}
             </div>
 
-            {/* Right Column (45%): Skills, Courses, Certificates, Education, Languages */}
+            {/* Right Column (45%) */}
             <div style={{ flex: "1 1 45%" }}>
-              {/* SKILLS & COMPETENCIES */}
-              <div>
-                {renderIvanaHeader("SKILLS & COMPETENCIES", <Sparkles style={{ width: 12, height: 12, color: "#ffffff" }} />)}
-                <div style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
-                  {(hardSkills.length > 0
-                    ? hardSkills.slice(0, 10)
-                    : ["HRIS", "Intake Analysis", "Onboarding", "Skill Coaching", "Programs Evaluation", "SAP HR", "Data Analysis", "Labor Law Compliance"]
-                  ).map((s, idx) => (
-                    <span
-                      key={idx}
-                      style={{
-                        backgroundColor: "#8da9c4",
-                        color: "#ffffff",
-                        padding: "3px 8px",
-                        borderRadius: "4px",
-                        fontSize: "7.5pt",
-                        fontWeight: "600",
-                      }}
-                    >
-                      {s}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              {/* COURSES & TRAINING / ACHIEVEMENTS */}
-              {data.achievements && data.achievements.length > 0 && (
-                <div>
-                  {renderIvanaHeader("COURSES & TRAINING", <Bookmark style={{ width: 12, height: 12, color: "#ffffff" }} />)}
-                  <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
-                    {data.achievements.map((ach, idx) => (
-                      <div key={idx}>
-                        <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{ach.title}</div>
-                        {ach.description && <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{ach.description}</div>}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* CERTIFICATES */}
-              {data.certifications && data.certifications.length > 0 && (
-                <div>
-                  {renderIvanaHeader("CERTIFICATES", <Award style={{ width: 12, height: 12, color: "#ffffff" }} />)}
-                  <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
-                    {data.certifications.map((c, idx) => (
-                      <div key={idx}>
-                        <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{c.name}</div>
-                        {c.issuer && <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{c.issuer}</div>}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* EDUCATION */}
-              {data.education && data.education.length > 0 && (
-                <div>
-                  {renderIvanaHeader("EDUCATION", <GraduationCap style={{ width: 12, height: 12, color: "#ffffff" }} />)}
-                  <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                    {data.education.map((edu, idx) => (
-                      <div key={idx}>
-                        <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{edu.school}</div>
-                        <div style={{ fontSize: "8pt", color: "#334155" }}>{edu.degree}</div>
-                        {edu.date && <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{edu.date}</div>}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* LANGUAGES */}
-              {data.languages && data.languages.length > 0 && (
-                <div>
-                  {renderIvanaHeader("LANGUAGES", <Globe style={{ width: 12, height: 12, color: "#ffffff" }} />)}
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px 12px" }}>
-                    {data.languages.map((l, idx) => (
-                      <div key={idx}>
-                        <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{l.name}</div>
-                        <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{l.proficiency}</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+              {sidebarSections.map(secId => renderIvanaSection(secId, true))}
             </div>
           </div>
         </div>
       );
     };
 
-    // 12. Melissa Ware — Copywriter
+    // 11. Melissa Ware — Copywriter
     const renderProMelissa = () => {
       const email = data.personalInfo?.email;
       const phone = data.personalInfo?.phone;
       const location = data.personalInfo?.location;
       const portfolio = data.personalInfo?.portfolio;
       const linkedin = data.personalInfo?.linkedin;
+      const github = data.personalInfo?.github;
+      const customLinks = data.personalInfo?.customLinks || [];
       const photoUrl =
         data.personalInfo?.photoUrl ||
         "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80";
+
+      const allSkills = [
+        ...(data.skills?.technical || []),
+        ...(data.skills?.tools || []),
+        ...(data.skills?.concepts || []),
+        ...(data.skills?.soft || []),
+      ];
 
       const renderMelissaHeader = (title: string) => (
         <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "14px", marginBottom: "8px" }}>
@@ -4509,6 +4851,173 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
           </span>
         </div>
       );
+
+      const defaultMelissaSidebar = ["skills", "projects", "certifications", "languages", "achievements"];
+      const userSidebar = cs.sidebarSections && cs.sidebarSections.length > 0 ? cs.sidebarSections : defaultMelissaSidebar;
+      const sidebarSet = new Set(userSidebar);
+      const orderedSections = (cs.sectionOrder && cs.sectionOrder.length > 0 ? cs.sectionOrder : defaultSections).filter(id => !hidden.has(id));
+
+      const mainSections = orderedSections.filter(id => !sidebarSet.has(id) && id !== "summary");
+      const sidebarSections = orderedSections.filter(id => sidebarSet.has(id) && id !== "summary");
+
+      const renderMelissaSection = (secId: string, isSidebar: boolean) => {
+        switch (secId) {
+          case "experience":
+            if (!data.experience || data.experience.length === 0) return null;
+            return (
+              <div key="experience">
+                {renderMelissaHeader("WORK EXPERIENCE")}
+                <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                  {data.experience.map((exp, idx) => (
+                    <div key={idx} style={{ position: "relative", paddingLeft: "16px" }}>
+                      <div
+                        style={{
+                          position: "absolute",
+                          left: 0,
+                          top: "4px",
+                          width: "8px",
+                          height: "8px",
+                          borderRadius: "50%",
+                          border: "2px solid #0f172a",
+                          backgroundColor: "#ffffff",
+                        }}
+                      />
+                      <div
+                        style={{
+                          position: "absolute",
+                          left: "3.5px",
+                          top: "14px",
+                          bottom: "-8px",
+                          width: "1.5px",
+                          backgroundColor: "#cbd5e1",
+                        }}
+                      />
+                      <div style={{ fontSize: "9.5pt", fontWeight: "700", color: "#0f172a" }}>{exp.title}</div>
+                      <div style={{ fontSize: "8.5pt", color: "#334155", fontWeight: "600" }}>{exp.company}</div>
+                      <div style={{ fontSize: "7.5pt", color: "#64748b", margin: "1px 0" }}>
+                        {exp.date} {exp.location ? `• ${exp.location}` : ""}
+                      </div>
+                      {exp.bullets && exp.bullets.length > 0 && (
+                        <ul style={{ margin: "2px 0 0 0", paddingLeft: "14px" }}>
+                          {exp.bullets.map((b, bIdx) => (
+                            <li key={bIdx} style={{ fontSize: "8.5pt", color: "#334155", lineHeight: 1.4, marginBottom: "2px" }}>
+                              {renderFormattedText(b)}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          case "education":
+            if (!data.education || data.education.length === 0) return null;
+            return (
+              <div key="education">
+                {renderMelissaHeader("EDUCATION")}
+                {data.education.map((edu, idx) => (
+                  <div key={idx} style={{ position: "relative", paddingLeft: "16px", marginBottom: "6px" }}>
+                    <div
+                      style={{
+                        position: "absolute",
+                        left: 0,
+                        top: "4px",
+                        width: "8px",
+                        height: "8px",
+                        borderRadius: "50%",
+                        border: "2px solid #0f172a",
+                        backgroundColor: "#ffffff",
+                      }}
+                    />
+                    <div style={{ fontSize: "9.5pt", fontWeight: "700", color: "#0f172a" }}>{edu.degree}</div>
+                    <div style={{ fontSize: "8.5pt", color: "#334155" }}>{edu.school}</div>
+                    {edu.date && <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{edu.date}</div>}
+                  </div>
+                ))}
+              </div>
+            );
+          case "skills":
+            if (allSkills.length === 0) return null;
+            return (
+              <div key="skills">
+                {renderMelissaHeader("GENERAL SKILLS")}
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "5px", fontSize: "8pt", color: "#334155" }}>
+                  {allSkills.map((s, idx) => (
+                    <div key={idx} style={{ padding: "1px 0" }}>• {s}</div>
+                  ))}
+                </div>
+              </div>
+            );
+          case "projects":
+            if (!data.projects || data.projects.length === 0) return null;
+            return (
+              <div key="projects">
+                {renderMelissaHeader("PERSONAL PROJECTS")}
+                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                  {data.projects.map((p, idx) => (
+                    <div key={idx}>
+                      <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{p.name}</div>
+                      <p style={{ fontSize: "8pt", color: "#334155", lineHeight: 1.35, margin: "2px 0 0 0" }}>
+                        {p.description}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          case "certifications":
+            if (!data.certifications || data.certifications.length === 0) return null;
+            return (
+              <div key="certifications">
+                {renderMelissaHeader("CERTIFICATES")}
+                <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                  {data.certifications.map((c, idx) => (
+                    <div key={idx}>
+                      <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{c.name}</div>
+                      {c.issuer && <div style={{ fontSize: "7pt", color: "#64748b" }}>{c.issuer}</div>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          case "languages":
+            if (!data.languages || data.languages.length === 0) return null;
+            return (
+              <div key="languages">
+                {renderMelissaHeader("LANGUAGES")}
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px 12px" }}>
+                  {data.languages.map((l, idx) => (
+                    <div key={idx} style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                      <div style={{ width: 8, height: 8, borderRadius: "50%", backgroundColor: "#d4af37" }} />
+                      <div>
+                        <div style={{ fontSize: "8pt", fontWeight: "700", color: "#0f172a" }}>{l.name}</div>
+                        {l.proficiency && <div style={{ fontSize: "7pt", color: "#64748b" }}>{l.proficiency}</div>}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          case "achievements":
+            if (!data.achievements || data.achievements.length === 0) return null;
+            return (
+              <div key="achievements">
+                {renderMelissaHeader("ACHIEVEMENTS")}
+                <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                  {data.achievements.map((ach, idx) => (
+                    <div key={idx}>
+                      <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{ach.title}</div>
+                      {ach.description && <div style={{ fontSize: "7pt", color: "#64748b" }}>{ach.description}</div>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          default:
+            return null;
+        }
+      };
 
       return (
         <div
@@ -4593,12 +5102,24 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                   <LinkedinIcon style={{ width: 12, height: 12, color: "#0f172a" }} />
                 </div>
               )}
+              {github && (
+                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                  <span>{github.replace(/^https?:\/\//, "")}</span>
+                  <GithubIcon style={{ width: 12, height: 12, color: "#0f172a" }} />
+                </div>
+              )}
               {portfolio && (
                 <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
                   <span>{portfolio.replace(/^https?:\/\//, "")}</span>
                   <Globe style={{ width: 12, height: 12, color: "#0f172a" }} />
                 </div>
               )}
+              {customLinks.map((cl, i) => (
+                <div key={i} style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                  <span><strong>{cl.label}:</strong> {cl.url.replace(/^https?:\/\//, "")}</span>
+                  <Globe style={{ width: 12, height: 12, color: "#0f172a" }} />
+                </div>
+              ))}
             </div>
           </div>
 
@@ -4617,84 +5138,11 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
             />
           </div>
 
-          {/* 2-Column Body */}
+          {/* Dynamic 2-Column Body */}
           <div style={{ display: "flex", gap: "22px" }}>
-            {/* Left Column (52%): Work Experience & Education with Timeline Rule */}
+            {/* Left Column (52%) */}
             <div style={{ flex: "1 1 52%" }}>
-              {data.experience && data.experience.length > 0 && (
-                <div>
-                  {renderMelissaHeader("WORK EXPERIENCE")}
-                  <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-                    {data.experience.map((exp, idx) => (
-                      <div key={idx} style={{ position: "relative", paddingLeft: "16px" }}>
-                        <div
-                          style={{
-                            position: "absolute",
-                            left: 0,
-                            top: "4px",
-                            width: "8px",
-                            height: "8px",
-                            borderRadius: "50%",
-                            border: "2px solid #0f172a",
-                            backgroundColor: "#ffffff",
-                          }}
-                        />
-                        <div
-                          style={{
-                            position: "absolute",
-                            left: "3.5px",
-                            top: "14px",
-                            bottom: "-8px",
-                            width: "1.5px",
-                            backgroundColor: "#cbd5e1",
-                          }}
-                        />
-
-                        <div style={{ fontSize: "9.5pt", fontWeight: "700", color: "#0f172a" }}>{exp.title}</div>
-                        <div style={{ fontSize: "8.5pt", color: "#334155", fontWeight: "600" }}>{exp.company}</div>
-                        <div style={{ display: "flex", justifyContent: "space-between", fontSize: "7.5pt", color: "#64748b", margin: "1px 0" }}>
-                          <span>{exp.date}</span>
-                          <span style={{ color: "#d4af37", fontWeight: "700" }}>2 Achievements</span>
-                        </div>
-                        {exp.bullets && exp.bullets.length > 0 && (
-                          <ul style={{ margin: "2px 0 0 0", paddingLeft: "14px" }}>
-                            {exp.bullets.map((b, bIdx) => (
-                              <li key={bIdx} style={{ fontSize: "8.5pt", color: "#334155", lineHeight: 1.4, marginBottom: "2px" }}>
-                                {renderFormattedText(b)}
-                              </li>
-                            ))}
-                          </ul>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {data.education && data.education.length > 0 && (
-                <div style={{ marginTop: "12px" }}>
-                  {renderMelissaHeader("EDUCATION")}
-                  {data.education.map((edu, idx) => (
-                    <div key={idx} style={{ position: "relative", paddingLeft: "16px" }}>
-                      <div
-                        style={{
-                          position: "absolute",
-                          left: 0,
-                          top: "4px",
-                          width: "8px",
-                          height: "8px",
-                          borderRadius: "50%",
-                          border: "2px solid #0f172a",
-                          backgroundColor: "#ffffff",
-                        }}
-                      />
-                      <div style={{ fontSize: "9.5pt", fontWeight: "700", color: "#0f172a" }}>{edu.degree}</div>
-                      <div style={{ fontSize: "8.5pt", color: "#334155" }}>{edu.school}</div>
-                      {edu.date && <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{edu.date}</div>}
-                    </div>
-                  ))}
-                </div>
-              )}
+              {mainSections.map(secId => renderMelissaSection(secId, false))}
             </div>
 
             {/* Right Column (48%): Soft Grey Card Container */}
@@ -4707,135 +5155,14 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                 border: "1px solid #f1f5f9",
               }}
             >
-              {/* GENERAL SKILLS */}
-              <div>
-                {renderMelissaHeader("GENERAL SKILLS")}
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "5px", fontSize: "8pt", color: "#334155" }}>
-                  {[
-                    "Copywriting", "Establishing Tone",
-                    "Identifying Audience", "WordPress",
-                    "SEO", "Digital Marketing",
-                    "Attention to Detail", "Time-management",
-                    "Creative Writing", "Editing"
-                  ].map((s, idx) => (
-                    <div key={idx} style={{ padding: "1px 0" }}>{s}</div>
-                  ))}
-                </div>
-              </div>
-
-              {/* PERSONAL PROJECTS */}
-              {data.projects && data.projects.length > 0 && (
-                <div>
-                  {renderMelissaHeader("PERSONAL PROJECTS")}
-                  <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                    {data.projects.map((p, idx) => (
-                      <div key={idx}>
-                        <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{p.name}</div>
-                        <p style={{ fontSize: "8pt", color: "#334155", lineHeight: 1.35, margin: "2px 0 0 0" }}>
-                          {p.description}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* CERTIFICATES */}
-              {data.certifications && data.certifications.length > 0 && (
-                <div style={{ marginTop: "12px" }}>
-                  {renderMelissaHeader("CERTIFICATES")}
-                  <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                    {data.certifications.map((c, idx) => (
-                      <div key={idx}>
-                        <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{c.name}</div>
-                        {c.issuer && <div style={{ fontSize: "7pt", color: "#64748b" }}>{c.issuer}</div>}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* ACHIEVEMENTS */}
-              {data.achievements && data.achievements.length > 0 && (
-                <div style={{ marginTop: "12px" }}>
-                  {renderMelissaHeader("ACHIEVEMENTS")}
-                  <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                    {data.achievements.map((ach, idx) => (
-                      <div key={idx}>
-                        <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{ach.title}</div>
-                        {ach.description && <div style={{ fontSize: "7pt", color: "#64748b" }}>{ach.description}</div>}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* LANGUAGES: Radial Circular Gauge Meters */}
-              {data.languages && data.languages.length > 0 && (
-                <div>
-                  {renderMelissaHeader("LANGUAGES")}
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px 12px" }}>
-                    {data.languages.map((l, idx) => {
-                      const percent = l.name === "English" || l.name === "Spanish" ? 100 : l.name === "German" ? 65 : 45;
-                      const strokeDash = 2 * Math.PI * 10;
-                      const strokeOffset = strokeDash - (percent / 100) * strokeDash;
-
-                      return (
-                        <div key={idx} style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                          <svg width="24" height="24" viewBox="0 0 24 24" style={{ transform: "rotate(-90deg)", flexShrink: 0 }}>
-                            <circle cx="12" cy="12" r="10" stroke="#cbd5e1" strokeWidth="2.5" fill="none" />
-                            <circle
-                              cx="12"
-                              cy="12"
-                              r="10"
-                              stroke="#0f172a"
-                              strokeWidth="2.5"
-                              fill="none"
-                              strokeDasharray={strokeDash}
-                              strokeDashoffset={strokeOffset}
-                              strokeLinecap="round"
-                            />
-                          </svg>
-                          <div>
-                            <div style={{ fontSize: "8pt", fontWeight: "700", color: "#0f172a" }}>{l.name}</div>
-                            <div style={{ fontSize: "7pt", color: "#64748b" }}>{l.proficiency}</div>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-
-              {/* INTERESTS */}
-              <div style={{ marginTop: "12px" }}>
-                {renderMelissaHeader("INTERESTS")}
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "5px", fontSize: "7.5pt", color: "#334155" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
-                    <Sparkles style={{ width: 11, height: 11, color: "#d4af37" }} />
-                    <span>Renewable Energy</span>
-                  </div>
-                  <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
-                    <Layers style={{ width: 11, height: 11, color: "#d4af37" }} />
-                    <span>Calligraphy</span>
-                  </div>
-                  <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
-                    <Globe style={{ width: 11, height: 11, color: "#d4af37" }} />
-                    <span>Gardening</span>
-                  </div>
-                  <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
-                    <Compass style={{ width: 11, height: 11, color: "#d4af37" }} />
-                    <span>Astronomy</span>
-                  </div>
-                </div>
-              </div>
+              {sidebarSections.map(secId => renderMelissaSection(secId, true))}
             </div>
           </div>
         </div>
       );
     };
 
-    // 13. Veronica Cook — AWS Certified DevOps Engineer
+    // 12. Veronica Cook — AWS Certified DevOps Engineer
     const renderProVeronica = () => {
       const email = data.personalInfo?.email;
       const phone = data.personalInfo?.phone;
@@ -4843,10 +5170,13 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
       const portfolio = data.personalInfo?.portfolio;
       const linkedin = data.personalInfo?.linkedin;
       const github = data.personalInfo?.github;
+      const customLinks = data.personalInfo?.customLinks || [];
 
       const techSkills = [
         ...(data.skills?.technical || []),
         ...(data.skills?.tools || []),
+        ...(data.skills?.concepts || []),
+        ...(data.skills?.soft || []),
       ];
 
       const renderVeronicaHeader = (title: string, icon: React.ReactNode) => (
@@ -4881,6 +5211,159 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
           <div style={{ flex: 1, height: "2.5px", backgroundColor: "#1e3a5f" }} />
         </div>
       );
+
+      const orderedSections = (cs.sectionOrder && cs.sectionOrder.length > 0 ? cs.sectionOrder : defaultSections).filter(id => !hidden.has(id));
+
+      const renderVeronicaSection = (secId: string) => {
+        switch (secId) {
+          case "skills":
+            if (techSkills.length === 0) return null;
+            return (
+              <div key="skills">
+                {renderVeronicaHeader("TECHNICAL SKILLS", <Cpu style={{ width: 12, height: 12, color: "#ffffff" }} />)}
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "5px" }}>
+                  {techSkills.map((s, idx) => (
+                    <span
+                      key={idx}
+                      style={{
+                        backgroundColor: "#64748b",
+                        color: "#ffffff",
+                        padding: "3px 9px",
+                        borderRadius: "4px",
+                        fontSize: "7.5pt",
+                        fontWeight: "600",
+                      }}
+                    >
+                      {s}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            );
+          case "experience":
+            if (!data.experience || data.experience.length === 0) return null;
+            return (
+              <div key="experience">
+                {renderVeronicaHeader("WORK EXPERIENCE", <Briefcase style={{ width: 12, height: 12, color: "#ffffff" }} />)}
+                <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                  {data.experience.map((exp, idx) => (
+                    <div key={idx}>
+                      <div style={{ fontSize: "9.5pt", fontWeight: "700", color: "#0f172a" }}>{exp.title}</div>
+                      <div style={{ fontSize: "8.5pt", color: "#1e3a5f", fontWeight: "600" }}>{exp.company}</div>
+                      {exp.date && <div style={{ fontSize: "7.5pt", color: "#c85a48", margin: "1px 0" }}>{exp.date}</div>}
+                      {exp.bullets && exp.bullets.length > 0 && (
+                        <ul style={{ margin: "2px 0 0 0", paddingLeft: "14px", listStyleType: "none" }}>
+                          {exp.bullets.map((b, bIdx) => (
+                            <li
+                              key={bIdx}
+                              style={{
+                                fontSize: "8.5pt",
+                                color: "#334155",
+                                lineHeight: 1.4,
+                                marginBottom: "2px",
+                                position: "relative",
+                                paddingLeft: "12px",
+                              }}
+                            >
+                              <span
+                                style={{
+                                  position: "absolute",
+                                  left: 0,
+                                  top: "5px",
+                                  width: "5px",
+                                  height: "5px",
+                                  backgroundColor: "#c85a48",
+                                }}
+                              />
+                              {renderFormattedText(b)}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          case "education":
+            if (!data.education || data.education.length === 0) return null;
+            return (
+              <div key="education">
+                {renderVeronicaHeader("EDUCATION", <GraduationCap style={{ width: 12, height: 12, color: "#ffffff" }} />)}
+                {data.education.map((edu, idx) => (
+                  <div key={idx} style={{ marginBottom: "6px" }}>
+                    <div style={{ fontSize: "9.5pt", fontWeight: "700", color: "#0f172a" }}>{edu.degree}</div>
+                    <div style={{ fontSize: "8.5pt", color: "#334155" }}>{edu.school}</div>
+                    {edu.date && <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{edu.date}</div>}
+                  </div>
+                ))}
+              </div>
+            );
+          case "projects":
+            if (!data.projects || data.projects.length === 0) return null;
+            return (
+              <div key="projects">
+                {renderVeronicaHeader("PROJECTS & INITIATIVES", <FolderGit2 style={{ width: 12, height: 12, color: "#ffffff" }} />)}
+                <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                  {data.projects.map((proj, idx) => (
+                    <div key={idx}>
+                      <div style={{ fontSize: "9.5pt", fontWeight: "700", color: "#0f172a" }}>
+                        {proj.name} {proj.tech ? <span style={{ fontSize: "8pt", color: "#c85a48", fontWeight: "600" }}>({proj.tech})</span> : null}
+                      </div>
+                      {proj.description && <div style={{ fontSize: "8.5pt", color: "#334155", lineHeight: 1.4 }}>{proj.description}</div>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          case "certifications":
+            if (!data.certifications || data.certifications.length === 0) return null;
+            return (
+              <div key="certifications">
+                {renderVeronicaHeader("CERTIFICATIONS", <Award style={{ width: 12, height: 12, color: "#ffffff" }} />)}
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
+                  {data.certifications.map((c, idx) => (
+                    <div key={idx}>
+                      <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{c.name}</div>
+                      <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{c.issuer} {c.date ? `(${c.date})` : ""}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          case "achievements":
+            if (!data.achievements || data.achievements.length === 0) return null;
+            return (
+              <div key="achievements">
+                {renderVeronicaHeader("ACHIEVEMENTS & HONORS", <Sparkles style={{ width: 12, height: 12, color: "#ffffff" }} />)}
+                <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                  {data.achievements.map((ach, idx) => (
+                    <div key={idx}>
+                      <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{ach.title}</div>
+                      {ach.description && <div style={{ fontSize: "7.5pt", color: "#334155" }}>{ach.description}</div>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          case "languages":
+            if (!data.languages || data.languages.length === 0) return null;
+            return (
+              <div key="languages">
+                {renderVeronicaHeader("LANGUAGES", <Globe style={{ width: 12, height: 12, color: "#ffffff" }} />)}
+                <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
+                  {data.languages.map((l, idx) => (
+                    <div key={idx} style={{ fontSize: "8.5pt" }}>
+                      <strong style={{ color: "#0f172a" }}>{l.name}</strong> {l.proficiency ? <span style={{ color: "#64748b" }}>({l.proficiency})</span> : null}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          default:
+            return null;
+        }
+      };
 
       return (
         <div
@@ -4967,7 +5450,7 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
               {github && (
                 <div style={{ display: "flex", alignItems: "center", gap: "8px", wordBreak: "break-all" }}>
                   <div style={{ width: 16, height: 16, backgroundColor: "rgba(255,255,255,0.15)", borderRadius: 3, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                    <Globe style={{ width: 10, height: 10, color: "#ffffff" }} />
+                    <GithubIcon style={{ width: 10, height: 10, color: "#ffffff" }} />
                   </div>
                   <span>{github.replace(/^https?:\/\//, "")}</span>
                 </div>
@@ -4975,12 +5458,12 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
               {portfolio && (
                 <div style={{ display: "flex", alignItems: "center", gap: "8px", wordBreak: "break-all" }}>
                   <div style={{ width: 16, height: 16, backgroundColor: "rgba(255,255,255,0.15)", borderRadius: 3, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                    <Sparkles style={{ width: 10, height: 10, color: "#ffffff" }} />
+                    <Globe style={{ width: 10, height: 10, color: "#ffffff" }} />
                   </div>
                   <span>{portfolio.replace(/^https?:\/\//, "")}</span>
                 </div>
               )}
-              {data.personalInfo?.customLinks && data.personalInfo.customLinks.map((cl, idx) => (
+              {customLinks.map((cl, idx) => (
                 <div key={idx} style={{ display: "flex", alignItems: "center", gap: "8px", wordBreak: "break-all" }}>
                   <div style={{ width: 16, height: 16, backgroundColor: "rgba(255,255,255,0.15)", borderRadius: 3, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                     <Globe style={{ width: 10, height: 10, color: "#ffffff" }} />
@@ -4991,160 +5474,21 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
             </div>
           </div>
 
-          {/* 1. TECHNICAL SKILLS: Full-width blue-gray pill badges */}
-          <div>
-            {renderVeronicaHeader("TECHNICAL SKILLS", <Cpu style={{ width: 12, height: 12, color: "#ffffff" }} />)}
-            <div style={{ display: "flex", flexWrap: "wrap", gap: "5px" }}>
-              {(techSkills.length > 0
-                ? techSkills.slice(0, 14)
-                : ["Python", "CI/CD", "Deployment", "Programming", "Linux/BASH", "Docker/Swarm", "Kubernetes", "Jenkins", "Terraform / IaC", "Cloud Infrastructure", "GCP", "AWS", "Scrum", "Agile"]
-              ).map((s, idx) => (
-                <span
-                  key={idx}
-                  style={{
-                    backgroundColor: "#64748b",
-                    color: "#ffffff",
-                    padding: "3px 9px",
-                    borderRadius: "4px",
-                    fontSize: "7.5pt",
-                    fontWeight: "600",
-                  }}
-                >
-                  {s}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          {/* 2. WORK EXPERIENCE: Full-width with square terracotta bullet markers */}
-          {data.experience && data.experience.length > 0 && (
-            <div>
-              {renderVeronicaHeader("WORK EXPERIENCE", <Briefcase style={{ width: 12, height: 12, color: "#ffffff" }} />)}
-              <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-                {data.experience.map((exp, idx) => (
-                  <div key={idx}>
-                    <div style={{ fontSize: "9.5pt", fontWeight: "700", color: "#0f172a" }}>{exp.title}</div>
-                    <div style={{ fontSize: "8.5pt", color: "#1e3a5f", fontWeight: "600" }}>{exp.company}</div>
-                    {exp.date && <div style={{ fontSize: "7.5pt", color: "#c85a48", margin: "1px 0" }}>{exp.date}</div>}
-                    {exp.bullets && exp.bullets.length > 0 && (
-                      <ul style={{ margin: "2px 0 0 0", paddingLeft: "14px", listStyleType: "none" }}>
-                        {exp.bullets.map((b, bIdx) => (
-                          <li
-                            key={bIdx}
-                            style={{
-                              fontSize: "8.5pt",
-                              color: "#334155",
-                              lineHeight: 1.4,
-                              marginBottom: "2px",
-                              position: "relative",
-                              paddingLeft: "12px",
-                            }}
-                          >
-                            <span
-                              style={{
-                                position: "absolute",
-                                left: 0,
-                                top: "5px",
-                                width: "5px",
-                                height: "5px",
-                                backgroundColor: "#c85a48",
-                              }}
-                            />
-                            {renderFormattedText(b)}
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* 3. EDUCATION */}
-          {data.education && data.education.length > 0 && (
-            <div>
-              {renderVeronicaHeader("EDUCATION", <GraduationCap style={{ width: 12, height: 12, color: "#ffffff" }} />)}
-              {data.education.map((edu, idx) => (
-                <div key={idx}>
-                  <div style={{ fontSize: "9.5pt", fontWeight: "700", color: "#0f172a" }}>{edu.degree}</div>
-                  <div style={{ fontSize: "8.5pt", color: "#334155" }}>{edu.school}</div>
-                  {edu.date && <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{edu.date}</div>}
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* 4. PROJECTS */}
-          {data.projects && data.projects.length > 0 && (
-            <div>
-              {renderVeronicaHeader("PROJECTS & INITIATIVES", <FolderGit2 style={{ width: 12, height: 12, color: "#ffffff" }} />)}
-              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                {data.projects.map((proj, idx) => (
-                  <div key={idx}>
-                    <div style={{ fontSize: "9.5pt", fontWeight: "700", color: "#0f172a" }}>
-                      {proj.name} {proj.tech ? <span style={{ fontSize: "8pt", color: "#c85a48", fontWeight: "600" }}>({proj.tech})</span> : null}
-                    </div>
-                    {proj.description && <div style={{ fontSize: "8.5pt", color: "#334155", lineHeight: 1.4 }}>{proj.description}</div>}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* 5. CERTIFICATIONS */}
-          {data.certifications && data.certifications.length > 0 && (
-            <div>
-              {renderVeronicaHeader("CERTIFICATIONS", <Award style={{ width: 12, height: 12, color: "#ffffff" }} />)}
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
-                {data.certifications.map((c, idx) => (
-                  <div key={idx}>
-                    <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{c.name}</div>
-                    <div style={{ fontSize: "7.5pt", color: "#64748b" }}>{c.issuer} {c.date ? `(${c.date})` : ""}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* 6. ACHIEVEMENTS */}
-          {data.achievements && data.achievements.length > 0 && (
-            <div>
-              {renderVeronicaHeader("ACHIEVEMENTS & HONORS", <Sparkles style={{ width: 12, height: 12, color: "#ffffff" }} />)}
-              <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                {data.achievements.map((ach, idx) => (
-                  <div key={idx}>
-                    <div style={{ fontSize: "8.5pt", fontWeight: "700", color: "#0f172a" }}>{ach.title}</div>
-                    {ach.description && <div style={{ fontSize: "7.5pt", color: "#334155" }}>{ach.description}</div>}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* 7. LANGUAGES */}
-          {data.languages && data.languages.length > 0 && (
-            <div>
-              {renderVeronicaHeader("LANGUAGES", <Globe style={{ width: 12, height: 12, color: "#ffffff" }} />)}
-              <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
-                {data.languages.map((l, idx) => (
-                  <div key={idx} style={{ fontSize: "8.5pt" }}>
-                    <strong style={{ color: "#0f172a" }}>{l.name}</strong> {l.proficiency ? <span style={{ color: "#64748b" }}>({l.proficiency})</span> : null}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+          {/* Dynamic Sections */}
+          {orderedSections.filter(id => id !== "summary").map(secId => renderVeronicaSection(secId))}
         </div>
       );
     };
 
-    // 4. Amanda Smith — Chief Information Officer (CIO)
+    // 13. Amanda Smith — Chief Information Officer (CIO)
     const renderProAmandaSmith = () => {
       const email = data.personalInfo?.email;
       const phone = data.personalInfo?.phone;
       const location = data.personalInfo?.location;
       const portfolio = data.personalInfo?.portfolio;
+      const linkedin = data.personalInfo?.linkedin;
+      const github = data.personalInfo?.github;
+      const customLinks = data.personalInfo?.customLinks || [];
       const photoUrl =
         data.personalInfo?.photoUrl ||
         "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=256&auto=format&fit=crop&q=80";
@@ -5176,6 +5520,144 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
           </span>
         </div>
       );
+
+      const defaultAmandaSidebar = ["skills", "certifications", "languages", "achievements"];
+      const userSidebar = cs.sidebarSections && cs.sidebarSections.length > 0 ? cs.sidebarSections : defaultAmandaSidebar;
+      const sidebarSet = new Set(userSidebar);
+      const orderedSections = (cs.sectionOrder && cs.sectionOrder.length > 0 ? cs.sectionOrder : defaultSections).filter(id => !hidden.has(id));
+
+      const mainSections = orderedSections.filter(id => !sidebarSet.has(id) && id !== "summary");
+      const sidebarSections = orderedSections.filter(id => sidebarSet.has(id) && id !== "summary");
+
+      const renderAmandaSection = (secId: string, isSidebar: boolean) => {
+        switch (secId) {
+          case "experience":
+            if (!data.experience || data.experience.length === 0) return null;
+            return (
+              <div key="experience">
+                {renderSquareHeader("Work Experience")}
+                <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                  {data.experience.map((exp, i) => (
+                    <div key={i}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+                        <span style={{ fontSize: "10pt", fontWeight: "bold", color: "#18181b" }}>
+                          {renderFormattedText(exp.title || "")}
+                        </span>
+                        <span style={{ fontSize: "8pt", color: "#71717a" }}>{exp.date}</span>
+                      </div>
+                      <div style={{ fontSize: "8.5pt", fontStyle: "italic", color: "#52525b", marginBottom: "3px" }}>
+                        {renderFormattedText(exp.company || "")}
+                        {exp.location ? ` - ${exp.location}` : ""}
+                      </div>
+                      {renderBulletList(exp.bullets, isSidebar, "•", "8.5pt")}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          case "education":
+            if (!data.education || data.education.length === 0) return null;
+            return (
+              <div key="education">
+                {renderSquareHeader("Education")}
+                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                  {data.education.map((edu, i) => (
+                    <div key={i}>
+                      <div style={{ fontSize: "9.5pt", fontWeight: "bold", color: "#18181b" }}>
+                        {edu.degree} {edu.field ? `in ${edu.field}` : ""}
+                      </div>
+                      <div style={{ fontSize: "8pt", color: "#71717a" }}>
+                        {edu.school} {edu.date ? `• ${edu.date}` : ""}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          case "projects":
+            if (!data.projects || data.projects.length === 0) return null;
+            return (
+              <div key="projects">
+                {renderSquareHeader("Key Projects")}
+                <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                  {data.projects.map((proj, i) => (
+                    <div key={i}>
+                      <div style={{ fontSize: "9.5pt", fontWeight: "bold", color: "#18181b" }}>
+                        {proj.name} {proj.tech ? <span style={{ fontSize: "8pt", color: "#71717a" }}>({proj.tech})</span> : null}
+                      </div>
+                      {proj.description && <div style={{ fontSize: "8pt", color: "#52525b" }}>{proj.description}</div>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          case "skills":
+            if (allSkills.length === 0) return null;
+            return (
+              <div key="skills">
+                {renderSquareHeader("General Skills")}
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4px 8px" }}>
+                  {allSkills.map((sk, i) => (
+                    <div key={i} style={{ fontSize: "8pt", color: "#3f3f46", fontWeight: 500 }}>
+                      • {sk}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          case "certifications":
+            if (!data.certifications || data.certifications.length === 0) return null;
+            return (
+              <div key="certifications">
+                {renderSquareHeader("Certifications and Memberships")}
+                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                  {data.certifications.map((c, i) => (
+                    <div key={i}>
+                      <div style={{ fontSize: "8.5pt", fontWeight: "bold", color: "#18181b" }}>{c.name}</div>
+                      <div style={{ fontSize: "7.5pt", color: "#71717a" }}>
+                        {c.issuer} {c.date ? `(${c.date})` : ""}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          case "achievements":
+            if (!data.achievements || data.achievements.length === 0) return null;
+            return (
+              <div key="achievements">
+                {renderSquareHeader("Achievements & Honors")}
+                <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                  {data.achievements.map((ach, i) => (
+                    <div key={i}>
+                      <div style={{ fontSize: "8.5pt", fontWeight: "bold", color: "#18181b" }}>{ach.title}</div>
+                      {ach.description && <div style={{ fontSize: "7.5pt", color: "#71717a" }}>{ach.description}</div>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          case "languages":
+            if (!data.languages || data.languages.length === 0) return null;
+            return (
+              <div key="languages">
+                {renderSquareHeader("Languages")}
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4px 8px" }}>
+                  {data.languages.map((l, i) => (
+                    <div key={i}>
+                      <div style={{ fontSize: "8.5pt", fontWeight: "bold", color: "#18181b" }}>{l.name}</div>
+                      {l.proficiency && (
+                        <div style={{ fontSize: "7.5pt", color: "#71717a" }}>{l.proficiency}</div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          default:
+            return null;
+        }
+      };
 
       return (
         <div
@@ -5278,172 +5760,42 @@ const ResumeTemplateRenderer = React.forwardRef<HTMLDivElement, ResumeTemplateRe
                 <span>{location}</span>
               </div>
             )}
+            {linkedin && (
+              <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                <LinkedinIcon style={{ width: "11px", height: "11px", color: "#a1a1aa" }} />
+                <span>{linkedin.replace(/^https?:\/\//, "")}</span>
+              </div>
+            )}
+            {github && (
+              <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                <GithubIcon style={{ width: "11px", height: "11px", color: "#a1a1aa" }} />
+                <span>{github.replace(/^https?:\/\//, "")}</span>
+              </div>
+            )}
             {portfolio && (
               <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
                 <Globe style={{ width: "11px", height: "11px", color: "#a1a1aa" }} />
-                <span>{portfolio}</span>
+                <span>{portfolio.replace(/^https?:\/\//, "")}</span>
               </div>
             )}
-            {data.personalInfo?.customLinks && data.personalInfo.customLinks.map((cl, i) => (
+            {customLinks.map((cl, i) => (
               <div key={i} style={{ display: "flex", alignItems: "center", gap: "6px" }}>
                 <Globe style={{ width: "11px", height: "11px", color: "#a1a1aa" }} />
-                <span><strong>{cl.label}:</strong> {cl.url}</span>
+                <span><strong>{cl.label}:</strong> {cl.url.replace(/^https?:\/\//, "")}</span>
               </div>
             ))}
           </div>
 
-          {/* 2-Column Body */}
+          {/* Dynamic 2-Column Body */}
           <div style={{ display: "flex", gap: "18px" }}>
             {/* Left Column (~55%) */}
             <div style={{ flex: "1 1 55%", display: "flex", flexDirection: "column", gap: "12px" }}>
-              {/* WORK EXPERIENCE */}
-              {data.experience && data.experience.length > 0 && (
-                <div>
-                  {renderSquareHeader("Work Experience")}
-                  <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-                    {data.experience.map((exp, i) => (
-                      <div key={i}>
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-                          <span style={{ fontSize: "10pt", fontWeight: "bold", color: "#18181b" }}>
-                            {renderFormattedText(exp.title || "")}
-                          </span>
-                          <span style={{ fontSize: "8pt", color: "#71717a" }}>{exp.date}</span>
-                        </div>
-                        <div style={{ fontSize: "8.5pt", fontStyle: "italic", color: "#52525b", marginBottom: "3px" }}>
-                          {renderFormattedText(exp.company || "")}
-                          {exp.location ? ` - ${exp.location}` : ""}
-                        </div>
-                        {renderBulletList(exp.bullets, false, "•", "8.5pt")}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* EDUCATION */}
-              {data.education && data.education.length > 0 && (
-                <div>
-                  {renderSquareHeader("Education")}
-                  <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                    {data.education.map((edu, i) => (
-                      <div key={i}>
-                        <div style={{ fontSize: "9.5pt", fontWeight: "bold", color: "#18181b" }}>
-                          {edu.degree} {edu.field ? `in ${edu.field}` : ""}
-                        </div>
-                        <div style={{ fontSize: "8pt", color: "#71717a" }}>
-                          {edu.school} {edu.date ? `• ${edu.date}` : ""}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* PROJECTS */}
-              {data.projects && data.projects.length > 0 && (
-                <div>
-                  {renderSquareHeader("Key Projects")}
-                  <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                    {data.projects.map((proj, i) => (
-                      <div key={i}>
-                        <div style={{ fontSize: "9.5pt", fontWeight: "bold", color: "#18181b" }}>
-                          {proj.name} {proj.tech ? <span style={{ fontSize: "8pt", color: "#71717a" }}>({proj.tech})</span> : null}
-                        </div>
-                        {proj.description && <div style={{ fontSize: "8pt", color: "#52525b" }}>{proj.description}</div>}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+              {mainSections.map(secId => renderAmandaSection(secId, false))}
             </div>
 
             {/* Right Column (~45%) */}
             <div style={{ flex: "1 1 45%", display: "flex", flexDirection: "column", gap: "12px" }}>
-              {/* GENERAL SKILLS in 2-Columns */}
-              {allSkills.length > 0 && (
-                <div>
-                  {renderSquareHeader("General Skills")}
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4px 8px" }}>
-                    {allSkills.map((sk, i) => (
-                      <div key={i} style={{ fontSize: "8pt", color: "#3f3f46", fontWeight: 500 }}>
-                        {sk}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* CERTIFICATIONS AND MEMBERSHIPS */}
-              {data.certifications && data.certifications.length > 0 && (
-                <div>
-                  {renderSquareHeader("Certifications and Memberships")}
-                  <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                    {data.certifications.map((c, i) => (
-                      <div key={i}>
-                        <div style={{ fontSize: "8.5pt", fontWeight: "bold", color: "#18181b" }}>{c.name}</div>
-                        <div style={{ fontSize: "7.5pt", color: "#71717a" }}>
-                          {c.issuer} {c.date ? `(${c.date})` : ""}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* ACHIEVEMENTS */}
-              {data.achievements && data.achievements.length > 0 && (
-                <div>
-                  {renderSquareHeader("Achievements & Honors")}
-                  <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                    {data.achievements.map((ach, i) => (
-                      <div key={i}>
-                        <div style={{ fontSize: "8.5pt", fontWeight: "bold", color: "#18181b" }}>{ach.title}</div>
-                        {ach.description && <div style={{ fontSize: "7.5pt", color: "#71717a" }}>{ach.description}</div>}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* LANGUAGES */}
-              {data.languages && data.languages.length > 0 && (
-                <div>
-                  {renderSquareHeader("Languages")}
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4px 8px" }}>
-                    {data.languages.map((l, i) => (
-                      <div key={i}>
-                        <div style={{ fontSize: "8.5pt", fontWeight: "bold", color: "#18181b" }}>{l.name}</div>
-                        {l.proficiency && (
-                          <div style={{ fontSize: "7.5pt", color: "#71717a" }}>{l.proficiency}</div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* INTERESTS */}
-              <div>
-                {renderSquareHeader("Interests")}
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px", fontSize: "8pt", color: "#3f3f46" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-                    <Cpu style={{ width: "11px", height: "11px", color: "#18181b" }} />
-                    <span>AI / Deep Tech</span>
-                  </div>
-                  <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-                    <Compass style={{ width: "11px", height: "11px", color: "#18181b" }} />
-                    <span>Chess & Strategy</span>
-                  </div>
-                  <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-                    <Sparkles style={{ width: "11px", height: "11px", color: "#18181b" }} />
-                    <span>Hiking & Outdoors</span>
-                  </div>
-                  <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-                    <Layers style={{ width: "11px", height: "11px", color: "#18181b" }} />
-                    <span>Renewable Energy</span>
-                  </div>
-                </div>
-              </div>
+              {sidebarSections.map(secId => renderAmandaSection(secId, true))}
             </div>
           </div>
         </div>
