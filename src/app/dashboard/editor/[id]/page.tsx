@@ -48,7 +48,9 @@ import {
   AlignLeft,
   List,
   Upload,
+  Crop,
 } from "lucide-react";
+import ImageCropModal from "@/components/ImageCropModal";
 import Link from "next/link";
 import { useReactToPrint } from "react-to-print";
 import { useRouter } from "next/navigation";
@@ -2432,6 +2434,10 @@ export default function ResumeEditorPage({
   const [draggedSectionIndex, setDraggedSectionIndex] = useState<number | null>(null);
   const [layoutFilter, setLayoutFilter] = useState<"all" | "added" | "unadded">("all");
 
+  // Photo crop modal state
+  const [cropModalOpen, setCropModalOpen] = useState(false);
+  const [tempImageForCrop, setTempImageForCrop] = useState<string>("");
+
   const componentRef = useRef<HTMLDivElement>(null);
   const summaryInputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -2447,25 +2453,31 @@ export default function ResumeEditorPage({
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (file.size > 3 * 1024 * 1024) {
-      notify("Image size should be less than 3MB");
+    if (file.size > 5 * 1024 * 1024) {
+      notify("Image size should be less than 5MB");
       return;
     }
     const reader = new FileReader();
     reader.onload = (event) => {
       const base64 = event.target?.result as string;
-      if (data) {
-        setData({
-          ...data,
-          personalInfo: {
-            ...data.personalInfo,
-            photoUrl: base64,
-          },
-        });
-        notify("Photo uploaded successfully!");
-      }
+      setTempImageForCrop(base64);
+      setCropModalOpen(true);
     };
     reader.readAsDataURL(file);
+    e.target.value = "";
+  };
+
+  const handleCropComplete = (croppedBase64: string) => {
+    if (data) {
+      setData({
+        ...data,
+        personalInfo: {
+          ...data.personalInfo,
+          photoUrl: croppedBase64,
+        },
+      });
+      notify("Photo cropped and updated!");
+    }
   };
 
   const fetchResume = async () => {
@@ -4753,7 +4765,7 @@ export default function ResumeEditorPage({
                         )}
                       </div>
                       <div className="space-y-1.5 flex-1">
-                        <div className="flex items-center gap-2">
+                        <div className="flex flex-wrap items-center gap-2">
                           <label className="cursor-pointer inline-flex items-center gap-1 px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-semibold rounded-md transition-colors shadow-2xs">
                             <Upload className="w-3 h-3" />
                             <span>Upload Image</span>
@@ -4765,21 +4777,34 @@ export default function ResumeEditorPage({
                             />
                           </label>
                           {data.personalInfo?.photoUrl && (
-                            <button
-                              type="button"
-                              onClick={() =>
-                                setData({
-                                  ...data,
-                                  personalInfo: {
-                                    ...data.personalInfo,
-                                    photoUrl: "",
-                                  },
-                                })
-                              }
-                              className="text-[11px] text-red-600 hover:text-red-700 font-medium px-2 py-1 hover:bg-red-50 rounded transition-colors"
-                            >
-                              Remove
-                            </button>
+                            <>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setTempImageForCrop(data.personalInfo?.photoUrl || "");
+                                  setCropModalOpen(true);
+                                }}
+                                className="inline-flex items-center gap-1 px-2.5 py-1 bg-white hover:bg-gray-100 text-gray-700 text-[11px] font-semibold rounded-md border border-gray-300 transition-colors shadow-2xs"
+                              >
+                                <Crop className="w-3 h-3 text-blue-600" />
+                                <span>Crop & Fit</span>
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setData({
+                                    ...data,
+                                    personalInfo: {
+                                      ...data.personalInfo,
+                                      photoUrl: "",
+                                    },
+                                  })
+                                }
+                                className="text-[11px] text-red-600 hover:text-red-700 font-medium px-2 py-1 hover:bg-red-50 rounded transition-colors"
+                              >
+                                Remove
+                              </button>
+                            </>
                           )}
                         </div>
                         <input
@@ -6164,6 +6189,15 @@ export default function ResumeEditorPage({
           />
         </div>
       </div>
+
+      {/* Interactive Photo Cropper, Fit & Move Modal */}
+      <ImageCropModal
+        isOpen={cropModalOpen}
+        imageSrc={tempImageForCrop}
+        onClose={() => setCropModalOpen(false)}
+        onCropComplete={handleCropComplete}
+        title="Crop, Fit & Position Resume Photo"
+      />
     </div>
   );
 }

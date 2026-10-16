@@ -4,8 +4,9 @@ import { useState, useEffect } from "react";
 import {
   User, Briefcase, GraduationCap, Code, FolderGit2, Award,
   Globe, Save, Plus, Trash2, CheckCircle, AlertCircle, Languages,
-  Link as LinkIcon, ChevronDown, ChevronUp, Upload
+  Link as LinkIcon, ChevronDown, ChevronUp, Upload, Crop
 } from "lucide-react";
+import ImageCropModal from "@/components/ImageCropModal";
 
 const sections = [
   { id: 'personal', label: 'Personal Info', icon: User },
@@ -44,6 +45,8 @@ export default function ProfilePage() {
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const [activeSection, setActiveSection] = useState('personal');
   const [newSkill, setNewSkill] = useState('');
+  const [cropModalOpen, setCropModalOpen] = useState(false);
+  const [tempImageForCrop, setTempImageForCrop] = useState<string>('');
 
   useEffect(() => { fetchProfile(); }, []);
 
@@ -55,17 +58,23 @@ export default function ProfilePage() {
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (file.size > 3 * 1024 * 1024) {
-      showNotification('Image size should be less than 3MB', 'error');
+    if (file.size > 5 * 1024 * 1024) {
+      showNotification('Image size should be less than 5MB', 'error');
       return;
     }
     const reader = new FileReader();
     reader.onload = (event) => {
       const base64 = event.target?.result as string;
-      setProfile((p: any) => ({ ...p, photoUrl: base64 }));
-      showNotification('Profile photo uploaded!', 'success');
+      setTempImageForCrop(base64);
+      setCropModalOpen(true);
     };
     reader.readAsDataURL(file);
+    e.target.value = '';
+  };
+
+  const handleCropComplete = (croppedBase64: string) => {
+    setProfile((p: any) => ({ ...p, photoUrl: croppedBase64 }));
+    showNotification('Photo cropped and positioned successfully! Click "Save Profile" to save.', 'success');
   };
 
   const fetchProfile = async () => {
@@ -252,31 +261,51 @@ export default function ProfilePage() {
               </div>
               <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-5">
                 {/* Profile Photo Upload */}
-                <div className="md:col-span-2 flex items-center gap-5 p-4 bg-gray-50 rounded-xl border border-gray-200">
-                  <div className="w-20 h-20 rounded-full border-2 border-blue-500 overflow-hidden bg-white flex items-center justify-center flex-shrink-0 shadow-sm">
+                <div className="md:col-span-2 flex flex-col sm:flex-row items-start sm:items-center gap-5 p-4 bg-gray-50 rounded-xl border border-gray-200">
+                  <div className="w-20 h-20 rounded-full border-2 border-blue-500 overflow-hidden bg-white flex items-center justify-center flex-shrink-0 shadow-sm relative">
                     {profile.photoUrl ? (
                       <img src={profile.photoUrl} alt="Profile" className="w-full h-full object-cover" />
                     ) : (
                       <User className="w-10 h-10 text-gray-400" />
                     )}
                   </div>
-                  <div className="space-y-2">
-                    <div className="text-sm font-semibold text-gray-800">Profile Photo</div>
-                    <p className="text-xs text-gray-500">Upload a headshot (JPG, PNG or WebP, max 3MB). Used in photo resume templates.</p>
-                    <div className="flex items-center gap-3">
-                      <label className="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium rounded-lg transition-colors shadow-xs">
+                  <div className="space-y-2 flex-1">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-bold text-gray-900">Profile Photo</span>
+                      <span className="text-[10px] font-semibold bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">
+                        ATS Resume Ready
+                      </span>
+                    </div>
+                    <p className="text-xs text-gray-500">
+                      Upload a headshot (JPG, PNG or WebP, max 5MB). Use our interactive cropper to center your face, zoom in/out, rotate, or fit for all photo resume templates.
+                    </p>
+                    <div className="flex flex-wrap items-center gap-2.5 pt-1">
+                      <label className="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg transition-colors shadow-xs">
                         <Upload className="w-3.5 h-3.5" />
-                        <span>Upload Image</span>
+                        <span>Upload New Image</span>
                         <input type="file" accept="image/*" className="hidden" onChange={handlePhotoUpload} />
                       </label>
                       {profile.photoUrl && (
-                        <button
-                          type="button"
-                          onClick={() => setProfile((p: any) => ({ ...p, photoUrl: '' }))}
-                          className="text-xs text-red-600 hover:text-red-700 font-medium px-2 py-1 hover:bg-red-50 rounded transition-colors"
-                        >
-                          Remove Photo
-                        </button>
+                        <>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setTempImageForCrop(profile.photoUrl);
+                              setCropModalOpen(true);
+                            }}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-gray-100 text-gray-700 text-xs font-semibold rounded-lg border border-gray-300 transition-colors shadow-xs"
+                          >
+                            <Crop className="w-3.5 h-3.5 text-blue-600" />
+                            <span>Crop, Fit & Move</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setProfile((p: any) => ({ ...p, photoUrl: '' }))}
+                            className="text-xs text-red-600 hover:text-red-700 font-medium px-2 py-1 hover:bg-red-50 rounded transition-colors"
+                          >
+                            Remove Photo
+                          </button>
+                        </>
                       )}
                     </div>
                   </div>
@@ -707,6 +736,15 @@ export default function ProfilePage() {
 
         </div>
       </div>
+
+      {/* Interactive Photo Cropper, Fit & Move Modal */}
+      <ImageCropModal
+        isOpen={cropModalOpen}
+        imageSrc={tempImageForCrop}
+        onClose={() => setCropModalOpen(false)}
+        onCropComplete={handleCropComplete}
+        title="Crop, Fit & Position Profile Photo"
+      />
     </div>
   );
 }
