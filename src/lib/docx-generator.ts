@@ -35,6 +35,14 @@ export const TEMPLATE_DEFAULT_SIDEBARS: Record<string, string[]> = {
 };
 
 /**
+ * Strips leading bullets, hyphens, and whitespace to prevent double bullets.
+ */
+function cleanBulletText(text: string | undefined): string {
+  if (!text) return "";
+  return text.replace(/^[\s•●\-–—›*]+\s*/, "").trim();
+}
+
+/**
  * Safely decodes base64 or fetches HTTP images into a Uint8Array for Word ImageRun.
  */
 async function resolveImageBytes(urlOrData: string | undefined): Promise<Uint8Array | null> {
@@ -637,13 +645,15 @@ export async function generateResumeDocxBlob(
       template?.style?.description?.includes("pill") ||
       false;
 
+    const pillBg = isMichelle ? "E59086" : accentHex;
+
     if (isPillStyle) {
       // Shaded pill tags matching the PDF terracotta/accent boxes with white text
       allSkills.forEach((skill) => {
         result.push(
           new Paragraph({
-            spacing: { before: 30, after: 30 },
-            shading: { fill: accentHex },
+            spacing: { before: 35, after: 35 },
+            shading: { fill: pillBg },
             indent: { left: 80, right: 80 },
             children: createFormattedRuns(skill, {
               size: Math.max(14, skillItemHalfPt - 1),
@@ -698,7 +708,7 @@ export async function generateResumeDocxBlob(
           spacing: { before: 80, after: 15 },
           children: [
             new TextRun({
-              text: exp.title || "",
+              text: cleanBulletText(exp.title || ""),
               bold: true,
               size: titleHalfPt,
               font: fontName,
@@ -747,6 +757,7 @@ export async function generateResumeDocxBlob(
             exp.bulletFontSizes?.[bi] || exp.bulletFontSize,
             expHalfPt
           );
+          const cleanB = cleanBulletText(bullet);
           result.push(
             new Paragraph({
               indent: { left: 200, hanging: 140 },
@@ -759,7 +770,7 @@ export async function generateResumeDocxBlob(
                   size: bHalfPt,
                   font: fontName,
                 }),
-                ...createFormattedRuns(bullet, {
+                ...createFormattedRuns(cleanB, {
                   size: bHalfPt,
                   font: fontName,
                   color: isSidebar && sidebarBgHex ? sidebarTextHex : "374151",
@@ -784,18 +795,24 @@ export async function generateResumeDocxBlob(
       const techHalfPt = getLineHalfPt("projectTech", proj.techFontSize, secHalfPt - 1);
       const descHalfPt = getLineHalfPt("descriptions", proj.descFontSize, secHalfPt);
 
+      const rawName = cleanBulletText(proj.name || "Project");
+      // Prevent duplicate "| Tech | Tech" if proj.name already includes tech
+      const alreadyHasTech =
+        proj.tech &&
+        (rawName.toLowerCase().includes(proj.tech.toLowerCase()) || rawName.includes("|"));
+
       result.push(
         new Paragraph({
           spacing: { before: 80, after: 20 },
           children: [
             new TextRun({
-              text: proj.name || "Project",
+              text: rawName,
               bold: true,
               size: nameHalfPt,
               font: fontName,
               color: isSidebar && sidebarBgHex ? sidebarTextHex : "0F172A",
             }),
-            ...(proj.tech
+            ...(proj.tech && !alreadyHasTech
               ? [
                   new TextRun({
                     text: ` | ${proj.tech}`,
@@ -819,6 +836,7 @@ export async function generateResumeDocxBlob(
           : [];
 
       projectBullets.forEach((b) => {
+        const cleanB = cleanBulletText(b);
         result.push(
           new Paragraph({
             indent: { left: 200, hanging: 140 },
@@ -831,7 +849,7 @@ export async function generateResumeDocxBlob(
                 size: descHalfPt,
                 font: fontName,
               }),
-              ...createFormattedRuns(b, {
+              ...createFormattedRuns(cleanB, {
                 size: descHalfPt,
                 font: fontName,
                 color: isSidebar && sidebarBgHex ? sidebarTextHex : "374151",
@@ -858,7 +876,7 @@ export async function generateResumeDocxBlob(
       result.push(
         new Paragraph({
           spacing: { before: 80, after: 15 },
-          children: createFormattedRuns(edu.degree || "Degree", {
+          children: createFormattedRuns(cleanBulletText(edu.degree || "Degree"), {
             bold: true,
             size: degHalfPt,
             font: fontName,
@@ -910,6 +928,7 @@ export async function generateResumeDocxBlob(
     const result: Paragraph[] = [createSectionHeading(headingTitle, isSidebar)];
 
     data.certifications.forEach((cert) => {
+      const cleanCertName = cleanBulletText(cert.name || "Certification");
       result.push(
         new Paragraph({
           indent: { left: 200, hanging: 140 },
@@ -922,7 +941,7 @@ export async function generateResumeDocxBlob(
               size: certHalfPt,
               font: fontName,
             }),
-            ...createFormattedRuns(cert.name || "Certification", {
+            ...createFormattedRuns(cleanCertName, {
               bold: true,
               size: certHalfPt,
               font: fontName,
@@ -974,7 +993,7 @@ export async function generateResumeDocxBlob(
               font: fontName,
             }),
             new TextRun({
-              text: ach.title || "Achievement",
+              text: cleanBulletText(ach.title || "Achievement"),
               bold: true,
               size: achHalfPt,
               font: fontName,
@@ -997,110 +1016,53 @@ export async function generateResumeDocxBlob(
     return result;
   };
 
-  const buildLanguagesParagraphs = (isSidebar: boolean): (Paragraph | Table)[] => {
+  const buildLanguagesParagraphs = (isSidebar: boolean): Paragraph[] => {
     if (!data.languages || data.languages.length === 0) return [];
     const secHalfPt = getSecHalfPt("languages", 10);
     const langHalfPt = getLineHalfPt("languages", undefined, secHalfPt);
-    const result: (Paragraph | Table)[] = [createSectionHeading("Languages", isSidebar)];
+    const result: Paragraph[] = [createSectionHeading("Languages", isSidebar)];
 
-    const langRows: TableRow[] = [];
-    for (let i = 0; i < data.languages.length; i += 2) {
-      const l1 = data.languages[i];
-      const l2 = data.languages[i + 1];
-
-      langRows.push(
-        new TableRow({
+    data.languages.forEach((lang) => {
+      const cleanName = cleanBulletText(lang.name);
+      result.push(
+        new Paragraph({
+          spacing: { before: 20, after: 15 },
+          indent: { left: 140, hanging: 100 },
           children: [
-            new TableCell({
-              width: { size: 50, type: WidthType.PERCENTAGE },
-              borders: {
-                top: { style: BorderStyle.NONE },
-                bottom: { style: BorderStyle.NONE },
-                left: { style: BorderStyle.NONE },
-                right: { style: BorderStyle.NONE },
-              },
-              children: [
-                new Paragraph({
-                  spacing: { before: 20, after: 10 },
-                  children: createFormattedRuns(l1.name, {
-                    bold: true,
-                    size: langHalfPt,
+            new TextRun({
+              text: `${bulletChar} `,
+              color: accentHex,
+              bold: true,
+              size: langHalfPt,
+              font: fontName,
+            }),
+            new TextRun({
+              text: cleanName,
+              bold: true,
+              size: langHalfPt,
+              font: fontName,
+              color: isSidebar && sidebarBgHex ? sidebarTextHex : "0F172A",
+            }),
+            ...(lang.proficiency
+              ? [
+                  new TextRun({
+                    text: ` (${lang.proficiency})`,
+                    size: Math.max(14, langHalfPt - 1),
                     font: fontName,
-                    color: isSidebar && sidebarBgHex ? sidebarTextHex : "0F172A",
+                    color: isSidebar && sidebarBgHex ? sidebarTextHex : "64748B",
                   }),
-                }),
-                ...(l1.proficiency
-                  ? [
-                      new Paragraph({
-                        spacing: { before: 0, after: 30 },
-                        children: createFormattedRuns(l1.proficiency, {
-                          size: Math.max(14, langHalfPt - 2),
-                          font: fontName,
-                          color: isSidebar && sidebarBgHex ? sidebarTextHex : "64748B",
-                        }),
-                      }),
-                    ]
-                  : []),
-              ],
-            }),
-            new TableCell({
-              width: { size: 50, type: WidthType.PERCENTAGE },
-              borders: {
-                top: { style: BorderStyle.NONE },
-                bottom: { style: BorderStyle.NONE },
-                left: { style: BorderStyle.NONE },
-                right: { style: BorderStyle.NONE },
-              },
-              children: l2
-                ? [
-                    new Paragraph({
-                      spacing: { before: 20, after: 10 },
-                      children: createFormattedRuns(l2.name, {
-                        bold: true,
-                        size: langHalfPt,
-                        font: fontName,
-                        color: isSidebar && sidebarBgHex ? sidebarTextHex : "0F172A",
-                      }),
-                    }),
-                    ...(l2.proficiency
-                      ? [
-                          new Paragraph({
-                            spacing: { before: 0, after: 30 },
-                            children: createFormattedRuns(l2.proficiency, {
-                              size: Math.max(14, langHalfPt - 2),
-                              font: fontName,
-                              color: isSidebar && sidebarBgHex ? sidebarTextHex : "64748B",
-                            }),
-                          }),
-                        ]
-                      : []),
-                  ]
-                : [new Paragraph("")],
-            }),
+                ]
+              : []),
           ],
         })
       );
-    }
+    });
 
-    result.push(
-      new Table({
-        width: { size: 100, type: WidthType.PERCENTAGE },
-        borders: {
-          top: { style: BorderStyle.NONE },
-          bottom: { style: BorderStyle.NONE },
-          left: { style: BorderStyle.NONE },
-          right: { style: BorderStyle.NONE },
-          insideHorizontal: { style: BorderStyle.NONE },
-          insideVertical: { style: BorderStyle.NONE },
-        },
-        rows: langRows,
-      })
-    );
     return result;
   };
 
   // Section dispatch mapper
-  const renderSection = (secId: string, isSidebar: boolean = false): (Paragraph | Table)[] => {
+  const renderSection = (secId: string, isSidebar: boolean = false): Paragraph[] => {
     switch (secId) {
       case "summary":
         return buildSummaryParagraphs(isSidebar);
@@ -1124,12 +1086,12 @@ export async function generateResumeDocxBlob(
   };
 
   const hidden = new Set(cs.hiddenSections || []);
-  const defaultOrder = [
+  const defaultSections = [
     "summary",
-    "skills",
     "experience",
-    "projects",
     "education",
+    "skills",
+    "projects",
     "certifications",
     "achievements",
     "languages",
@@ -1139,6 +1101,7 @@ export async function generateResumeDocxBlob(
   if (isTwoColumn) {
     const defaultSidebar = TEMPLATE_DEFAULT_SIDEBARS[templateId] || [
       "skills",
+      "projects",
       "certifications",
       "languages",
       "achievements",
@@ -1149,7 +1112,7 @@ export async function generateResumeDocxBlob(
         : defaultSidebar;
     const sidebarSet = new Set(userSidebar);
 
-    const ordered: string[] = (cs.sectionOrder || tStyle.sectionOrder || defaultOrder).filter(
+    const ordered: string[] = (cs.sectionOrder || defaultSections).filter(
       (id: string) => !hidden.has(id)
     );
 
@@ -1159,26 +1122,26 @@ export async function generateResumeDocxBlob(
     const mainSecs = bodyOrdered.filter((id: string) => !sidebarSet.has(id));
     const sideSecs = bodyOrdered.filter((id: string) => sidebarSet.has(id));
 
-    const mainElements: (Paragraph | Table)[] = [];
+    const mainElements: Paragraph[] = [];
     mainSecs.forEach((secId: string) => {
       mainElements.push(...renderSection(secId, false));
     });
 
-    const sideElements: (Paragraph | Table)[] = [];
+    const sideElements: Paragraph[] = [];
     sideSecs.forEach((secId: string) => {
       sideElements.push(...renderSection(secId, true));
     });
 
-    let sideWidth = 42;
+    let sideWidth = 44;
     if (cs.sidebarWidth) {
-      sideWidth = parseInt(cs.sidebarWidth) || 42;
+      sideWidth = parseInt(cs.sidebarWidth) || 44;
     } else if (tStyle.sidebarWidth) {
-      sideWidth = parseInt(tStyle.sidebarWidth) || 42;
+      sideWidth = parseInt(tStyle.sidebarWidth) || 44;
     }
     const mainWidth = 100 - sideWidth;
 
     if (isRightSidebar) {
-      // Main on Left (e.g. 55%), Sidebar on Right (e.g. 45%) - like Template 01
+      // Main on Left (e.g. 56%), Sidebar on Right (e.g. 44%) - like Template 01
       children.push(
         new Table({
           width: { size: 100, type: WidthType.PERCENTAGE },
@@ -1195,7 +1158,7 @@ export async function generateResumeDocxBlob(
               children: [
                 new TableCell({
                   width: { size: mainWidth, type: WidthType.PERCENTAGE },
-                  margins: { right: 200, top: 0, bottom: 0, left: 0 },
+                  margins: { right: 240, top: 0, bottom: 0, left: 0 },
                   borders: {
                     top: { style: BorderStyle.NONE },
                     bottom: { style: BorderStyle.NONE },
@@ -1206,7 +1169,7 @@ export async function generateResumeDocxBlob(
                 }),
                 new TableCell({
                   width: { size: sideWidth, type: WidthType.PERCENTAGE },
-                  margins: { left: 200, top: 0, bottom: 0, right: 0 },
+                  margins: { left: 240, top: 0, bottom: 0, right: 0 },
                   shading: sidebarBgHex ? { fill: sidebarBgHex } : undefined,
                   borders: {
                     top: { style: BorderStyle.NONE },
@@ -1239,7 +1202,7 @@ export async function generateResumeDocxBlob(
               children: [
                 new TableCell({
                   width: { size: sideWidth, type: WidthType.PERCENTAGE },
-                  margins: { right: 180, top: 0, bottom: 0, left: 0 },
+                  margins: { right: 200, top: 0, bottom: 0, left: 0 },
                   shading: sidebarBgHex ? { fill: sidebarBgHex } : undefined,
                   borders: {
                     top: { style: BorderStyle.NONE },
@@ -1251,7 +1214,7 @@ export async function generateResumeDocxBlob(
                 }),
                 new TableCell({
                   width: { size: mainWidth, type: WidthType.PERCENTAGE },
-                  margins: { left: 180, top: 0, bottom: 0, right: 0 },
+                  margins: { left: 200, top: 0, bottom: 0, right: 0 },
                   borders: {
                     top: { style: BorderStyle.NONE },
                     bottom: { style: BorderStyle.NONE },
@@ -1268,7 +1231,7 @@ export async function generateResumeDocxBlob(
     }
   } else {
     // Single Column Linear Render
-    const ordered: string[] = (cs.sectionOrder || tStyle.sectionOrder || defaultOrder).filter(
+    const ordered: string[] = (cs.sectionOrder || defaultSections).filter(
       (id: string) => !hidden.has(id)
     );
     ordered.forEach((secId: string) => {
